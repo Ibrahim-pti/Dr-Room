@@ -1,0 +1,296 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:pinput/pinput.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/widgets/dr_widgets.dart';
+
+class OtpScreen extends StatefulWidget {
+  final String phoneNumber;
+  final VoidCallback onVerified;
+  final VoidCallback onBack;
+
+  const OtpScreen({
+    super.key,
+    required this.phoneNumber,
+    required this.onVerified,
+    required this.onBack,
+  });
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
+  final _pinController = TextEditingController();
+  int _secondsRemaining = 60;
+  Timer? _timer;
+  bool _isVerifying = false;
+  bool _canResend = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _secondsRemaining = 60;
+    _canResend = false;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        setState(() => _secondsRemaining--);
+      } else {
+        setState(() => _canResend = true);
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final defaultPinTheme = PinTheme(
+      width: 54,
+      height: 60,
+      textStyle: AppTypography.headingMd.copyWith(
+        color: AppColors.textDark,
+        fontWeight: FontWeight.w700,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLightSecondary,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder, width: 1.5),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary, width: 2),
+      ),
+    );
+
+    final submittedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: AppColors.primary.withValues(alpha: 0.4), width: 1.5),
+      ),
+    );
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: Column(
+            children: [
+              const SizedBox(height: 16),
+
+              // ── Back button ──
+              Align(
+                alignment: AlignmentDirectional.topStart,
+                child: IconButton(
+                  onPressed: widget.onBack,
+                  icon: const Icon(Icons.arrow_back_ios_rounded, size: 20),
+                  style: IconButton.styleFrom(
+                    backgroundColor: AppColors.surfaceLightSecondary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: const BorderSide(
+                          color: AppColors.cardBorder, width: 1),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // ── SMS Icon ──
+              Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.sms_rounded,
+                  color: AppColors.primary,
+                  size: 40,
+                ),
+              ).animate().fadeIn(duration: 400.ms).scale(
+                    begin: const Offset(0.8, 0.8),
+                    end: const Offset(1, 1),
+                    duration: 400.ms,
+                    curve: Curves.easeOutBack,
+                  ),
+
+              const SizedBox(height: 28),
+
+              // ── Title ──
+              Text(
+                'کۆدی پشتڕاستکردنەوە',
+                style: AppTypography.headingLg.copyWith(
+                  color: AppColors.textDark,
+                ),
+                textDirection: TextDirection.rtl,
+              ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
+
+              const SizedBox(height: 8),
+
+              Directionality(
+                textDirection: TextDirection.rtl,
+                child: Text.rich(
+                  TextSpan(
+                    text: 'کۆدەکە نێردرا بۆ ',
+                    style: AppTypography.bodyMd.copyWith(
+                      color: AppColors.textMedium,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '+964 ${widget.phoneNumber}',
+                        style: AppTypography.labelMd.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  textDirection: TextDirection.rtl,
+                ),
+              ).animate(delay: 300.ms).fadeIn(duration: 400.ms),
+
+              const SizedBox(height: 44),
+
+              // ── PIN Input ──
+              Directionality(
+                textDirection: TextDirection.ltr,
+                child: Pinput(
+                  length: 6,
+                  controller: _pinController,
+                  defaultPinTheme: defaultPinTheme,
+                  focusedPinTheme: focusedPinTheme,
+                  submittedPinTheme: submittedPinTheme,
+                  separatorBuilder: (i) => const SizedBox(width: 10),
+                  hapticFeedbackType: HapticFeedbackType.lightImpact,
+                  onCompleted: (pin) {
+                    setState(() => _isVerifying = true);
+                    Future.delayed(const Duration(milliseconds: 1500), () {
+                      if (mounted) {
+                        setState(() => _isVerifying = false);
+                        widget.onVerified();
+                      }
+                    });
+                  },
+                  cursor: Container(
+                    width: 2,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              ).animate(delay: 400.ms).fadeIn(duration: 400.ms).slideY(
+                    begin: 0.1,
+                    end: 0,
+                    duration: 400.ms,
+                  ),
+
+              const SizedBox(height: 36),
+
+              // ── Timer ──
+              _buildTimer()
+                  .animate(delay: 500.ms)
+                  .fadeIn(duration: 400.ms),
+
+              const SizedBox(height: 12),
+
+              // ── Resend ──
+              TextButton(
+                onPressed: _canResend
+                    ? () {
+                        _startTimer();
+                        _pinController.clear();
+                      }
+                    : null,
+                child: Text(
+                  'ناردنەوەی کۆد',
+                  style: AppTypography.labelMd.copyWith(
+                    color: _canResend
+                        ? AppColors.primary
+                        : AppColors.textLight,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // ── Verify Button ──
+              DrButton(
+                text: 'پشتڕاستکردنەوە',
+                isLoading: _isVerifying,
+                onPressed: _pinController.text.length == 6
+                    ? () {
+                        setState(() => _isVerifying = true);
+                        Future.delayed(const Duration(milliseconds: 1500), () {
+                          if (mounted) {
+                            setState(() => _isVerifying = false);
+                            widget.onVerified();
+                          }
+                        });
+                      }
+                    : null,
+              ).animate(delay: 600.ms).fadeIn(duration: 400.ms),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimer() {
+    final progress = _secondsRemaining / 60;
+    return SizedBox(
+      width: 64,
+      height: 64,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 3,
+              color: AppColors.primaryLight,
+              backgroundColor: AppColors.cardBorder,
+            ),
+          ),
+          Text(
+            '$_secondsRemaining',
+            style: AppTypography.headingSm.copyWith(
+              color: _secondsRemaining > 10
+                  ? AppColors.textDark
+                  : AppColors.error,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
