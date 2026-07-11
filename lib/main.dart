@@ -4,6 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
+import 'features/auth/register_screen.dart';
 import 'features/auth/otp_screen.dart';
 import 'features/home/main_shell.dart';
 
@@ -12,8 +13,8 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
     ),
   );
   runApp(const DrRoomApp());
@@ -34,7 +35,7 @@ class DrRoomApp extends StatelessWidget {
   }
 }
 
-/// Manages the app flow: Splash → Onboarding → Login → OTP → Home
+/// Manages the app flow: Splash → Onboarding → Login ↔ Register → Home
 class _AppFlow extends StatefulWidget {
   const _AppFlow();
 
@@ -83,13 +84,19 @@ class _AppFlowState extends State<_AppFlow> {
       case _FlowState.login:
         return LoginScreen(
           key: const ValueKey('login'),
-          onSendCode: (phone) {
-            _phoneNumber = phone;
-            _goTo(_FlowState.otp);
-          },
+          onLogin: () => _goTo(_FlowState.home),
+          onSignUp: () => _goTo(_FlowState.register),
+        );
+        
+      case _FlowState.register:
+        return RegisterScreen(
+          key: const ValueKey('register'),
+          onRegister: () => _goTo(_FlowState.home),
+          onLogin: () => _goTo(_FlowState.login),
         );
 
       case _FlowState.otp:
+        // Keep OTP state in case it's needed later for verification flow
         return OtpScreen(
           key: const ValueKey('otp'),
           phoneNumber: _phoneNumber,
@@ -109,6 +116,7 @@ enum _FlowState {
   splash,
   onboarding,
   login,
+  register,
   otp,
   home,
 }
