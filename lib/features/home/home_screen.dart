@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../core/widgets/coming_soon_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'doctor_details_screen.dart';
 import '../notifications/notifications_screen.dart';
+import '../lab/lab_order_method_screen.dart';
+import '../nursing/nursing_services_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -251,12 +254,20 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'See All',
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF3B82F6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Categories')),
+                        );
+                      },
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF3B82F6),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
@@ -285,12 +296,20 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'See All',
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF3B82F6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Schedules')),
+                        );
+                      },
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF3B82F6),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
@@ -477,12 +496,20 @@ class HomeScreen extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'See All',
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF3B82F6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Doctors')),
+                        );
+                      },
+                      child: Text(
+                        'See All',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF3B82F6),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
@@ -625,13 +652,13 @@ class HomeScreen extends StatelessWidget {
           context,
           imagePath: 'assets/images/doctor.png',
           title: 'Doctor',
-          isActive: true,
+          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/medicine.png',
           title: 'Pharmacy',
-          isActive: true,
+          isActive: false,
         ),
         _buildGridCard(
           context,
@@ -643,7 +670,7 @@ class HomeScreen extends StatelessWidget {
           context,
           imagePath: 'assets/images/xray.png',
           title: 'X-Ray',
-          isActive: true,
+          isActive: false,
         ),
         _buildGridCard(
           context,
@@ -655,19 +682,19 @@ class HomeScreen extends StatelessWidget {
           context,
           imagePath: 'assets/images/report.png',
           title: 'Reports',
-          isActive: true,
+          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/apps.png',
           title: 'Specialty',
-          isActive: true,
+          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/add.png',
           title: 'Ambulance',
-          isActive: true,
+          isActive: false,
         ),
       ],
     );
@@ -684,9 +711,9 @@ class HomeScreen extends StatelessWidget {
         if (!isActive) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
-                'This section is under preparation and will be available soon.',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              content: Text(
+                'ئەم بەشە لە قۆناغی ئامادەکارییە و بەم زووانە دەکەوێتە خزمەتت.',
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               backgroundColor: const Color(0xFF0F172A),
               behavior: SnackBarBehavior.floating,
@@ -696,6 +723,18 @@ class HomeScreen extends StatelessWidget {
               duration: const Duration(seconds: 3),
             ),
           );
+        } else {
+          if (title == 'Lab') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const LabOrderMethodScreen()),
+            );
+          } else if (title == 'Nursing') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NursingServicesScreen()),
+            );
+          }
         }
       },
       child: Stack(
@@ -713,9 +752,12 @@ class HomeScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
+                  child: Opacity(
+                    opacity: isActive ? 1.0 : 0.6,
+                    child: Image.asset(
+                      imagePath,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

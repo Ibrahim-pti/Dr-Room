@@ -45,5 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to the camera to take photos of your prescription.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photos to upload your prescription.</string>
 </dict>
 </plist>
