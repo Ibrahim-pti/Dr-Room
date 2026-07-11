@@ -91,13 +91,13 @@ class SettingsScreen extends StatelessWidget {
                               height: 105,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white,
+                                color: const Color(0xFFE2E8F0),
                                 border: Border.all(color: Colors.white, width: 4),
-                                image: const DecorationImage(
-                                  image: AssetImage('assets/images/doctor2.png'), 
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.topCenter,
-                                ),
+                              ),
+                              child: const Icon(
+                                Icons.person_rounded,
+                                size: 55,
+                                color: Color(0xFF94A3B8),
                               ),
                             ),
                             Positioned(
