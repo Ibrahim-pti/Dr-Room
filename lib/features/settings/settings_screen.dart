@@ -1,274 +1,338 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
-import '../../core/widgets/dr_widgets.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkMode = false;
-  bool _notifications = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
-      body: SafeArea(
-        child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            children: [
-              const SizedBox(height: 20),
-              Text(
-                'ڕێکخستنەکان',
-                style: AppTypography.headingLg.copyWith(
-                  color: AppColors.textDark,
-                ),
-              ),
-              const SizedBox(height: 24),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Top Section (Blue bg, Profile pic, Name)
+            SizedBox(
+              height: 310,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // Blue Gradient
+                  Container(
+                    height: 220,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFF4A90E2),
+                          Color(0xFF82B1FF),
+                        ],
+                      ),
+                    ),
+                  ),
 
-              // ── Profile Card ──
-              DrCard(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primary, AppColors.primaryLight],
+                  // White Curve
+                  Positioned(
+                    top: 180,
+                    left: 0,
+                    right: 0,
+                    height: 45,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(40),
                         ),
                       ),
-                      child: const Icon(Iconsax.user, color: Colors.white, size: 28),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+
+                  // App Bar
+                  SafeArea(
+                    bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          const SizedBox(width: 28), // For balance
                           Text(
-                            'یەحیا ئەحمەد',
-                            style: AppTypography.headingSm.copyWith(
-                              color: AppColors.textDark,
+                            'Profile',
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          Text(
-                            '+964 750 XXX XXXX',
-                            style: AppTypography.bodySm.copyWith(
-                              color: AppColors.textMedium,
-                            ),
-                            textDirection: TextDirection.ltr,
+                          const Icon(
+                            Icons.notifications_none_rounded,
+                            color: Colors.white,
+                            size: 28,
                           ),
                         ],
                       ),
                     ),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.surfaceLightSecondary,
-                        border: Border.all(color: AppColors.cardBorder, width: 1),
-                      ),
-                      child: const Icon(
-                        Iconsax.edit_2,
-                        color: AppColors.primary,
-                        size: 18,
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(duration: 400.ms),
+                  ),
 
-              const SizedBox(height: 28),
-
-              // ── Settings Items ──
-              _settingItem(
-                Iconsax.user,
-                'پرۆفایلی من',
-                trailing: _chevron(),
-                index: 0,
-              ),
-              _settingItem(
-                Iconsax.global,
-                'زمان',
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'کوردی',
-                      style: AppTypography.bodySm.copyWith(
-                        color: AppColors.textMedium,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    _chevron(),
-                  ],
-                ),
-                index: 1,
-              ),
-              _settingItem(
-                Iconsax.moon,
-                'دۆخی تاریک',
-                trailing: Switch.adaptive(
-                  value: _darkMode,
-                  onChanged: (v) => setState(() => _darkMode = v),
-                  activeTrackColor: AppColors.primary,
-                ),
-                index: 2,
-              ),
-              _settingItem(
-                Iconsax.notification,
-                'ئاگادارکردنەوەکان',
-                trailing: Switch.adaptive(
-                  value: _notifications,
-                  onChanged: (v) => setState(() => _notifications = v),
-                  activeTrackColor: AppColors.primary,
-                ),
-                index: 3,
-              ),
-              _settingItem(
-                Iconsax.lock,
-                'ئاسایش و پاسوۆرد',
-                trailing: _chevron(),
-                index: 4,
-              ),
-              _settingItem(
-                Iconsax.health,
-                'یادەوەری دەرمان',
-                trailing: _chevron(),
-                index: 5,
-              ),
-              _settingItem(
-                Iconsax.people,
-                'بنەماڵەکانم',
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '3',
-                          style: AppTypography.bodySm.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
+                  // Profile Picture & Name
+                  Positioned(
+                    top: 110,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              width: 105,
+                              height: 105,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                border: Border.all(color: Colors.white, width: 4),
+                                image: const DecorationImage(
+                                  image: AssetImage('assets/images/doctor2.png'), 
+                                  fit: BoxFit.cover,
+                                  alignment: Alignment.topCenter,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 4,
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF82B1FF),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Sara Ahmad',
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF0F172A),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
                           ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'sar***@gmail.com',
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF64748B),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  // Top Grid
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildGridItem(
+                          icon: Iconsax.calendar_1,
+                          color: const Color(0xFF3B82F6),
+                          label: 'My\nAppointments',
+                        ),
+                        _buildGridItem(
+                          icon: Iconsax.document_text,
+                          color: const Color(0xFF10B981),
+                          label: 'Medical\nRecords',
+                        ),
+                        _buildGridItem(
+                          icon: Icons.medication_outlined,
+                          color: const Color(0xFF8B5CF6),
+                          label: 'My\nPrescriptions',
+                        ),
+                        _buildGridItem(
+                          icon: Iconsax.heart,
+                          color: const Color(0xFFEF4444),
+                          label: 'Health\nCheckups',
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Section 1
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildListItem(Iconsax.user, 'Personal Information'),
+                        _buildDivider(),
+                        _buildListItem(Iconsax.card, 'Payment Methods'),
+                        _buildDivider(),
+                        _buildListItem(Iconsax.location, 'Address'),
+                        _buildDivider(),
+                        _buildListItem(Iconsax.call, 'Emergency Contacts'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Section 2
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildListItem(Iconsax.setting_2, 'Settings'),
+                        _buildDivider(),
+                        _buildListItem(Icons.help_outline_rounded, 'Help & Support'),
+                        _buildDivider(),
+                        _buildListItem(Iconsax.info_circle, 'About DrRoom'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Log Out
+                  Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Iconsax.logout,
+                              color: Color(0xFFEF4444),
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Log Out',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFFEF4444),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    _chevron(),
-                  ],
-                ),
-                index: 6,
+                  ),
+
+                  const SizedBox(height: 40),
+                ],
               ),
-              _settingItem(
-                Iconsax.document,
-                'مافی تایبەتمەندی',
-                trailing: _chevron(),
-                index: 7,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridItem({required IconData icon, required Color color, required String label}) {
+    return Column(
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.poppins(
+            color: const Color(0xFF0F172A),
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildListItem(IconData icon, String title) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFF64748B),
+                size: 22,
               ),
-              _settingItem(
-                Iconsax.info_circle,
-                'دەربارەی DrRoom',
-                trailing: Text(
-                  'v1.0.0',
-                  style: AppTypography.bodySm.copyWith(
-                    color: AppColors.textLight,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF0F172A),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                index: 8,
               ),
-
-              const SizedBox(height: 8),
-
-              // ── Logout ──
-              _settingItem(
-                Iconsax.logout,
-                'چوونە دەرەوە',
-                iconColor: AppColors.error,
-                textColor: AppColors.error,
-                trailing: _chevron(color: AppColors.error),
-                index: 9,
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFFCBD5E1),
+                size: 24,
               ),
-
-              const SizedBox(height: 20),
-
-              // ── DrRoom Prime Banner ──
-              DrCard(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF9D976), Color(0xFFF39F86)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderColor: const Color(0xFFF9D976).withValues(alpha: 0.3),
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    const Text('💎', style: TextStyle(fontSize: 32)),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'بوو بە DrRoom Prime!',
-                            style: AppTypography.labelLg.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            'داشکاندنی ٢٠% و تایبەتمەندی زیادە',
-                            style: AppTypography.bodySm.copyWith(
-                              color: Colors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white.withValues(alpha: 0.25),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        'زانیاری',
-                        style: AppTypography.labelSm.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-                  .animate(delay: Duration(milliseconds: 100 * 10))
-                  .fadeIn(duration: 500.ms)
-                  .slideY(begin: 0.1, end: 0, duration: 500.ms),
-
-              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -276,61 +340,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _settingItem(
-    IconData icon,
-    String title, {
-    Widget? trailing,
-    Color? iconColor,
-    Color? textColor,
-    required int index,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color: (iconColor ?? AppColors.primary).withValues(alpha: 0.08),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: iconColor ?? AppColors.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: AppTypography.bodyLg.copyWith(
-                      color: textColor ?? AppColors.textDark,
-                    ),
-                  ),
-                ),
-                if (trailing != null) trailing,
-              ],
-            ),
-          ),
-        ),
+  Widget _buildDivider() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: Divider(
+        color: Color(0xFFF1F5F9),
+        height: 1,
+        thickness: 1,
       ),
-    )
-        .animate(delay: Duration(milliseconds: 50 * index))
-        .fadeIn(duration: 300.ms);
+    );
   }
-
-  Widget _chevron({Color? color}) => Icon(
-        Icons.chevron_left_rounded,
-        color: color ?? AppColors.textLight,
-        size: 22,
-      );
 }
