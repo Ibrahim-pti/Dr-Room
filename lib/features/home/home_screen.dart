@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../core/widgets/coming_soon_screen.dart';
+import '../categories/all_categories_screen.dart';
+import '../appointments/all_schedules_screen.dart';
+import '../doctors/all_doctors_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'doctor_details_screen.dart';
@@ -258,7 +260,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Categories')),
+                          MaterialPageRoute(builder: (context) => const AllCategoriesScreen()),
                         );
                       },
                       child: Text(
@@ -300,7 +302,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Schedules')),
+                          MaterialPageRoute(builder: (context) => const AllSchedulesScreen()),
                         );
                       },
                       child: Text(
@@ -500,7 +502,7 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const ComingSoonScreen(title: 'All Doctors')),
+                          MaterialPageRoute(builder: (context) => const AllDoctorsScreen()),
                         );
                       },
                       child: Text(
