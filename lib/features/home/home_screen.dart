@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'doctor_details_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -106,34 +107,44 @@ class HomeScreen extends StatelessWidget {
                                     ],
                                   ),
                                   // Notification Icon
-                                  Stack(
-                                    children: [
-                                      Container(
-                                        width: 46,
-                                        height: 46,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const NotificationsScreen(),
                                         ),
-                                        child: const Icon(
-                                          Iconsax.notification,
-                                          color: Color(0xFF0F172A),
-                                          size: 22,
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 12,
-                                        right: 12,
-                                        child: Container(
-                                          width: 8,
-                                          height: 8,
+                                      );
+                                    },
+                                    child: Stack(
+                                      children: [
+                                        Container(
+                                          width: 46,
+                                          height: 46,
                                           decoration: const BoxDecoration(
-                                            color: Colors.redAccent,
+                                            color: Colors.white,
                                             shape: BoxShape.circle,
                                           ),
+                                          child: const Icon(
+                                            Iconsax.notification,
+                                            color: Color(0xFF0F172A),
+                                            size: 22,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Positioned(
+                                          top: 12,
+                                          right: 12,
+                                          child: Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: const BoxDecoration(
+                                              color: Colors.redAccent,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               )

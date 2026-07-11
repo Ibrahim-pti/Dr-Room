@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import '../notifications/notifications_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -14,13 +15,13 @@ class SettingsScreen extends StatelessWidget {
           children: [
             // Top Section (Blue bg, Profile pic, Name)
             SizedBox(
-              height: 310,
+              height: 270,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   // Blue Gradient
                   Container(
-                    height: 220,
+                    height: 190,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -36,10 +37,10 @@ class SettingsScreen extends StatelessWidget {
 
                   // White Curve
                   Positioned(
-                    top: 180,
+                    top: 155,
                     left: 0,
                     right: 0,
-                    height: 45,
+                    height: 40,
                     child: Container(
                       decoration: const BoxDecoration(
                         color: Color(0xFFF5F7FA),
@@ -55,31 +56,22 @@ class SettingsScreen extends StatelessWidget {
                     bottom: false,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(width: 28), // For balance
-                          Text(
-                            'Profile',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const Icon(
-                            Icons.notifications_none_rounded,
+                      child: Center(
+                        child: Text(
+                          'Profile',
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
-                            size: 28,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
 
                   // Profile Picture & Name
                   Positioned(
-                    top: 110,
+                    top: 100,
                     left: 0,
                     right: 0,
                     child: Column(
@@ -87,8 +79,8 @@ class SettingsScreen extends StatelessWidget {
                         Stack(
                           children: [
                             Container(
-                              width: 105,
-                              height: 105,
+                              width: 90,
+                              height: 90,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: const Color(0xFFE2E8F0),
@@ -96,16 +88,16 @@ class SettingsScreen extends StatelessWidget {
                               ),
                               child: const Icon(
                                 Icons.person_rounded,
-                                size: 55,
+                                size: 50,
                                 color: Color(0xFF94A3B8),
                               ),
                             ),
                             Positioned(
                               bottom: 0,
-                              right: 4,
+                              right: 2,
                               child: Container(
-                                width: 32,
-                                height: 32,
+                                width: 28,
+                                height: 28,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF82B1FF),
                                   shape: BoxShape.circle,
@@ -114,18 +106,18 @@ class SettingsScreen extends StatelessWidget {
                                 child: const Icon(
                                   Icons.camera_alt,
                                   color: Colors.white,
-                                  size: 16,
+                                  size: 14,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 10),
                         Text(
                           'Sara Ahmad',
                           style: GoogleFonts.poppins(
                             color: const Color(0xFF0F172A),
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -151,10 +143,10 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   // Top Grid
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -184,13 +176,13 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // Section 1
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       children: [
@@ -205,13 +197,13 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // Section 2
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       children: [
@@ -224,20 +216,20 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
 
                   // Log Out
                   Container(
                     width: double.infinity,
-                    height: 56,
+                    height: 52,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         onTap: () {},
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -262,7 +254,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -276,25 +268,25 @@ class SettingsScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 50,
-          height: 50,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(
             icon,
             color: color,
-            size: 24,
+            size: 22,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           label,
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             color: const Color(0xFF0F172A),
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: FontWeight.w500,
             height: 1.3,
           ),
@@ -309,21 +301,21 @@ class SettingsScreen extends StatelessWidget {
       child: InkWell(
         onTap: () {},
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               Icon(
                 icon,
                 color: const Color(0xFF64748B),
-                size: 22,
+                size: 20,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   title,
                   style: GoogleFonts.poppins(
                     color: const Color(0xFF0F172A),
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -331,7 +323,7 @@ class SettingsScreen extends StatelessWidget {
               const Icon(
                 Icons.chevron_right_rounded,
                 color: Color(0xFFCBD5E1),
-                size: 24,
+                size: 22,
               ),
             ],
           ),
@@ -342,7 +334,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildDivider() {
     return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: Divider(
         color: Color(0xFFF1F5F9),
         height: 1,
