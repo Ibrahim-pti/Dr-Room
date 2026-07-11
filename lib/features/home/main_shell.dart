@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_typography.dart';
 import 'home_screen.dart';
 import '../orders/orders_screen.dart';
 import '../records/records_screen.dart';
@@ -26,77 +25,101 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
-        ),
-        bottomNavigationBar: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surfaceLight,
-            border: Border(
-              top: BorderSide(color: AppColors.divider, width: 1),
-            ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9), // Light background to match Home
+      body: Stack(
+        children: [
+          // Main Content
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens,
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          
+          // Floating Bottom Navigation Bar
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 30, // Floats above the bottom
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem(0, Iconsax.home_2, Iconsax.home_2, 'سەرەتا'),
-                  _buildNavItem(1, Iconsax.clipboard_text, Iconsax.clipboard_tick, 'داواکارییەکان'),
-                  _buildNavItem(2, Iconsax.folder_open, Iconsax.folder_open, 'مەلەفەکانم'),
-                  _buildNavItem(3, Iconsax.setting_2, Iconsax.setting_2, 'ڕێکخستنەکان'),
+                  _buildNavItem(0, Iconsax.home_2),
+                  _buildNavItem(1, Iconsax.heart),
+                  _buildNavItem(2, Iconsax.briefcase),
+                  _buildNavItem(3, Iconsax.setting_2),
                 ],
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon) {
+    final isActive = _currentIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: isActive
+            ? const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
+            : const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isActive ? const Color(0xFFE0EEFF) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
+              size: 24,
+            ),
+            if (isActive) ...[
+              const SizedBox(width: 8),
+              Text(
+                _getLabelForIndex(index),
+                style: const TextStyle(
+                  color: Color(0xFF2563EB),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ]
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(
-      int index, IconData icon, IconData activeIcon, String label) {
-    final isActive = _currentIndex == index;
-    return Expanded(
-      child: InkWell(
-        onTap: () => setState(() => _currentIndex = index),
-        borderRadius: BorderRadius.circular(14),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: isActive
-                ? AppColors.primary.withValues(alpha: 0.08)
-                : Colors.transparent,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                isActive ? activeIcon : icon,
-                color: isActive ? AppColors.primary : AppColors.textLight,
-                size: 24,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: AppTypography.bodySm.copyWith(
-                  color: isActive ? AppColors.primary : AppColors.textLight,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                  fontSize: 10,
-                ),
-                maxLines: 1,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  String _getLabelForIndex(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Favorites';
+      case 2:
+        return 'Records';
+      case 3:
+        return 'Settings';
+      default:
+        return '';
+    }
   }
 }
