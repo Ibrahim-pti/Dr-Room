@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   // Blue Gradient Background
                   Container(
-                    height: 380,
+                    height: 280,
                     width: double.infinity,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -228,10 +228,83 @@ class HomeScreen extends StatelessWidget {
                               .slideY(begin: 0.2, end: 0),
 
                           const SizedBox(height: 28),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              // ── Categories (Grid) ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Categories',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF0F172A),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'See All',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF3B82F6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 350.ms),
+
+              const SizedBox(height: 16),
+
+              _buildCategoryGrid(
+                context,
+              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+
+              const SizedBox(height: 32),
+
+              // ── Upcoming Schedule Header ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Upcoming Schedule',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF0F172A),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      'See All',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF3B82F6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 450.ms),
+
+              const SizedBox(height: 16),
+
 
                           // ── Upcoming Appointment Card ──
-                          Container(
-                                padding: const EdgeInsets.all(20),
+                          Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(24),
@@ -345,7 +418,7 @@ class HomeScreen extends StatelessWidget {
                                             ),
                                             child: Center(
                                               child: Text(
-                                                'Update Time',
+                                                'Cancel',
                                                 style: GoogleFonts.poppins(
                                                   color: const Color(
                                                     0xFF64748B,
@@ -368,7 +441,7 @@ class HomeScreen extends StatelessWidget {
                                             ),
                                             child: Center(
                                               child: Text(
-                                                'Update Time',
+                                                'Reschedule',
                                                 style: GoogleFonts.poppins(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w500,
@@ -386,73 +459,37 @@ class HomeScreen extends StatelessWidget {
                               .animate()
                               .fadeIn(delay: 300.ms, duration: 400.ms)
                               .slideY(begin: 0.2, end: 0),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // ── Our Services (Grid) ──
+              // ── Top Doctors Header ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Our Services',
+                      'Top Doctors',
                       style: GoogleFonts.poppins(
                         color: const Color(0xFF0F172A),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    Text(
+                      'See All',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF3B82F6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
-              ).animate().fadeIn(delay: 350.ms),
+              ).animate().fadeIn(delay: 450.ms),
 
               const SizedBox(height: 16),
-
-              _buildCategoryGrid(
-                context,
-              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: 32),
-
-              // ── Categories Section ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Text(
-                  'Choose Category',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF0F172A),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ).animate().fadeIn(delay: 400.ms),
-
-              const SizedBox(height: 16),
-
-              // Horizontal Scroll Categories
-              SizedBox(
-                height: 52,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  children: [
-                    _buildCategoryPill('Dermatologist', true),
-                    const SizedBox(width: 12),
-                    _buildCategoryPill('Dermatologist', false),
-                    const SizedBox(width: 12),
-                    _buildCategoryPill('Dentist', false),
-                  ],
-                ),
-              ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.2, end: 0),
-
-              const SizedBox(height: 28),
 
               // ── Doctor List Card ──
               Padding(
@@ -574,64 +611,38 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryPill(String title, bool isFirst) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(26),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF0F4FD),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isFirst ? Iconsax.activity : Iconsax.health,
-              color: const Color(0xFF3B82F6),
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: GoogleFonts.poppins(
-              color: const Color(0xFF0F172A),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildCategoryGrid(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      mainAxisSpacing: 16,
+      mainAxisSpacing: 12,
       crossAxisSpacing: 12,
-      childAspectRatio: 0.75, // Taller aspect ratio to fit image and text
+      childAspectRatio: 0.9, // Adjust ratio to reduce vertical space
       padding: const EdgeInsets.symmetric(horizontal: 24),
       children: [
         _buildGridCard(
           context,
+          imagePath: 'assets/images/doctor.png',
+          title: 'Doctor',
+          isActive: true,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/medicine.png',
+          title: 'Pharmacy',
+          isActive: true,
+        ),
+        _buildGridCard(
+          context,
           imagePath: 'assets/images/lab.png',
           title: 'Lab',
+          isActive: true,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/xray.png',
+          title: 'X-Ray',
           isActive: true,
         ),
         _buildGridCard(
@@ -642,39 +653,21 @@ class HomeScreen extends StatelessWidget {
         ),
         _buildGridCard(
           context,
-          imagePath: 'assets/images/doctor.png',
-          title: 'Doctor',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/medicine.png',
-          title: 'Pharmacy',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/xray.png',
-          title: 'X-Ray',
-          isActive: false,
+          imagePath: 'assets/images/report.png',
+          title: 'Reports',
+          isActive: true,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/apps.png',
-          title: 'Apps',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/report.png',
-          title: 'Report',
-          isActive: false,
+          title: 'Specialty',
+          isActive: true,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/add.png',
-          title: 'More',
-          isActive: false,
+          title: 'Ambulance',
+          isActive: true,
         ),
       ],
     );
@@ -713,20 +706,13 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                width: 64,
-                height: 64,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.cover,
