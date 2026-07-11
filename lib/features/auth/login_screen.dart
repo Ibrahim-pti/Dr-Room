@@ -66,10 +66,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Doctor Image (Aligned tightly to the right, fading at bottom)
                   Positioned(
-                    right: -30,
-                    top: 40, // Push up to make her larger
-                    bottom: -20, // Small overlap
-                    width: size.width * 0.65, // Increased width
+                    right: -20,
+                    top: 90,
+                    bottom: 0,
+                    width: size.width * 0.65,
                     child:
                         ShaderMask(
                               shaderCallback: (rect) {
@@ -81,18 +81,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Colors.black,
                                     Colors.transparent,
                                   ],
-                                  stops: [
-                                    0.0,
-                                    0.85,
-                                    1.0,
-                                  ], // Fade later so crossed arms are visible
+                                  stops: [0.0, 0.85, 1.0],
                                 ).createShader(rect);
                               },
                               blendMode: BlendMode.dstIn,
                               child: Image.asset(
                                 'assets/images/doctor2.png',
-                                fit: BoxFit.contain,
-                                alignment: Alignment.bottomCenter,
+                                fit: BoxFit.cover,
+                                alignment: Alignment.topCenter,
                               ),
                             )
                             .animate()
@@ -137,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: SizedBox(
                       width:
                           size.width *
-                          0.55, // Constrain width so it doesn't overlap doctor
+                          0.45, // Constrain width so it doesn't overlap doctor
                       child:
                           Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
