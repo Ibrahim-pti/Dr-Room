@@ -55,10 +55,31 @@ class _LoginScreenState extends State<LoginScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            const Color(0xFFE0EEFF), // soft blue
-                            const Color(0xFFF8FAFC), // scaffold background
+                            const Color(0xFFE0EEFF),
+                            const Color(0xFFF8FAFC),
                           ],
                           stops: const [0.0, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Soft blue glow behind doctor
+                  Positioned(
+                    right: 0,
+                    top: size.height * 0.05,
+                    child: Container(
+                      width: size.width * 0.6,
+                      height: size.width * 0.6,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            const Color(0xFF93C5FD).withValues(alpha: 0.3),
+                            const Color(0xFFDBEAFE).withValues(alpha: 0.15),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
                         ),
                       ),
                     ),
@@ -128,51 +149,110 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // DrRoom Logo & Welcome Text
                   Positioned(
-                    left: 24,
-                    top: 120, // Positioned exactly below back button
+                    left: 28,
+                    top: 120,
                     child: SizedBox(
                       width:
                           size.width *
-                          0.45, // Constrain width so it doesn't overlap doctor
+                          0.40,
                       child:
                           Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Logo Custom Design
-                                  SvgPicture.string(
-                                    _drRoomLogoSvg,
-                                    width: 64,
-                                    height: 64,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  // Logo Text
-                                  Text(
-                                    'DrRoom',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF0F172A),
-                                      letterSpacing: -0.5,
+                                  Container(
+                                    width: 58,
+                                    height: 58,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xFF60A5FA),
+                                          Color(0xFF2563EB),
+                                          Color(0xFF1D4ED8),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                                          blurRadius: 20,
+                                          offset: const Offset(0, 8),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        // Decorative circle
+                                        Positioned(
+                                          top: -8,
+                                          right: -8,
+                                          child: Container(
+                                            width: 28,
+                                            height: 28,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white.withValues(alpha: 0.15),
+                                            ),
+                                          ),
+                                        ),
+                                        // Medical cross icon
+                                        const Center(
+                                          child: Icon(
+                                            Icons.local_hospital_rounded,
+                                            color: Colors.white,
+                                            size: 28,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 24),
+                                  const SizedBox(height: 10),
+                                  // Logo Text
+                                  RichText(
+                                    text: TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: 'Dr',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w800,
+                                            color: const Color(0xFF2563EB),
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Room',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w800,
+                                            color: const Color(0xFF0F172A),
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
                                   // Welcome Text
                                   Text(
-                                    'Welcome Back!',
+                                    'Welcome\nBack!',
                                     style: GoogleFonts.poppins(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w700,
                                       color: const Color(0xFF0F172A),
-                                      height: 1.1,
+                                      height: 1.15,
+                                      letterSpacing: -0.3,
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
+                                  const SizedBox(height: 8),
                                   Text(
                                     'Sign in to continue',
                                     style: GoogleFonts.poppins(
-                                      fontSize: 14,
+                                      fontSize: 15,
                                       fontWeight: FontWeight.w400,
-                                      color: const Color(0xFF64748B),
+                                      color: const Color(0xFF94A3B8),
                                     ),
                                   ),
                                 ],
@@ -191,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 28),
               child: Column(
                 children: [
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
 
                   // Email/Phone Input
                   _buildInputField(
@@ -215,12 +295,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Forgot Password
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text(
-                      'Forgot Password?',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Text(
+                        'Forgot Password?',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF2563EB),
+                          decoration: TextDecoration.underline,
+                          decorationColor: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                        ),
                       ),
                     ),
                   ).animate().fadeIn(delay: 500.ms),
@@ -234,9 +319,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: widget.onLogin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: const Color(0xFF1D4ED8),
                         foregroundColor: Colors.white,
-                        elevation: 0,
+                        elevation: 4,
+                        shadowColor: const Color(0xFF1D4ED8).withValues(alpha: 0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -334,15 +420,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE2E8F0).withValues(alpha: 0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+          width: 1,
+        ),
       ),
       child: TextField(
         controller: controller,
@@ -387,21 +470,26 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSocialButton(String svgData) {
-    return Container(
-      width: 72,
-      height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+    return Expanded(
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: const Color(0xFFE2E8F0),
+            width: 1,
           ),
-        ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(child: SvgPicture.string(svgData, width: 28, height: 28)),
       ),
-      child: Center(child: SvgPicture.string(svgData, width: 24, height: 24)),
     );
   }
 }
@@ -427,10 +515,11 @@ const String _facebookSvg = '''
 </svg>
 ''';
 
-const String _drRoomLogoSvg = '''
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M14 6C10.6863 6 8 8.68629 8 12V36C8 39.3137 10.6863 42 14 42H28C31.3137 42 34 39.3137 34 36V28.3262C34 23.3642 38.0294 19.3348 42.9915 19.3348C43.3297 19.3348 43.6664 19.3533 44 19.3897V18C44 14.6863 41.3137 12 38 12H34V12C34 8.68629 31.3137 6 28 6H14Z" fill="#2563EB"/>
-<circle cx="28" cy="18" r="9" fill="white"/>
-<path d="M28 14V22M24 18H32" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+const String _drRoomIconSvg = '''
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="4" y="4" width="24" height="24" rx="6" fill="white" fill-opacity="0.2"/>
+<path d="M16 9V23" stroke="white" stroke-width="3" stroke-linecap="round"/>
+<path d="M9 16H23" stroke="white" stroke-width="3" stroke-linecap="round"/>
+<circle cx="22" cy="10" r="4" fill="white" fill-opacity="0.25"/>
 </svg>
 ''';
