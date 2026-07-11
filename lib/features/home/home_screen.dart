@@ -394,6 +394,30 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
+              // ── Our Services (Grid) ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Our Services',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF0F172A),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 350.ms),
+
+              const SizedBox(height: 16),
+
+              _buildCategoryGrid(context).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+
+              const SizedBox(height: 32),
+
               // ── Categories Section ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -585,6 +609,170 @@ class HomeScreen extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryGrid(BuildContext context) {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 3,
+      mainAxisSpacing: 14,
+      crossAxisSpacing: 14,
+      childAspectRatio: 0.95, // Clean square aspect ratio
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      children: [
+        _buildGridCard(
+          context,
+          icon: Icons.person_outline,
+          title: 'Doctor',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          icon: Icons.medical_services_outlined, 
+          title: 'Nursing',
+          isActive: true,
+          iconColor: const Color(0xFF3B82F6), // Blue
+        ),
+        _buildGridCard(
+          context,
+          icon: Icons.science_outlined,
+          title: 'Lab',
+          isActive: true,
+          iconColor: const Color(0xFF10B981), // Green
+        ),
+        _buildGridCard(
+          context,
+          icon: Icons.grid_view_rounded, 
+          title: 'More\nServices',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          icon: Icons.monitor_heart_outlined,
+          title: 'X-Ray',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          icon: Icons.medication_outlined, 
+          title: 'Pharmacy',
+          isActive: false,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required bool isActive,
+    Color iconColor = const Color(0xFF3B82F6),
+  }) {
+    return GestureDetector(
+      onTap: () {
+        if (!isActive) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'This section is under preparation and will be available soon.',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: const Color(0xFF0F172A),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      },
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(20),
+              border: isActive 
+                  ? Border.all(color: iconColor.withValues(alpha: 0.1), width: 1.5)
+                  : Border.all(color: Colors.transparent),
+              boxShadow: isActive ? [
+                BoxShadow(
+                  color: iconColor.withValues(alpha: 0.08),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ] : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: isActive ? iconColor.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon, 
+                      color: isActive ? iconColor : const Color(0xFF94A3B8), 
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      style: GoogleFonts.poppins(
+                        color: isActive ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                        fontSize: 11,
+                        fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (!isActive)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Soon',
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF94A3B8),
+                    fontSize: 8,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
