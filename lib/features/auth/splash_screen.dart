@@ -22,11 +22,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _ecgController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 1800),
     )..forward();
 
     // Remove splash screen after delay
-    Future.delayed(const Duration(milliseconds: 3500), () {
+    Future.delayed(const Duration(milliseconds: 2200), () {
       if (mounted) widget.onFinished();
     });
   }
@@ -62,20 +62,21 @@ class _SplashScreenState extends State<SplashScreen>
                       Text(
                         'Dr',
                         style: GoogleFonts.poppins(
-                          fontSize: 64,
-                          fontWeight: FontWeight.w300,
-                          color: const Color(0xFF94A3B8), // Slate 400
-                          letterSpacing: -2,
+                          fontSize: 54,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1E293B), // Dark slate color
+                          letterSpacing: -1.2,
                           height: 1,
                         ),
                       ),
+                      const SizedBox(width: 6),
                       Text(
                         'Room',
                         style: GoogleFonts.poppins(
-                          fontSize: 64,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 54,
+                          fontWeight: FontWeight.w700,
                           color: const Color(0xFF3B82F6), // Primary Blue
-                          letterSpacing: -2,
+                          letterSpacing: -1.2,
                           height: 1,
                         ),
                       ),
