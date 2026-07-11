@@ -622,48 +622,58 @@ class HomeScreen extends StatelessWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      mainAxisSpacing: 14,
-      crossAxisSpacing: 14,
-      childAspectRatio: 0.95, // Clean square aspect ratio
+      crossAxisCount: 4,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 12,
+      childAspectRatio: 0.75, // Taller aspect ratio to fit image and text
       padding: const EdgeInsets.symmetric(horizontal: 24),
       children: [
         _buildGridCard(
           context,
-          icon: Icons.person_outline,
+          imagePath: 'assets/images/lab.png',
+          title: 'Lab',
+          isActive: true,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/doctor_bag.png',
+          title: 'Nursing',
+          isActive: true,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/doctor.png',
           title: 'Doctor',
           isActive: false,
         ),
         _buildGridCard(
           context,
-          icon: Icons.medical_services_outlined,
-          title: 'Nursing',
-          isActive: true,
-          iconColor: const Color(0xFF3B82F6), // Blue
-        ),
-        _buildGridCard(
-          context,
-          icon: Icons.science_outlined,
-          title: 'Lab',
-          isActive: true,
-          iconColor: const Color(0xFF10B981), // Green
-        ),
-        _buildGridCard(
-          context,
-          icon: Icons.grid_view_rounded,
-          title: 'More\nServices',
+          imagePath: 'assets/images/medicine.png',
+          title: 'Pharmacy',
           isActive: false,
         ),
         _buildGridCard(
           context,
-          icon: Icons.monitor_heart_outlined,
+          imagePath: 'assets/images/xray.png',
           title: 'X-Ray',
           isActive: false,
         ),
         _buildGridCard(
           context,
-          icon: Icons.medication_outlined,
-          title: 'Pharmacy',
+          imagePath: 'assets/images/apps.png',
+          title: 'Apps',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/report.png',
+          title: 'Report',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/add.png',
+          title: 'More',
           isActive: false,
         ),
       ],
@@ -672,10 +682,9 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildGridCard(
     BuildContext context, {
-    required IconData icon,
+    required String imagePath,
     required String title,
     required bool isActive,
-    Color iconColor = const Color(0xFF3B82F6),
   }) {
     return GestureDetector(
       onTap: () {
@@ -698,86 +707,58 @@ class HomeScreen extends StatelessWidget {
       },
       child: Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: isActive
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(20),
-              border: isActive
-                  ? Border.all(
-                      color: iconColor.withValues(alpha: 0.1),
-                      width: 1.5,
-                    )
-                  : Border.all(color: Colors.transparent),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                        color: iconColor.withValues(alpha: 0.08),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? iconColor.withValues(alpha: 0.1)
-                          : const Color(0xFFF1F5F9),
-                      shape: BoxShape.circle,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    child: Icon(
-                      icon,
-                      color: isActive ? iconColor : const Color(0xFF94A3B8),
-                      size: 24,
-                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      style: GoogleFonts.poppins(
-                        color: isActive
-                            ? const Color(0xFF0F172A)
-                            : const Color(0xFF64748B),
-                        fontSize: 11,
-                        fontWeight: isActive
-                            ? FontWeight.w600
-                            : FontWeight.w500,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  color: isActive
+                      ? const Color(0xFF0F172A)
+                      : const Color(0xFF64748B),
+                  fontSize: 11,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           if (!isActive)
             Positioned(
-              top: 8,
-              right: 8,
+              top: -6,
+              right: -6,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.white, width: 1.5),
                 ),
                 child: Text(
                   'Soon',
