@@ -112,7 +112,8 @@ class HomeScreen extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const NotificationsScreen(),
+                                          builder: (context) =>
+                                              const NotificationsScreen(),
                                         ),
                                       );
                                     },
@@ -414,7 +415,9 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              _buildCategoryGrid(context).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+              _buildCategoryGrid(
+                context,
+              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
 
               const SizedBox(height: 32),
 
@@ -466,103 +469,104 @@ class HomeScreen extends StatelessWidget {
                   child: Container(
                     height: 160,
                     decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      // Text Info on the left
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dr. Nusrat\nJahan',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFF0F172A),
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                height: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Pediatrician Specialist',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFF64748B),
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Spacer(),
-                            // Rating
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.star_rounded,
-                                  color: Color(0xFFFBBF24),
-                                  size: 20,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        // Text Info on the left
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dr. Nusrat\nJahan',
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFF0F172A),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '4.9',
-                                  style: GoogleFonts.poppins(
-                                    color: const Color(0xFF0F172A),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Pediatrician Specialist',
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFF64748B),
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const Spacer(),
+                              // Rating
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.star_rounded,
+                                    color: Color(0xFFFBBF24),
+                                    size: 20,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '4.9',
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF0F172A),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Doctor Image on the right
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              bottomRight: Radius.circular(24),
                             ),
-                          ],
+                            child: Image.asset(
+                              'assets/images/doctor3.png',
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
 
-                      // Doctor Image on the right
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(24),
-                          ),
-                          child: Image.asset(
-                            'assets/images/doctor3.png',
-                            height: 150,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-
-                      // Heart Icon
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF0F4FD),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.favorite,
-                            color: Color(0xFF3B82F6),
-                            size: 18,
+                        // Heart Icon
+                        Positioned(
+                          top: 16,
+                          right: 16,
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF0F4FD),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.favorite,
+                              color: Color(0xFF3B82F6),
+                              size: 18,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              )).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
             ],
           ),
         ),
@@ -632,7 +636,7 @@ class HomeScreen extends StatelessWidget {
         ),
         _buildGridCard(
           context,
-          icon: Icons.medical_services_outlined, 
+          icon: Icons.medical_services_outlined,
           title: 'Nursing',
           isActive: true,
           iconColor: const Color(0xFF3B82F6), // Blue
@@ -646,7 +650,7 @@ class HomeScreen extends StatelessWidget {
         ),
         _buildGridCard(
           context,
-          icon: Icons.grid_view_rounded, 
+          icon: Icons.grid_view_rounded,
           title: 'More\nServices',
           isActive: false,
         ),
@@ -658,7 +662,7 @@ class HomeScreen extends StatelessWidget {
         ),
         _buildGridCard(
           context,
-          icon: Icons.medication_outlined, 
+          icon: Icons.medication_outlined,
           title: 'Pharmacy',
           isActive: false,
         ),
@@ -680,14 +684,13 @@ class HomeScreen extends StatelessWidget {
             SnackBar(
               content: const Text(
                 'This section is under preparation and will be available soon.',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
               backgroundColor: const Color(0xFF0F172A),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               duration: const Duration(seconds: 3),
             ),
           );
@@ -698,24 +701,31 @@ class HomeScreen extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.6),
+              color: isActive
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
-              border: isActive 
-                  ? Border.all(color: iconColor.withValues(alpha: 0.1), width: 1.5)
+              border: isActive
+                  ? Border.all(
+                      color: iconColor.withValues(alpha: 0.1),
+                      width: 1.5,
+                    )
                   : Border.all(color: Colors.transparent),
-              boxShadow: isActive ? [
-                BoxShadow(
-                  color: iconColor.withValues(alpha: 0.08),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ] : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: isActive
+                  ? [
+                      BoxShadow(
+                        color: iconColor.withValues(alpha: 0.08),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
             ),
             child: Center(
               child: Column(
@@ -725,12 +735,14 @@ class HomeScreen extends StatelessWidget {
                     width: 46,
                     height: 46,
                     decoration: BoxDecoration(
-                      color: isActive ? iconColor.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+                      color: isActive
+                          ? iconColor.withValues(alpha: 0.1)
+                          : const Color(0xFFF1F5F9),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      icon, 
-                      color: isActive ? iconColor : const Color(0xFF94A3B8), 
+                      icon,
+                      color: isActive ? iconColor : const Color(0xFF94A3B8),
                       size: 24,
                     ),
                   ),
@@ -742,9 +754,13 @@ class HomeScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       style: GoogleFonts.poppins(
-                        color: isActive ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                        color: isActive
+                            ? const Color(0xFF0F172A)
+                            : const Color(0xFF64748B),
                         fontSize: 11,
-                        fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isActive
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         height: 1.3,
                       ),
                     ),
