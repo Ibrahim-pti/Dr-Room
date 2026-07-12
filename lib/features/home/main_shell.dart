@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../doctors/favorite_doctors_screen.dart';
 import '../ai_assistant/ai_symptom_checker_screen.dart';
 import '../body_map/body_map_screen.dart';
+import '../surgery/surgery_timeline_screen.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
@@ -279,6 +280,21 @@ class _MainShellState extends State<MainShell> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const BodyMapScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.hospital,
+                    title: 'Surgery Timeline',
+                    color: const Color(0xFFEF4444),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SurgeryTimelineScreen(),
                         ),
                       );
                     },
