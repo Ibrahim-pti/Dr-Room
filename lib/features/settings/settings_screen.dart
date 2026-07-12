@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import 'family_members_screen.dart';
-import 'saved_addresses_screen.dart';
+import '../settings/saved_addresses_screen.dart';
+import '../records/medical_records_screen.dart';
+import '../prescriptions/pill_reminder_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -171,12 +173,24 @@ class SettingsScreen extends StatelessWidget {
                           icon: Iconsax.document_text,
                           color: const Color(0xFF10B981),
                           label: 'Medical\nRecords',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const MedicalRecordsScreen()),
+                            );
+                          },
                         ),
                         _buildGridItem(
                           context,
                           icon: Icons.medication_outlined,
                           color: const Color(0xFF8B5CF6),
                           label: 'My\nPrescriptions',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const PillReminderScreen()),
+                            );
+                          },
                         ),
                         _buildGridItem(
                           context,
@@ -203,7 +217,7 @@ class SettingsScreen extends StatelessWidget {
                       title: 'Dark Mode',
                       value: isDark,
                       onChanged: (val) {
-                        ThemeProvider().toggleTheme();
+                        Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
                       },
                     ),
                   ),
@@ -311,34 +325,38 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(BuildContext context, {required IconData icon, required Color color, required String label}) {
-    return Column(
-      children: [
-        Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14),
+  Widget _buildGridItem(BuildContext context, {required IconData icon, required Color color, required String label, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 22,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 22,
+          const SizedBox(height: 6),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: AppColors.getTextTitle(context),
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              height: 1.3,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(
-            color: AppColors.getTextTitle(context),
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            height: 1.3,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

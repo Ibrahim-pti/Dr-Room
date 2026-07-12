@@ -11,6 +11,9 @@ import '../notifications/notifications_screen.dart';
 import '../lab/lab_order_method_screen.dart';
 import '../nursing/nursing_services_screen.dart';
 import 'promo_carousel.dart';
+import '../records/medical_records_screen.dart';
+import '../emergency/sos_screen.dart';
+import '../locator/clinic_locator_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -659,7 +662,7 @@ class HomeScreen extends StatelessWidget {
           context,
           imagePath: 'assets/images/doctor.png',
           title: 'Doctor',
-          isActive: false,
+          isActive: true,
         ),
         _buildGridCard(
           context,
@@ -688,20 +691,20 @@ class HomeScreen extends StatelessWidget {
         _buildGridCard(
           context,
           imagePath: 'assets/images/report.png',
-          title: 'Reports',
-          isActive: false,
+          title: 'Records',
+          isActive: true,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/apps.png',
-          title: 'Specialty',
-          isActive: false,
+          title: 'Locator',
+          isActive: true,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/add.png',
           title: 'Ambulance',
-          isActive: false,
+          isActive: true,
         ),
       ],
     );
@@ -746,6 +749,34 @@ class HomeScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const NursingServicesScreen(),
+              ),
+            );
+          } else if (title == 'Doctor') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AllDoctorsScreen(),
+              ),
+            );
+          } else if (title == 'Records') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MedicalRecordsScreen(),
+              ),
+            );
+          } else if (title == 'Locator') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ClinicLocatorScreen(),
+              ),
+            );
+          } else if (title == 'Ambulance') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SosScreen(),
               ),
             );
           }
