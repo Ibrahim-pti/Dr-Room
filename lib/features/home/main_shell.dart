@@ -7,6 +7,7 @@ import '../records/medical_records_screen.dart';
 import '../discover/discover_screen.dart';
 import '../settings/settings_screen.dart';
 import '../appointments/all_schedules_screen.dart';
+import '../notifications/notifications_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MainShell extends StatefulWidget {
@@ -139,7 +140,7 @@ class _MainShellState extends State<MainShell> {
         borderRadius: BorderRadius.horizontal(left: Radius.circular(32)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
             padding: const EdgeInsets.only(
@@ -149,28 +150,11 @@ class _MainShellState extends State<MainShell> {
               right: 24,
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.getBorder(context),
-                          width: 2,
-                        ),
-                        image: const DecorationImage(
-                          image: AssetImage(
-                            'assets/images/doctor2.png',
-                          ), // Placeholder
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
                     // Close Button
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
@@ -190,11 +174,29 @@ class _MainShellState extends State<MainShell> {
                         ),
                       ),
                     ),
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.getBorder(context),
+                          width: 2,
+                        ),
+                        image: const DecorationImage(
+                          image: AssetImage(
+                            'assets/images/doctor2.png',
+                          ), // Placeholder
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'Sara Ahmed',
+                  textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextTitle(context),
                     fontSize: 24,
@@ -204,6 +206,7 @@ class _MainShellState extends State<MainShell> {
                 const SizedBox(height: 4),
                 Text(
                   '+964 750 123 4567',
+                  textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextSubtitle(context),
                     fontSize: 14,
@@ -225,8 +228,6 @@ class _MainShellState extends State<MainShell> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Iconsax.star_1, color: Colors.white, size: 16),
-                      const SizedBox(width: 8),
                       Text(
                         'DrRoom Plus Member',
                         style: GoogleFonts.poppins(
@@ -235,6 +236,8 @@ class _MainShellState extends State<MainShell> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      const Icon(Iconsax.star_1, color: Colors.white, size: 16),
                     ],
                   ),
                 ),
@@ -248,7 +251,7 @@ class _MainShellState extends State<MainShell> {
                 children: [
                   _buildDrawerItem(
                     context,
-                    icon: Iconsax.receipt_2,
+                    imagePath: 'assets/images/drawer_orders.png',
                     title: 'My Orders',
                     color: const Color(0xFF3B82F6),
                     onTap: () {
@@ -263,34 +266,48 @@ class _MainShellState extends State<MainShell> {
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Iconsax.heart,
-                    title: 'Favorites',
-                    color: const Color(0xFFEF4444),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Iconsax.wallet_2,
+                    imagePath: 'assets/images/drawer_wallet.png',
                     title: 'Wallet & Payments',
                     color: const Color(0xFF10B981),
                     onTap: () => Navigator.pop(context),
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Iconsax.setting_2,
-                    title: 'Settings',
+                    imagePath: 'assets/images/settings_security.png',
+                    title: 'Data & Security',
                     color: const Color(0xFF64748B),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    imagePath: 'assets/images/settings_notifications.png',
+                    title: 'Notifications',
+                    color: const Color(0xFFF59E0B),
                     onTap: () {
                       Navigator.pop(context);
-                      // Let the user handle where to go, or go to Profile.
-                      setState(() {
-                        _currentIndex = 4;
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                      );
                     },
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Iconsax.message_question,
+                    icon: Iconsax.call,
+                    title: 'Emergency Contacts',
+                    color: const Color(0xFFEF4444),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.user_add,
+                    title: 'Invite Friends',
+                    color: const Color(0xFF3B82F6),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    imagePath: 'assets/images/drawer_help.png',
                     title: 'Help & Support',
                     color: const Color(0xFFF59E0B),
                     onTap: () => Navigator.pop(context),
@@ -304,7 +321,7 @@ class _MainShellState extends State<MainShell> {
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Iconsax.logout,
+                    imagePath: 'assets/images/drawer_logout.png',
                     title: 'Logout',
                     color: const Color(0xFFEF4444),
                     isLogout: true,
@@ -322,7 +339,8 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildDrawerItem(
     BuildContext context, {
-    required IconData icon,
+    IconData? icon,
+    String? imagePath,
     required String title,
     required VoidCallback onTap,
     required Color color,
@@ -336,37 +354,44 @@ class _MainShellState extends State<MainShell> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           child: Row(
             children: [
+              Icon(
+                Icons.chevron_left_rounded,
+                color: isLogout ? Colors.transparent : const Color(0xFFCBD5E1),
+                size: 22,
+              ),
+              Expanded(
+                child: Text(
+                  title,
+                  textAlign: TextAlign.right,
+                  style: GoogleFonts.poppins(
+                    color: color,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: isLogout
-                      ? color.withValues(alpha: 0.1)
-                      : AppColors.getSurface(context),
                   borderRadius: BorderRadius.circular(14),
-                  border: isLogout
+                  border: (isLogout || imagePath != null)
                       ? null
                       : Border.all(color: AppColors.getBorder(context)),
                 ),
-                child: Icon(icon, color: color, size: 22),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    color: isLogout ? color : AppColors.getTextTitle(context),
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: imagePath != null
+                      ? Image.asset(imagePath, fit: BoxFit.cover)
+                      : Container(
+                          color: isLogout
+                              ? color.withValues(alpha: 0.1)
+                              : AppColors.getSurface(context),
+                          child: Icon(icon, color: color, size: 22),
+                        ),
                 ),
               ),
-              if (!isLogout)
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors.getTextSubtitle(context),
-                  size: 20,
-                ),
             ],
           ),
         ),

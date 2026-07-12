@@ -176,7 +176,9 @@ class HomeScreen extends StatelessWidget {
                                           width: 46,
                                           height: 46,
                                           decoration: BoxDecoration(
-                                            color: AppColors.getSurface(context),
+                                            color: AppColors.getSurface(
+                                              context,
+                                            ),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(
@@ -271,7 +273,10 @@ class HomeScreen extends StatelessWidget {
               ),
 
               // ── Promo Carousel ──
-              const PromoCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+              const PromoCarousel()
+                  .animate()
+                  .fadeIn(delay: 300.ms)
+                  .slideY(begin: 0.1, end: 0),
 
               const SizedBox(height: 32),
 
@@ -779,9 +784,7 @@ class HomeScreen extends StatelessWidget {
           } else if (title == 'Doctor') {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const AllDoctorsScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const AllDoctorsScreen()),
             );
           } else if (title == 'Records') {
             Navigator.push(
@@ -800,9 +803,7 @@ class HomeScreen extends StatelessWidget {
           } else if (title == 'Ambulance') {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => const SosScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const SosScreen()),
             );
           }
         }

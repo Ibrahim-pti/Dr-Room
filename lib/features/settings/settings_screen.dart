@@ -8,6 +8,7 @@ import 'family_members_screen.dart';
 import '../settings/saved_addresses_screen.dart';
 import '../records/medical_records_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -164,14 +165,12 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         _buildGridItem(
                           context,
-                          icon: Iconsax.calendar_1,
-                          color: const Color(0xFF3B82F6),
+                          imagePath: 'assets/images/settings_appointments.png',
                           label: 'My\nAppointments',
                         ),
                         _buildGridItem(
                           context,
-                          icon: Iconsax.document_text,
-                          color: const Color(0xFF10B981),
+                          imagePath: 'assets/images/drawer_orders.png',
                           label: 'Medical\nRecords',
                           onTap: () {
                             Navigator.push(
@@ -182,8 +181,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         _buildGridItem(
                           context,
-                          icon: Icons.medication_outlined,
-                          color: const Color(0xFF8B5CF6),
+                          imagePath: 'assets/images/medicine.png',
                           label: 'My\nPrescriptions',
                           onTap: () {
                             Navigator.push(
@@ -194,8 +192,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         _buildGridItem(
                           context,
-                          icon: Iconsax.heart,
-                          color: const Color(0xFFEF4444),
+                          imagePath: 'assets/images/drawer_favorites.png',
                           label: 'Health\nCheckups',
                         ),
                       ],
@@ -213,7 +210,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     child: _buildToggleItem(
                       context,
-                      icon: isDark ? Iconsax.moon : Iconsax.sun_1,
+                      imagePath: 'assets/images/settings_theme.png',
                       title: 'Dark Mode',
                       value: isDark,
                       onChanged: (val) {
@@ -233,85 +230,22 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(context, Iconsax.user, 'Personal Information', onTap: () {}),
+                        _buildListItem(context, imagePath: 'assets/images/settings_personal.png', title: 'Personal Information', onTap: () {}),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.card, 'Payment Methods', onTap: () {}),
-                        _buildDivider(context),
-                        _buildListItem(context, Iconsax.people, 'My Family', onTap: () {
+                        _buildListItem(context, imagePath: 'assets/images/doctor.png', title: 'My Family', onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const FamilyMembersScreen()),
                           );
                         }),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.location, 'Address', onTap: () {
+                        _buildListItem(context, imagePath: 'assets/images/settings_addresses.png', title: 'Address', onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const SavedAddressesScreen()),
                           );
                         }),
-                        _buildDivider(context),
-                        _buildListItem(context, Iconsax.call, 'Emergency Contacts', onTap: () {}),
                       ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Section 2
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.getBorder(context)),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildListItem(context, Iconsax.setting_2, 'Settings', onTap: () {}),
-                        _buildDivider(context),
-                        _buildListItem(context, Icons.help_outline_rounded, 'Help & Support', onTap: () {}),
-                        _buildDivider(context),
-                        _buildListItem(context, Iconsax.info_circle, 'About DrRoom', onTap: () {}),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Log Out
-                  Container(
-                    width: double.infinity,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.getBorder(context)),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Iconsax.logout,
-                              color: Color(0xFFEF4444),
-                              size: 22,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Log Out',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFFEF4444),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
 
@@ -325,7 +259,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(BuildContext context, {required IconData icon, required Color color, required String label, VoidCallback? onTap}) {
+  Widget _buildGridItem(BuildContext context, {IconData? icon, String? imagePath, Color? color, required String label, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -335,14 +269,19 @@ class SettingsScreen extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color != null ? color.withValues(alpha: 0.1) : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 22,
-            ),
+            child: imagePath != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                  )
+                : Icon(
+                    icon,
+                    color: color,
+                    size: 22,
+                  ),
           ),
           const SizedBox(height: 6),
           Text(
@@ -360,7 +299,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(BuildContext context, IconData icon, String title, {VoidCallback? onTap}) {
+  Widget _buildListItem(BuildContext context, {IconData? icon, String? imagePath, required String title, VoidCallback? onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -369,11 +308,24 @@ class SettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Icon(
-                icon,
-                color: AppColors.getTextSubtitle(context),
-                size: 20,
-              ),
+              if (imagePath != null)
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                  ),
+                )
+              else if (icon != null)
+                Icon(
+                  icon,
+                  color: AppColors.getTextSubtitle(context),
+                  size: 20,
+                ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
@@ -399,16 +351,29 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildToggleItem(BuildContext context, {required IconData icon, required String title, required bool value, required ValueChanged<bool> onChanged}) {
+  Widget _buildToggleItem(BuildContext context, {IconData? icon, String? imagePath, required String title, required bool value, required ValueChanged<bool> onChanged}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: AppColors.primary,
-            size: 20,
-          ),
+          if (imagePath != null)
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(imagePath, fit: BoxFit.cover),
+              ),
+            )
+          else if (icon != null)
+            Icon(
+              icon,
+              color: AppColors.primary,
+              size: 20,
+            ),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
