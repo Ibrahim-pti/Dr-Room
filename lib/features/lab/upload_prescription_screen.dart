@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../checkout/checkout_details_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UploadPrescriptionScreen extends StatefulWidget {
@@ -170,18 +171,10 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
               child: ElevatedButton(
                 onPressed: _imageFile != null
                     ? () {
-                        // Navigate to next step
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Prescription uploaded successfully!',
-                              style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                            backgroundColor: const Color(0xFF10B981),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CheckoutDetailsScreen(),
                           ),
                         );
                       }

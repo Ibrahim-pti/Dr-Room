@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../checkout/checkout_details_screen.dart';
 
 class SelectTestsScreen extends StatefulWidget {
   const SelectTestsScreen({super.key});
@@ -178,7 +179,12 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                     child: ElevatedButton(
                       onPressed: selectedCount > 0
                           ? () {
-                              // Navigate to next step
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CheckoutDetailsScreen(),
+                                ),
+                              );
                             }
                           : null,
                       style: ElevatedButton.styleFrom(

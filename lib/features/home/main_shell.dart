@@ -5,6 +5,7 @@ import 'home_screen.dart';
 import '../orders/orders_screen.dart';
 import '../records/records_screen.dart';
 import '../settings/settings_screen.dart';
+import '../appointments/all_schedules_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -19,6 +20,7 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = const [
     HomeScreen(),
     OrdersScreen(),
+    AllSchedulesScreen(),
     RecordsScreen(),
     SettingsScreen(),
   ];
@@ -57,9 +59,10 @@ class _MainShellState extends State<MainShell> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(0, Iconsax.home_2),
-                  _buildNavItem(1, Iconsax.heart),
-                  _buildNavItem(2, Iconsax.briefcase),
-                  _buildNavItem(3, Iconsax.setting_2),
+                  _buildNavItem(1, Iconsax.receipt_2),
+                  _buildNavItem(2, Iconsax.calendar_1),
+                  _buildNavItem(3, Iconsax.folder_2),
+                  _buildNavItem(4, Iconsax.user),
                 ],
               ),
             ),
@@ -113,11 +116,13 @@ class _MainShellState extends State<MainShell> {
       case 0:
         return 'Home';
       case 1:
-        return 'Favorites';
+        return 'Orders';
       case 2:
-        return 'Records';
+        return 'Schedule';
       case 3:
-        return 'Settings';
+        return 'Records';
+      case 4:
+        return 'Profile';
       default:
         return '';
     }
