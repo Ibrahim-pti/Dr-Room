@@ -10,6 +10,7 @@ import 'doctor_details_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../lab/lab_order_method_screen.dart';
 import '../nursing/nursing_services_screen.dart';
+import 'promo_carousel.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -241,7 +242,10 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 24),
+              // ── Promo Carousel ──
+              const PromoCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+
+              const SizedBox(height: 32),
 
               // ── Categories (Grid) ──
               Padding(
