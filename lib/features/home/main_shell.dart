@@ -1,5 +1,7 @@
 import 'package:dr_room/features/orders/orders_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../doctors/favorite_doctors_screen.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
@@ -249,6 +251,21 @@ class _MainShellState extends State<MainShell> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.favorite,
+                    title: 'Favorite Doctors',
+                    color: const Color(0xFFEF4444),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FavoriteDoctorsScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   _buildDrawerItem(
                     context,
                     imagePath: 'assets/images/drawer_orders.png',
