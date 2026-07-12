@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import 'chat_screen.dart';
+import 'doctor_reviews_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final String name;
@@ -229,6 +230,53 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     ],
                   ),
                 ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.1, end: 0),
+
+                const SizedBox(height: 20),
+
+                // ── Reviews Section ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Iconsax.star_1, color: Color(0xFFF59E0B), size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            '4.9 (124 reviews)',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DoctorReviewsScreen(
+                                doctorName: widget.name,
+                                rating: '4.9',
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'See All',
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate(delay: 250.ms).fadeIn(),
 
                 const SizedBox(height: 24),
 

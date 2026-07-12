@@ -2,6 +2,7 @@ import 'package:dr_room/features/orders/orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../doctors/favorite_doctors_screen.dart';
+import '../ai_assistant/ai_symptom_checker_screen.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
@@ -251,6 +252,21 @@ class _MainShellState extends State<MainShell> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.health,
+                    title: 'DrRoom AI Assistant',
+                    color: const Color(0xFF8B5CF6),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AiSymptomCheckerScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   _buildDrawerItem(
                     context,
                     icon: Icons.favorite,

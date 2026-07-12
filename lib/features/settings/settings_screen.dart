@@ -7,6 +7,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'personal_information_screen.dart';
 import 'help_support_screen.dart';
+import '../health_sync/health_dashboard_screen.dart';
 import '../settings/saved_addresses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -210,6 +211,21 @@ class SettingsScreen extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) =>
                                     const PersonalInformationScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        _buildDivider(context),
+                        _buildListItem(
+                          context,
+                          icon: Iconsax.health,
+                          title: 'Health Data Sync',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HealthDashboardScreen(),
                               ),
                             );
                           },

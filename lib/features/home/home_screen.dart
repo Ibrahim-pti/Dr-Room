@@ -278,6 +278,8 @@ class HomeScreen extends StatelessWidget {
                   .fadeIn(delay: 300.ms)
                   .slideY(begin: 0.1, end: 0),
 
+
+
               const SizedBox(height: 32),
 
               // ── Categories (Grid) ──
@@ -365,160 +367,184 @@ class HomeScreen extends StatelessWidget {
               // ── Upcoming Appointment Card ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AllSchedulesScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: AppColors.getBorder(context),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        // Doctor Info Row
-                        Row(
-                          children: [
-                            Container(
-                              width: 56,
-                              height: 56,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage('assets/images/doctor1.png'),
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.topCenter,
-                                ),
+                child:
+                    GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const AllSchedulesScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: AppColors.getSurface(context),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: AppColors.getBorder(context),
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
                               children: [
-                                Text(
-                                  'Dr. Ayesha Rahman',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.getTextTitle(context),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Skin Specialist',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.getTextSubtitle(context),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        // Date & Time Row
-                        Row(
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Iconsax.calendar_1,
-                                  size: 18,
-                                  color: Color(0xFF64748B),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '13 Nov, Thursday',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.getTextSubtitle(context),
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 24),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Iconsax.clock,
-                                  size: 18,
-                                  color: Color(0xFF64748B),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '6:30 PM',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.getTextSubtitle(context),
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        // Actions Row
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Cancel',
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(0xFF3B82F6),
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
+                                // Doctor Info Row
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 56,
+                                      height: 56,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            'assets/images/doctor1.png',
+                                          ),
+                                          fit: BoxFit.cover,
+                                          alignment: Alignment.topCenter,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Container(
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF3B82F6),
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Reschedule',
-                                    style: GoogleFonts.poppins(
-                                      color: AppColors.getSurface(context),
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
+                                    const SizedBox(width: 16),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Dr. Ayesha Rahman',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.getTextTitle(
+                                              context,
+                                            ),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Skin Specialist',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.getTextSubtitle(
+                                              context,
+                                            ),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ),
+                                const SizedBox(height: 20),
+                                // Date & Time Row
+                                Row(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Iconsax.calendar_1,
+                                          size: 18,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '13 Nov, Thursday',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.getTextSubtitle(
+                                              context,
+                                            ),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 24),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Iconsax.clock,
+                                          size: 18,
+                                          color: Color(0xFF64748B),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          '6:30 PM',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.getTextSubtitle(
+                                              context,
+                                            ),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                // Actions Row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFF3B82F6,
+                                          ).withValues(alpha: 0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Cancel',
+                                            style: GoogleFonts.poppins(
+                                              color: const Color(0xFF3B82F6),
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Container(
+                                        height: 48,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF3B82F6),
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            'Reschedule',
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors.getSurface(
+                                                context,
+                                              ),
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.2, end: 0),
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(delay: 300.ms, duration: 400.ms)
+                        .slideY(begin: 0.2, end: 0),
               ),
-              
-               SizedBox(height: 32),
-                           
+
+              SizedBox(height: 32),
+
               // ── Top Doctors Header ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
