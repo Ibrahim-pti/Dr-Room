@@ -7,7 +7,7 @@ import '../records/medical_records_screen.dart';
 import '../discover/discover_screen.dart';
 import '../settings/settings_screen.dart';
 import '../appointments/all_schedules_screen.dart';
-import '../notifications/notifications_screen.dart';
+import '../prescriptions/pill_reminder_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MainShell extends StatefulWidget {
@@ -266,66 +266,18 @@ class _MainShellState extends State<MainShell> {
                   ),
                   _buildDrawerItem(
                     context,
-                    imagePath: 'assets/images/drawer_wallet.png',
-                    title: 'Wallet & Payments',
-                    color: const Color(0xFF10B981),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    imagePath: 'assets/images/settings_security.png',
-                    title: 'Data & Security',
-                    color: const Color(0xFF64748B),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    imagePath: 'assets/images/settings_notifications.png',
-                    title: 'Notifications',
-                    color: const Color(0xFFF59E0B),
+                    imagePath: 'assets/images/medicine.png',
+                    title: 'My Prescriptions',
+                    color: const Color(0xFF8B5CF6),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const PillReminderScreen(),
+                        ),
                       );
                     },
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Iconsax.call,
-                    title: 'Emergency Contacts',
-                    color: const Color(0xFFEF4444),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Iconsax.user_add,
-                    title: 'Invite Friends',
-                    color: const Color(0xFF3B82F6),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    imagePath: 'assets/images/drawer_help.png',
-                    title: 'Help & Support',
-                    color: const Color(0xFFF59E0B),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    child: Divider(color: AppColors.getBorder(context)),
-                  ),
-                  _buildDrawerItem(
-                    context,
-                    imagePath: 'assets/images/drawer_logout.png',
-                    title: 'Logout',
-                    color: const Color(0xFFEF4444),
-                    isLogout: true,
-                    onTap: () => Navigator.pop(context),
                   ),
                   const SizedBox(height: 32),
                 ],

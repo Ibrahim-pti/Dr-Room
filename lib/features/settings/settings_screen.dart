@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'personal_information_screen.dart';
 import 'family_members_screen.dart';
 import '../settings/saved_addresses_screen.dart';
-import '../records/medical_records_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
-import '../notifications/notifications_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -38,7 +37,10 @@ class SettingsScreen extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: isDark
                             ? [const Color(0xFF1E3A8A), const Color(0xFF3B82F6)]
-                            : [const Color(0xFF4A90E2), const Color(0xFF82B1FF)],
+                            : [
+                                const Color(0xFF4A90E2),
+                                const Color(0xFF82B1FF),
+                              ],
                       ),
                     ),
                   ),
@@ -63,7 +65,10 @@ class SettingsScreen extends StatelessWidget {
                   SafeArea(
                     bottom: false,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 10,
+                      ),
                       child: Center(
                         child: Text(
                           'Profile',
@@ -91,14 +96,22 @@ class SettingsScreen extends StatelessWidget {
                               height: 90,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                                color: isDark
+                                    ? const Color(0xFF334155)
+                                    : const Color(0xFFE2E8F0),
                                 border: Border.all(
-                                    color: Theme.of(context).scaffoldBackgroundColor, width: 4),
+                                  color: Theme.of(
+                                    context,
+                                  ).scaffoldBackgroundColor,
+                                  width: 4,
+                                ),
                               ),
                               child: Icon(
                                 Icons.person_rounded,
                                 size: 50,
-                                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                                color: isDark
+                                    ? const Color(0xFF64748B)
+                                    : const Color(0xFF94A3B8),
                               ),
                             ),
                             Positioned(
@@ -111,7 +124,11 @@ class SettingsScreen extends StatelessWidget {
                                   color: const Color(0xFF3B82F6),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                      color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                                    color: Theme.of(
+                                      context,
+                                    ).scaffoldBackgroundColor,
+                                    width: 2,
+                                  ),
                                 ),
                                 child: const Icon(
                                   Icons.camera_alt,
@@ -151,56 +168,6 @@ class SettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Top Grid
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.getBorder(context)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildGridItem(
-                          context,
-                          imagePath: 'assets/images/settings_appointments.png',
-                          label: 'My\nAppointments',
-                        ),
-                        _buildGridItem(
-                          context,
-                          imagePath: 'assets/images/drawer_orders.png',
-                          label: 'Medical\nRecords',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const MedicalRecordsScreen()),
-                            );
-                          },
-                        ),
-                        _buildGridItem(
-                          context,
-                          imagePath: 'assets/images/medicine.png',
-                          label: 'My\nPrescriptions',
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const PillReminderScreen()),
-                            );
-                          },
-                        ),
-                        _buildGridItem(
-                          context,
-                          imagePath: 'assets/images/drawer_favorites.png',
-                          label: 'Health\nCheckups',
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
                   // Dark Mode Toggle Section
                   Container(
                     decoration: BoxDecoration(
@@ -214,7 +181,10 @@ class SettingsScreen extends StatelessWidget {
                       title: 'Dark Mode',
                       value: isDark,
                       onChanged: (val) {
-                        Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+                        Provider.of<ThemeProvider>(
+                          context,
+                          listen: false,
+                        ).toggleTheme();
                       },
                     ),
                   ),
@@ -230,22 +200,103 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(context, imagePath: 'assets/images/settings_personal.png', title: 'Personal Information', onTap: () {}),
+                        _buildListItem(
+                          context,
+                          imagePath: 'assets/images/settings_personal.png',
+                          title: 'Personal Information',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const PersonalInformationScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
                         _buildDivider(context),
-                        _buildListItem(context, imagePath: 'assets/images/doctor.png', title: 'My Family', onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const FamilyMembersScreen()),
-                          );
-                        }),
-                        _buildDivider(context),
-                        _buildListItem(context, imagePath: 'assets/images/settings_addresses.png', title: 'Address', onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const SavedAddressesScreen()),
-                          );
-                        }),
+                        _buildListItem(
+                          context,
+                          imagePath: 'assets/images/settings_addresses.png',
+                          title: 'Address',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const SavedAddressesScreen(),
+                              ),
+                            );
+                          },
+                        ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Section 2
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildListItem(
+                          context,
+                          imagePath: 'assets/images/drawer_help.png',
+                          title: 'Help & Support',
+                          onTap: () {},
+                        ),
+                        _buildDivider(context),
+                        _buildListItem(
+                          context,
+                          icon: Iconsax.user_add,
+                          title: 'Invite Friends',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Log Out
+                  Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {},
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Iconsax.logout,
+                              color: Color(0xFFEF4444),
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Log Out',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFFEF4444),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
 
@@ -259,7 +310,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(BuildContext context, {IconData? icon, String? imagePath, Color? color, required String label, VoidCallback? onTap}) {
+  Widget _buildGridItem(
+    BuildContext context, {
+    IconData? icon,
+    String? imagePath,
+    Color? color,
+    required String label,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -269,7 +327,9 @@ class SettingsScreen extends StatelessWidget {
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: color != null ? color.withValues(alpha: 0.1) : Colors.transparent,
+              color: color != null
+                  ? color.withValues(alpha: 0.1)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
             ),
             child: imagePath != null
@@ -277,11 +337,7 @@ class SettingsScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     child: Image.asset(imagePath, fit: BoxFit.cover),
                   )
-                : Icon(
-                    icon,
-                    color: color,
-                    size: 22,
-                  ),
+                : Icon(icon, color: color, size: 22),
           ),
           const SizedBox(height: 6),
           Text(
@@ -299,7 +355,13 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(BuildContext context, {IconData? icon, String? imagePath, required String title, VoidCallback? onTap}) {
+  Widget _buildListItem(
+    BuildContext context, {
+    IconData? icon,
+    String? imagePath,
+    required String title,
+    VoidCallback? onTap,
+  }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -321,11 +383,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 )
               else if (icon != null)
-                Icon(
-                  icon,
-                  color: AppColors.getTextSubtitle(context),
-                  size: 20,
-                ),
+                Icon(icon, color: AppColors.getTextSubtitle(context), size: 20),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
@@ -339,8 +397,8 @@ class SettingsScreen extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? const Color(0xFF475569) 
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF475569)
                     : const Color(0xFFCBD5E1),
                 size: 22,
               ),
@@ -351,7 +409,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildToggleItem(BuildContext context, {IconData? icon, String? imagePath, required String title, required bool value, required ValueChanged<bool> onChanged}) {
+  Widget _buildToggleItem(
+    BuildContext context, {
+    IconData? icon,
+    String? imagePath,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
@@ -360,20 +425,14 @@ class SettingsScreen extends StatelessWidget {
             Container(
               width: 32,
               height: 32,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(imagePath, fit: BoxFit.cover),
               ),
             )
           else if (icon != null)
-            Icon(
-              icon,
-              color: AppColors.primary,
-              size: 20,
-            ),
+            Icon(icon, color: AppColors.primary, size: 20),
           const SizedBox(width: 14),
           Expanded(
             child: Text(
