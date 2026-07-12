@@ -120,48 +120,73 @@ class HomeScreen extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  // Notification Icon
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NotificationsScreen(),
+                                  // Right Icons (Menu & Notification)
+                                  Row(
+                                    children: [
+                                      // Notification Icon
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const NotificationsScreen(),
+                                            ),
+                                          );
+                                        },
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 46,
+                                              height: 46,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.getSurface(
+                                                  context,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Iconsax.notification,
+                                                color: Color(0xFF0F172A),
+                                                size: 22,
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 12,
+                                              right: 12,
+                                              child: Container(
+                                                width: 8,
+                                                height: 8,
+                                                decoration: const BoxDecoration(
+                                                  color: Colors.redAccent,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    },
-                                    child: Stack(
-                                      children: [
-                                        Container(
+                                      ),
+                                      const SizedBox(width: 12),
+                                      // Menu Icon
+                                      GestureDetector(
+                                        onTap: () {
+                                          Scaffold.of(context).openEndDrawer();
+                                        },
+                                        child: Container(
                                           width: 46,
                                           height: 46,
                                           decoration: BoxDecoration(
-                                            color: AppColors.getSurface(
-                                              context,
-                                            ),
+                                            color: AppColors.getSurface(context),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(
-                                            Iconsax.notification,
+                                            Iconsax.menu_1,
                                             color: Color(0xFF0F172A),
                                             size: 22,
                                           ),
                                         ),
-                                        Positioned(
-                                          top: 12,
-                                          right: 12,
-                                          child: Container(
-                                            width: 8,
-                                            height: 8,
-                                            decoration: BoxDecoration(
-                                              color: Colors.redAccent,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               )
