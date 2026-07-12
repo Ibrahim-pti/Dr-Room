@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../categories/all_categories_screen.dart';
 import '../appointments/all_schedules_screen.dart';
@@ -16,9 +17,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFFF0F4FD,
-      ), // Very light blue-grey background
+      backgroundColor: Theme.of(
+        context,
+      ).scaffoldBackgroundColor, // Very light blue-grey background
       body: SingleChildScrollView(
         child: Padding(
           // Extra bottom padding for the floating navigation bar
@@ -34,7 +35,7 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     height: 280,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -71,7 +72,9 @@ class HomeScreen extends StatelessWidget {
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: Colors.white,
+                                            color: AppColors.getSurface(
+                                              context,
+                                            ),
                                             width: 2,
                                           ),
                                           image: const DecorationImage(
@@ -92,7 +95,9 @@ class HomeScreen extends StatelessWidget {
                                           Text(
                                             'Hi, Sara',
                                             style: GoogleFonts.poppins(
-                                              color: Colors.white,
+                                              color: AppColors.getSurface(
+                                                context,
+                                              ),
                                               fontSize: 18,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -127,8 +132,10 @@ class HomeScreen extends StatelessWidget {
                                         Container(
                                           width: 46,
                                           height: 46,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.getSurface(
+                                              context,
+                                            ),
                                             shape: BoxShape.circle,
                                           ),
                                           child: const Icon(
@@ -143,7 +150,7 @@ class HomeScreen extends StatelessWidget {
                                           child: Container(
                                             width: 8,
                                             height: 8,
-                                            decoration: const BoxDecoration(
+                                            decoration: BoxDecoration(
                                               color: Colors.redAccent,
                                               shape: BoxShape.circle,
                                             ),
@@ -164,7 +171,7 @@ class HomeScreen extends StatelessWidget {
                           Text(
                                 'Your Health Starts With\nThe Right Doctor',
                                 style: GoogleFonts.poppins(
-                                  color: Colors.white,
+                                  color: AppColors.getSurface(context),
                                   fontSize: 26,
                                   fontWeight: FontWeight.w600,
                                   height: 1.3,
@@ -184,17 +191,11 @@ class HomeScreen extends StatelessWidget {
                                   right: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppColors.getSurface(context),
                                   borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
-                                      ),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+                                  border: Border.all(
+                                    color: AppColors.getBorder(context),
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
@@ -215,13 +216,13 @@ class HomeScreen extends StatelessWidget {
                                     Container(
                                       width: 44,
                                       height: 44,
-                                      decoration: const BoxDecoration(
+                                      decoration: BoxDecoration(
                                         color: Color(0xFF3B82F6),
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(
+                                      child: Icon(
                                         Iconsax.microphone,
-                                        color: Colors.white,
+                                        color: AppColors.getSurface(context),
                                         size: 20,
                                       ),
                                     ),
@@ -251,7 +252,7 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Categories',
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF0F172A),
+                        color: AppColors.getTextTitle(context),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -260,7 +261,9 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const AllCategoriesScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const AllCategoriesScreen(),
+                          ),
                         );
                       },
                       child: Text(
@@ -293,7 +296,7 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Upcoming Schedule',
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF0F172A),
+                        color: AppColors.getTextTitle(context),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -302,7 +305,9 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const AllSchedulesScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const AllSchedulesScreen(),
+                          ),
                         );
                       },
                       child: Text(
@@ -320,166 +325,166 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-
-                          // ── Upcoming Appointment Card ──
-                          Padding(
+              // ── Upcoming Appointment Card ──
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(
-                                        0xFF3B82F6,
-                                      ).withValues(alpha: 0.1),
-                                      blurRadius: 24,
-                                      offset: const Offset(0, 8),
+                child:
+                    Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: AppColors.getSurface(context),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: AppColors.getBorder(context),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              // Doctor Info Row
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 56,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: const DecorationImage(
+                                        image: AssetImage(
+                                          'assets/images/doctor1.png',
+                                        ), // placeholder
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.topCenter,
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    // Doctor Info Row
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 56,
-                                          height: 56,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: const DecorationImage(
-                                              image: AssetImage(
-                                                'assets/images/doctor1.png',
-                                              ), // placeholder
-                                              fit: BoxFit.cover,
-                                              alignment: Alignment.topCenter,
-                                            ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Dr. Ayesha Rahman',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextTitle(
+                                            context,
+                                          ),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Skin Specialist',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextSubtitle(
+                                            context,
+                                          ),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              // Date & Time Row
+                              Row(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Iconsax.calendar_1,
+                                        size: 18,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '13 Nov, Thursday',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextSubtitle(
+                                            context,
+                                          ),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 24),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Iconsax.clock,
+                                        size: 18,
+                                        color: Color(0xFF64748B),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '6:30 PM',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextSubtitle(
+                                            context,
+                                          ),
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              // Buttons Row
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF1F5F9),
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Cancel',
+                                          style: GoogleFonts.poppins(
+                                            color: const Color(0xFF64748B),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 16),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Dr. Ayesha Rahman',
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF0F172A),
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Skin Specialist',
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF64748B),
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                    const SizedBox(height: 20),
-                                    // Date & Time Row
-                                    Row(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Iconsax.calendar_1,
-                                              size: 18,
-                                              color: Color(0xFF64748B),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Container(
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF3B82F6),
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Reschedule',
+                                          style: GoogleFonts.poppins(
+                                            color: AppColors.getSurface(
+                                              context,
                                             ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              '13 Nov, Thursday',
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF64748B),
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 24),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Iconsax.clock,
-                                              size: 18,
-                                              color: Color(0xFF64748B),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              '6:30 PM',
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF64748B),
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 20),
-                                    // Buttons Row
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Container(
-                                            height: 48,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFF1F5F9),
-                                              borderRadius:
-                                                  BorderRadius.circular(24),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                'Cancel',
-                                                style: GoogleFonts.poppins(
-                                                  color: const Color(
-                                                    0xFF64748B,
-                                                  ),
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Container(
-                                            height: 48,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF3B82F6),
-                                              borderRadius:
-                                                  BorderRadius.circular(24),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                'Reschedule',
-                                                style: GoogleFonts.poppins(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ],
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(delay: 300.ms, duration: 400.ms)
-                              .slideY(begin: 0.2, end: 0),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(delay: 300.ms, duration: 400.ms)
+                        .slideY(begin: 0.2, end: 0),
               ),
 
               const SizedBox(height: 32),
@@ -493,7 +498,7 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'Top Doctors',
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF0F172A),
+                        color: AppColors.getTextTitle(context),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -502,7 +507,9 @@ class HomeScreen extends StatelessWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const AllDoctorsScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const AllDoctorsScreen(),
+                          ),
                         );
                       },
                       child: Text(
@@ -535,15 +542,9 @@ class HomeScreen extends StatelessWidget {
                   child: Container(
                     height: 160,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Stack(
                       children: [
@@ -556,7 +557,7 @@ class HomeScreen extends StatelessWidget {
                               Text(
                                 'Dr. Nusrat\nJahan',
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF0F172A),
+                                  color: AppColors.getTextTitle(context),
                                   fontSize: 20,
                                   fontWeight: FontWeight.w600,
                                   height: 1.2,
@@ -566,7 +567,7 @@ class HomeScreen extends StatelessWidget {
                               Text(
                                 'Pediatrician Specialist',
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF64748B),
+                                  color: AppColors.getTextSubtitle(context),
                                   fontSize: 13,
                                 ),
                               ),
@@ -583,7 +584,7 @@ class HomeScreen extends StatelessWidget {
                                   Text(
                                     '4.9',
                                     style: GoogleFonts.poppins(
-                                      color: const Color(0xFF0F172A),
+                                      color: AppColors.getTextTitle(context),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -617,7 +618,7 @@ class HomeScreen extends StatelessWidget {
                           child: Container(
                             width: 36,
                             height: 36,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               color: Color(0xFFF0F4FD),
                               shape: BoxShape.circle,
                             ),
@@ -715,7 +716,10 @@ class HomeScreen extends StatelessWidget {
             SnackBar(
               content: Text(
                 'ئەم بەشە لە قۆناغی ئامادەکارییە و بەم زووانە دەکەوێتە خزمەتت.',
-                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               backgroundColor: const Color(0xFF0F172A),
               behavior: SnackBarBehavior.floating,
@@ -729,12 +733,16 @@ class HomeScreen extends StatelessWidget {
           if (title == 'Lab') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LabOrderMethodScreen()),
+              MaterialPageRoute(
+                builder: (context) => const LabOrderMethodScreen(),
+              ),
             );
           } else if (title == 'Nursing') {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const NursingServicesScreen()),
+              MaterialPageRoute(
+                builder: (context) => const NursingServicesScreen(),
+              ),
             );
           }
         }
@@ -756,10 +764,7 @@ class HomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(18),
                   child: Opacity(
                     opacity: isActive ? 1.0 : 0.6,
-                    child: Image.asset(
-                      imagePath,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -788,7 +793,10 @@ class HomeScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  border: Border.all(
+                    color: AppColors.getSurface(context),
+                    width: 1.5,
+                  ),
                 ),
                 child: Text(
                   'Soon',

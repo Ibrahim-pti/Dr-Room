@@ -1,48 +1,66 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class AppColors {
   AppColors._();
 
-  // ─── Primary Blue (matches reference) ─────────────────────
+  // ─── Primary Blue ─────────────────────
   static const Color primary = Color(0xFF2E86DE);
   static const Color primaryLight = Color(0xFF54A0FF);
   static const Color primarySoft = Color(0xFFDBECFF);
-  static const Color primaryBg = Color(0xFFEEF5FF);
-
-  // ─── Background ───────────────────────────────────────────
+  
+  // ─── Background (Light Mode) ───────────────────
   static const Color backgroundLight = Color(0xFFF6F9FF);
   static const Color surfaceLight = Color(0xFFFFFFFF);
   static const Color surfaceLightSecondary = Color(0xFFF0F4FA);
 
-  // ─── Text ─────────────────────────────────────────────────
+  // ─── Background (Dark Mode) ────────────────────
+  static const Color backgroundDark = Color(0xFF0F172A); // Deep slate
+  static const Color surfaceDark = Color(0xFF1E293B); // Slate card
+  static const Color surfaceDarkSecondary = Color(0xFF334155);
+
+  // ─── Text (Light Mode) ──────────────────────────
   static const Color textDark = Color(0xFF1A1F36);
   static const Color textMedium = Color(0xFF6E7191);
   static const Color textLight = Color(0xFFA0A3BD);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
-  // ─── Service Card Colors ──────────────────────────────────
-  static const Color labCard = Color(0xFFEEF5FF);
-  static const Color labCardAccent = Color(0xFF2E86DE);
-  static const Color nursingCard = Color(0xFFEDF9F0);
-  static const Color nursingCardAccent = Color(0xFF27AE60);
-  static const Color doctorCard = Color(0xFFF3EEFF);
-  static const Color doctorCardAccent = Color(0xFF8B5CF6);
-  static const Color pharmacyCard = Color(0xFFFFF4EB);
-  static const Color pharmacyCardAccent = Color(0xFFE67E22);
-  static const Color xrayCard = Color(0xFFFEECF0);
-  static const Color xrayCardAccent = Color(0xFFE74C6F);
-  static const Color moreCard = Color(0xFFE8FFFE);
-  static const Color moreCardAccent = Color(0xFF00B4D8);
-  static const Color newsCard = Color(0xFFFFF9EB);
-  static const Color newsCardAccent = Color(0xFFD4A017);
+  // ─── Text (Dark Mode) ───────────────────────────
+  static const Color textDarkBg = Color(0xFFF8FAFC); // Almost white
+  static const Color textMediumDarkBg = Color(0xFFCBD5E1);
+  static const Color textLightDarkBg = Color(0xFF94A3B8);
 
   // ─── Status ───────────────────────────────────────────────
   static const Color success = Color(0xFF27AE60);
   static const Color warning = Color(0xFFF39C12);
-  static const Color error = Color(0xFFEB5757);
+  static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF2E86DE);
 
   // ─── Misc ─────────────────────────────────────────────────
-  static const Color divider = Color(0xFFEAEDF3);
-  static const Color cardBorder = Color(0xFFE8ECF4);
+  static const Color dividerLight = Color(0xFFEAEDF3);
+  static const Color dividerDark = Color(0xFF334155);
+  static const Color cardBorderLight = Color(0xFFE8ECF4);
+  static const Color cardBorderDark = Color(0xFF334155);
+
+  // ─── Helpers ─────────────────────────────────────────────
+  static Color getBackground(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? backgroundDark : backgroundLight;
+  
+  static Color getSurface(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? surfaceDark : surfaceLight;
+      
+  static Color getSurfaceSecondary(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? surfaceDarkSecondary : surfaceLightSecondary;
+
+  static Color getTextTitle(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? textDarkBg : textDark;
+      
+  static Color getTextSubtitle(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? textMediumDarkBg : textMedium;
+      
+  static Color getDivider(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? dividerDark : dividerLight;
+      
+  static Color getBorder(BuildContext context) => 
+      Theme.of(context).brightness == Brightness.dark ? cardBorderDark : cardBorderLight;
 }

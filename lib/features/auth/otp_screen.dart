@@ -61,19 +61,19 @@ class _OtpScreenState extends State<OtpScreen> {
       width: 54,
       height: 60,
       textStyle: AppTypography.headingMd.copyWith(
-        color: AppColors.textDark,
+        color: AppColors.getTextTitle(context),
         fontWeight: FontWeight.w700,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLightSecondary,
+        color: AppColors.getSurfaceSecondary(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.cardBorder, width: 1.5),
+        border: Border.all(color: AppColors.getBorder(context), width: 1.5),
       ),
     );
 
     final focusedPinTheme = defaultPinTheme.copyWith(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.getSurface(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.primary, width: 2),
       ),
@@ -84,12 +84,14 @@ class _OtpScreenState extends State<OtpScreen> {
         color: AppColors.primary.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.4), width: 1.5),
+          color: AppColors.primary.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
       ),
     );
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.getBackground(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28),
@@ -104,11 +106,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   onPressed: widget.onBack,
                   icon: const Icon(Icons.arrow_back_ios_rounded, size: 20),
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.surfaceLightSecondary,
+                    backgroundColor: AppColors.getSurfaceSecondary(context),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(
-                          color: AppColors.cardBorder, width: 1),
+                      side: BorderSide(color: AppColors.getBorder(context), width: 1),
                     ),
                   ),
                 ),
@@ -118,22 +119,25 @@ class _OtpScreenState extends State<OtpScreen> {
 
               // ── SMS Icon ──
               Container(
-                width: 88,
-                height: 88,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    width: 1.5,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.sms_rounded,
-                  color: AppColors.primary,
-                  size: 40,
-                ),
-              ).animate().fadeIn(duration: 400.ms).scale(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.sms_rounded,
+                      color: AppColors.primary,
+                      size: 40,
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .scale(
                     begin: const Offset(0.8, 0.8),
                     end: const Offset(1, 1),
                     duration: 400.ms,
@@ -159,7 +163,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   TextSpan(
                     text: 'کۆدەکە نێردرا بۆ ',
                     style: AppTypography.bodyMd.copyWith(
-                      color: AppColors.textMedium,
+                      color: AppColors.getTextSubtitle(context),
+                      height: 1.5,
+                      fontSize: 15,
                     ),
                     children: [
                       TextSpan(
@@ -178,45 +184,42 @@ class _OtpScreenState extends State<OtpScreen> {
 
               // ── PIN Input ──
               Directionality(
-                textDirection: TextDirection.ltr,
-                child: Pinput(
-                  length: 6,
-                  controller: _pinController,
-                  defaultPinTheme: defaultPinTheme,
-                  focusedPinTheme: focusedPinTheme,
-                  submittedPinTheme: submittedPinTheme,
-                  separatorBuilder: (i) => const SizedBox(width: 10),
-                  hapticFeedbackType: HapticFeedbackType.lightImpact,
-                  onCompleted: (pin) {
-                    setState(() => _isVerifying = true);
-                    Future.delayed(const Duration(milliseconds: 1500), () {
-                      if (mounted) {
-                        setState(() => _isVerifying = false);
-                        widget.onVerified();
-                      }
-                    });
-                  },
-                  cursor: Container(
-                    width: 2,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(1),
+                    textDirection: TextDirection.ltr,
+                    child: Pinput(
+                      length: 6,
+                      controller: _pinController,
+                      defaultPinTheme: defaultPinTheme,
+                      focusedPinTheme: focusedPinTheme,
+                      submittedPinTheme: submittedPinTheme,
+                      separatorBuilder: (i) => const SizedBox(width: 10),
+                      hapticFeedbackType: HapticFeedbackType.lightImpact,
+                      onCompleted: (pin) {
+                        setState(() => _isVerifying = true);
+                        Future.delayed(const Duration(milliseconds: 1500), () {
+                          if (mounted) {
+                            setState(() => _isVerifying = false);
+                            widget.onVerified();
+                          }
+                        });
+                      },
+                      cursor: Container(
+                        width: 2,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ).animate(delay: 400.ms).fadeIn(duration: 400.ms).slideY(
-                    begin: 0.1,
-                    end: 0,
-                    duration: 400.ms,
-                  ),
+                  )
+                  .animate(delay: 400.ms)
+                  .fadeIn(duration: 400.ms)
+                  .slideY(begin: 0.1, end: 0, duration: 400.ms),
 
               const SizedBox(height: 36),
 
               // ── Timer ──
-              _buildTimer()
-                  .animate(delay: 500.ms)
-                  .fadeIn(duration: 400.ms),
+              _buildTimer().animate(delay: 500.ms).fadeIn(duration: 400.ms),
 
               const SizedBox(height: 12),
 
@@ -231,9 +234,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Text(
                   'ناردنەوەی کۆد',
                   style: AppTypography.labelMd.copyWith(
-                    color: _canResend
-                        ? AppColors.primary
-                        : AppColors.textLight,
+                    color: _canResend ? AppColors.primary : AppColors.textLight,
                   ),
                 ),
               ),
@@ -278,14 +279,14 @@ class _OtpScreenState extends State<OtpScreen> {
               value: progress,
               strokeWidth: 3,
               color: AppColors.primaryLight,
-              backgroundColor: AppColors.cardBorder,
+              backgroundColor: AppColors.getBorder(context),
             ),
           ),
           Text(
             '$_secondsRemaining',
             style: AppTypography.headingSm.copyWith(
               color: _secondsRemaining > 10
-                  ? AppColors.textDark
+                  ? AppColors.getTextTitle(context)
                   : AppColors.error,
             ),
           ),

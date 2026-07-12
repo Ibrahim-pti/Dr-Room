@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
@@ -25,12 +26,19 @@ class DrRoomApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'DrRoom',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      locale: const Locale('ckb'),
-      home: const _AppFlow(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeProvider().themeModeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          title: 'DrRoom',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
+          locale: const Locale('ckb'),
+          home: const _AppFlow(),
+        );
+      },
     );
   }
 }

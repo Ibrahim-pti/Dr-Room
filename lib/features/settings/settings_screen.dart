@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import '../notifications/notifications_screen.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/theme_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Top Section (Blue bg, Profile pic, Name)
+            // Top Section
             SizedBox(
               height: 270,
               child: Stack(
@@ -23,28 +26,27 @@ class SettingsScreen extends StatelessWidget {
                   Container(
                     height: 190,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFF4A90E2),
-                          Color(0xFF82B1FF),
-                        ],
+                        colors: isDark
+                            ? [const Color(0xFF1E3A8A), const Color(0xFF3B82F6)]
+                            : [const Color(0xFF4A90E2), const Color(0xFF82B1FF)],
                       ),
                     ),
                   ),
 
-                  // White Curve
+                  // Background Curve
                   Positioned(
                     top: 155,
                     left: 0,
                     right: 0,
                     height: 40,
                     child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F7FA),
-                        borderRadius: BorderRadius.vertical(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(40),
                         ),
                       ),
@@ -83,13 +85,14 @@ class SettingsScreen extends StatelessWidget {
                               height: 90,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: const Color(0xFFE2E8F0),
-                                border: Border.all(color: Colors.white, width: 4),
+                                color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                                border: Border.all(
+                                    color: Theme.of(context).scaffoldBackgroundColor, width: 4),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.person_rounded,
                                 size: 50,
-                                color: Color(0xFF94A3B8),
+                                color: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
                               ),
                             ),
                             Positioned(
@@ -99,9 +102,10 @@ class SettingsScreen extends StatelessWidget {
                                 width: 28,
                                 height: 28,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF82B1FF),
+                                  color: const Color(0xFF3B82F6),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  border: Border.all(
+                                      color: Theme.of(context).scaffoldBackgroundColor, width: 2),
                                 ),
                                 child: const Icon(
                                   Icons.camera_alt,
@@ -116,7 +120,7 @@ class SettingsScreen extends StatelessWidget {
                         Text(
                           'Sara Ahmad',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF0F172A),
+                            color: AppColors.getTextTitle(context),
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -125,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
                         Text(
                           'sar***@gmail.com',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF64748B),
+                            color: AppColors.getTextSubtitle(context),
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
                           ),
@@ -145,29 +149,34 @@ class SettingsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildGridItem(
+                          context,
                           icon: Iconsax.calendar_1,
                           color: const Color(0xFF3B82F6),
                           label: 'My\nAppointments',
                         ),
                         _buildGridItem(
+                          context,
                           icon: Iconsax.document_text,
                           color: const Color(0xFF10B981),
                           label: 'Medical\nRecords',
                         ),
                         _buildGridItem(
+                          context,
                           icon: Icons.medication_outlined,
                           color: const Color(0xFF8B5CF6),
                           label: 'My\nPrescriptions',
                         ),
                         _buildGridItem(
+                          context,
                           icon: Iconsax.heart,
                           color: const Color(0xFFEF4444),
                           label: 'Health\nCheckups',
@@ -178,21 +187,42 @@ class SettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
+                  // Dark Mode Toggle Section
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
+                    ),
+                    child: _buildToggleItem(
+                      context,
+                      icon: isDark ? Iconsax.moon : Iconsax.sun_1,
+                      title: 'Dark Mode',
+                      value: isDark,
+                      onChanged: (val) {
+                        ThemeProvider().toggleTheme();
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // Section 1
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(Iconsax.user, 'Personal Information'),
-                        _buildDivider(),
-                        _buildListItem(Iconsax.card, 'Payment Methods'),
-                        _buildDivider(),
-                        _buildListItem(Iconsax.location, 'Address'),
-                        _buildDivider(),
-                        _buildListItem(Iconsax.call, 'Emergency Contacts'),
+                        _buildListItem(context, Iconsax.user, 'Personal Information'),
+                        _buildDivider(context),
+                        _buildListItem(context, Iconsax.card, 'Payment Methods'),
+                        _buildDivider(context),
+                        _buildListItem(context, Iconsax.location, 'Address'),
+                        _buildDivider(context),
+                        _buildListItem(context, Iconsax.call, 'Emergency Contacts'),
                       ],
                     ),
                   ),
@@ -202,16 +232,17 @@ class SettingsScreen extends StatelessWidget {
                   // Section 2
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(Iconsax.setting_2, 'Settings'),
-                        _buildDivider(),
-                        _buildListItem(Icons.help_outline_rounded, 'Help & Support'),
-                        _buildDivider(),
-                        _buildListItem(Iconsax.info_circle, 'About DrRoom'),
+                        _buildListItem(context, Iconsax.setting_2, 'Settings'),
+                        _buildDivider(context),
+                        _buildListItem(context, Icons.help_outline_rounded, 'Help & Support'),
+                        _buildDivider(context),
+                        _buildListItem(context, Iconsax.info_circle, 'About DrRoom'),
                       ],
                     ),
                   ),
@@ -223,8 +254,9 @@ class SettingsScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Material(
                       color: Colors.transparent,
@@ -264,7 +296,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem({required IconData icon, required Color color, required String label}) {
+  Widget _buildGridItem(BuildContext context, {required IconData icon, required Color color, required String label}) {
     return Column(
       children: [
         Container(
@@ -285,7 +317,7 @@ class SettingsScreen extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 10,
             fontWeight: FontWeight.w500,
             height: 1.3,
@@ -295,7 +327,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(IconData icon, String title) {
+  Widget _buildListItem(BuildContext context, IconData icon, String title) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -306,7 +338,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: const Color(0xFF64748B),
+                color: AppColors.getTextSubtitle(context),
                 size: 20,
               ),
               const SizedBox(width: 14),
@@ -314,15 +346,17 @@ class SettingsScreen extends StatelessWidget {
                 child: Text(
                   title,
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF0F172A),
+                    color: AppColors.getTextTitle(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: Color(0xFFCBD5E1),
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? const Color(0xFF475569) 
+                    : const Color(0xFFCBD5E1),
                 size: 22,
               ),
             ],
@@ -332,11 +366,42 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+  Widget _buildToggleItem(BuildContext context, {required IconData icon, required String title, required bool value, required ValueChanged<bool> onChanged}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: AppColors.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                color: AppColors.getTextTitle(context),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.primary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Divider(
-        color: Color(0xFFF1F5F9),
+        color: AppColors.getDivider(context),
         height: 1,
         thickness: 1,
       ),

@@ -102,11 +102,11 @@ class DrCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: gradient == null ? (color ?? AppColors.surfaceLight) : null,
+        color: gradient == null ? (color ?? AppColors.getSurface(context)) : null,
         gradient: gradient,
         borderRadius: borderRadius ?? BorderRadius.circular(20),
         border: Border.all(
-          color: borderColor ?? AppColors.cardBorder,
+          color: borderColor ?? AppColors.getBorder(context),
           width: 1,
         ),
       ),
