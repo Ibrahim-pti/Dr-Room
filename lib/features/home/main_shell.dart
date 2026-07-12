@@ -3,7 +3,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
 import '../orders/orders_screen.dart';
-import '../records/records_screen.dart';
+import '../discover/discover_screen.dart';
 import '../settings/settings_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 
@@ -21,7 +21,7 @@ class _MainShellState extends State<MainShell> {
     HomeScreen(),
     OrdersScreen(),
     AllSchedulesScreen(),
-    RecordsScreen(),
+    const DiscoverScreen(),
     SettingsScreen(),
   ];
 
@@ -61,7 +61,7 @@ class _MainShellState extends State<MainShell> {
                   _buildNavItem(0, Iconsax.home_2),
                   _buildNavItem(1, Iconsax.receipt_2),
                   _buildNavItem(2, Iconsax.calendar_1),
-                  _buildNavItem(3, Iconsax.folder_2),
+                  _buildNavItem(3, Iconsax.book),
                   _buildNavItem(4, Iconsax.user),
                 ],
               ),
@@ -120,7 +120,7 @@ class _MainShellState extends State<MainShell> {
       case 2:
         return 'Schedule';
       case 3:
-        return 'Records';
+        return 'Discover';
       case 4:
         return 'Profile';
       default:
