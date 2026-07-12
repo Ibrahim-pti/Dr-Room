@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'personal_information_screen.dart';
+import 'help_support_screen.dart';
 import '../settings/saved_addresses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -255,7 +256,14 @@ class SettingsScreen extends StatelessWidget {
                           context,
                           imagePath: 'assets/images/drawer_help.png',
                           title: 'Help & Support',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HelpSupportScreen(),
+                              ),
+                            );
+                          },
                         ),
                         _buildDivider(context),
                         _buildListItem(
@@ -532,7 +540,12 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageOption(BuildContext context, String title, String flag, bool isSelected) {
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String title,
+    String flag,
+    bool isSelected,
+  ) {
     return InkWell(
       onTap: () {
         Navigator.pop(context);
@@ -541,10 +554,14 @@ class SettingsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6).withValues(alpha: 0.1) : AppColors.getSurface(context),
+          color: isSelected
+              ? const Color(0xFF3B82F6).withValues(alpha: 0.1)
+              : AppColors.getSurface(context),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : AppColors.getBorder(context),
+            color: isSelected
+                ? const Color(0xFF3B82F6)
+                : AppColors.getBorder(context),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -559,14 +576,20 @@ class SettingsScreen extends StatelessWidget {
               child: Text(
                 title,
                 style: GoogleFonts.poppins(
-                  color: isSelected ? const Color(0xFF3B82F6) : AppColors.getTextTitle(context),
+                  color: isSelected
+                      ? const Color(0xFF3B82F6)
+                      : AppColors.getTextTitle(context),
                   fontSize: 16,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: Color(0xFF3B82F6), size: 24),
+              const Icon(
+                Icons.check_circle_rounded,
+                color: Color(0xFF3B82F6),
+                size: 24,
+              ),
           ],
         ),
       ),

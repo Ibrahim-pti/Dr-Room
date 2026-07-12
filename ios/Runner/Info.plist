@@ -55,5 +55,14 @@
 	<string>This app needs access to location to deliver medical services to your exact address.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location to deliver medical services to your exact address.</string>
+
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>mailto</string>
+		<string>sms</string>
+		<string>https</string>
+		<string>http</string>
+	</array>
 </dict>
 </plist>
