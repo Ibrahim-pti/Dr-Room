@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
+import 'family_members_screen.dart';
+import 'saved_addresses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -216,13 +219,25 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(context, Iconsax.user, 'Personal Information'),
+                        _buildListItem(context, Iconsax.user, 'Personal Information', onTap: () {}),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.card, 'Payment Methods'),
+                        _buildListItem(context, Iconsax.card, 'Payment Methods', onTap: () {}),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.location, 'Address'),
+                        _buildListItem(context, Iconsax.people, 'My Family', onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const FamilyMembersScreen()),
+                          );
+                        }),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.call, 'Emergency Contacts'),
+                        _buildListItem(context, Iconsax.location, 'Address', onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SavedAddressesScreen()),
+                          );
+                        }),
+                        _buildDivider(context),
+                        _buildListItem(context, Iconsax.call, 'Emergency Contacts', onTap: () {}),
                       ],
                     ),
                   ),
@@ -238,11 +253,11 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        _buildListItem(context, Iconsax.setting_2, 'Settings'),
+                        _buildListItem(context, Iconsax.setting_2, 'Settings', onTap: () {}),
                         _buildDivider(context),
-                        _buildListItem(context, Icons.help_outline_rounded, 'Help & Support'),
+                        _buildListItem(context, Icons.help_outline_rounded, 'Help & Support', onTap: () {}),
                         _buildDivider(context),
-                        _buildListItem(context, Iconsax.info_circle, 'About DrRoom'),
+                        _buildListItem(context, Iconsax.info_circle, 'About DrRoom', onTap: () {}),
                       ],
                     ),
                   ),
@@ -327,11 +342,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(BuildContext context, IconData icon, String title) {
+  Widget _buildListItem(BuildContext context, IconData icon, String title, {VoidCallback? onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(

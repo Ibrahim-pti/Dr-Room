@@ -22,23 +22,47 @@ class OrderModel {
   });
 }
 
-class OrderProvider {
-  // Singleton
-  static final OrderProvider _instance = OrderProvider._internal();
-  factory OrderProvider() => _instance;
-  OrderProvider._internal();
+class OrderProvider extends ChangeNotifier {
+  List<OrderModel> _orders = [];
+  bool _isLoading = false;
 
-  final ValueNotifier<List<OrderModel>> ordersNotifier = ValueNotifier([]);
+  List<OrderModel> get orders => _orders;
+  bool get isLoading => _isLoading;
 
-  List<OrderModel> get orders => ordersNotifier.value;
+  OrderProvider() {
+    // Optionally fetch initial orders here
+  }
 
-  void addOrder(OrderModel order) {
-    // Add to the top of the list
-    ordersNotifier.value = [order, ...ordersNotifier.value];
+  // Simulate network request to fetch orders
+  Future<void> fetchOrders() async {
+    _isLoading = true;
+    notifyListeners();
+
+    // Fake network delay (2 seconds)
+    await Future.delayed(const Duration(seconds: 2));
+
+    // For now we don't overwrite if we already have local orders,
+    // but in a real app, this would fetch from Firebase.
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // Simulate network request to add an order
+  Future<void> addOrder(OrderModel order) async {
+    _isLoading = true;
+    notifyListeners();
+
+    // Fake network delay (1.5 seconds) to simulate saving to DB
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    _orders = [order, ..._orders];
+    
+    _isLoading = false;
+    notifyListeners();
   }
 
   void updateOrderStatus(String id, String newStatus, Color newColor) {
-    final updatedList = ordersNotifier.value.map((order) {
+    _orders = _orders.map((order) {
       if (order.id == id) {
         return OrderModel(
           id: order.id,
@@ -53,6 +77,6 @@ class OrderProvider {
       }
       return order;
     }).toList();
-    ordersNotifier.value = updatedList;
+    notifyListeners();
   }
 }

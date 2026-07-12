@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'doctor_details_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../home/doctor_details_screen.dart';
 
 class AllDoctorsScreen extends StatelessWidget {
   const AllDoctorsScreen({super.key});
@@ -42,7 +42,11 @@ class AllDoctorsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0F172A), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF0F172A),
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -66,7 +70,11 @@ class AllDoctorsScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DoctorDetailsScreen(),
+                    builder: (context) => DoctorDetailsScreen(
+                      name: doc['name']!,
+                      specialty: doc['specialty']!,
+                      image: doc['image']!,
+                    ),
                   ),
                 );
               },
@@ -91,7 +99,10 @@ class AllDoctorsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            doc['name']!.replaceFirst(' ', '\n'), // Split into two lines like design
+                            doc['name']!.replaceFirst(
+                              ' ',
+                              '\n',
+                            ), // Split into two lines like design
                             style: GoogleFonts.poppins(
                               color: const Color(0xFF0F172A),
                               fontSize: 18,
@@ -163,8 +174,11 @@ class AllDoctorsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ).animate().fadeIn(delay: (100 * index).ms).slideY(begin: 0.1, end: 0),
-          );
+            ),
+          )
+          .animate()
+          .fadeIn(delay: (100 * index).ms)
+          .slideY(begin: 0.1, end: 0);
         },
       ),
     );

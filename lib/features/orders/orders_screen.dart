@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import '../../core/providers/order_provider.dart';
+import '../../core/widgets/shimmer_loading_list.dart';
 import 'order_details_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -101,9 +102,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
           // ── Orders List ──
           Expanded(
-            child: ValueListenableBuilder<List<OrderModel>>(
-              valueListenable: OrderProvider().ordersNotifier,
-              builder: (context, orders, child) {
+            child: Consumer<OrderProvider>(
+              builder: (context, orderProvider, child) {
+                if (orderProvider.isLoading) {
+                  return const ShimmerLoadingList();
+                }
+
+                final orders = orderProvider.orders;
+
                 if (orders.isEmpty) {
                   return Center(
                     child: Text(

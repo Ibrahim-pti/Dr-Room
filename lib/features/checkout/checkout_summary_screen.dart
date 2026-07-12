@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 import 'order_success_screen.dart';
 import '../../core/providers/order_provider.dart';
+import '../../core/providers/checkout_provider.dart';
 
 class CheckoutSummaryScreen extends StatefulWidget {
   const CheckoutSummaryScreen({super.key});
@@ -85,7 +87,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
 
                   // ── Payment Methods ──
                   Text(
-                    'Payment Method',
+                    'Selected Payment Method',
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 18,
@@ -94,22 +96,17 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1, end: 0),
                   const SizedBox(height: 16),
                   
-                  _buildPaymentMethod(
-                    index: 0,
-                    title: 'Cash on Delivery',
-                    subtitle: 'Pay when the service arrives',
-                    icon: Iconsax.money,
-                    color: const Color(0xFF10B981),
-                    delay: 300,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildPaymentMethod(
-                    index: 1,
-                    title: 'Credit / Debit Card',
-                    subtitle: 'Pay securely online',
-                    icon: Iconsax.card,
-                    color: const Color(0xFF3B82F6),
-                    delay: 400,
+                  Consumer<CheckoutProvider>(
+                    builder: (context, checkoutProvider, child) {
+                      return _buildPaymentMethod(
+                        index: 0,
+                        title: checkoutProvider.selectedPaymentMethod,
+                        subtitle: 'Will be used for this transaction',
+                        icon: checkoutProvider.selectedPaymentMethod == 'Cash on Delivery' ? Iconsax.money : Iconsax.card,
+                        color: checkoutProvider.selectedPaymentMethod == 'Cash on Delivery' ? const Color(0xFF10B981) : const Color(0xFF3B82F6),
+                        delay: 300,
+                      );
+                    },
                   ),
                   const SizedBox(height: 40),
                 ],
@@ -132,41 +129,64 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Add to OrderProvider
-                    OrderProvider().addOrder(OrderModel(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      title: 'Complete Blood Count (CBC)', // Example title based on \$65 total
-                      status: 'Pending',
-                      statusColor: const Color(0xFFF59E0B),
-                      icon: Iconsax.health,
-                      iconColor: const Color(0xFF3B82F6),
-                      price: 65.00,
-                      date: DateTime.now(),
-                    ));
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OrderSuccessScreen(),
+                child: Consumer<CheckoutProvider>(
+                  builder: (context, checkoutProvider, child) {
+                    return ElevatedButton(
+                      onPressed: checkoutProvider.isProcessing ? null : () async {
+                        // Process Payment
+                        final success = await checkoutProvider.processPayment();
+                        
+                        if (success && context.mounted) {
+                          // Add to OrderProvider
+                          await context.read<OrderProvider>().addOrder(OrderModel(
+                            id: DateTime.now().millisecondsSinceEpoch.toString(),
+                            title: 'Complete Blood Count (CBC)', // Example title based on \$65 total
+                            status: 'Pending',
+                            statusColor: const Color(0xFFF59E0B),
+                            icon: Iconsax.health,
+                            iconColor: const Color(0xFF3B82F6),
+                            price: 65.00,
+                            date: DateTime.now(),
+                          ));
+                          
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const OrderSuccessScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                        disabledBackgroundColor: const Color(0xFF3B82F6).withValues(alpha: 0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        elevation: 0,
                       ),
+                      child: checkoutProvider.isProcessing
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                          : Text(
+                              'Confirm Order - \$65.00',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Confirm Order - \$65.00',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.getSurface(context),
-                    ),
-                  ),
                 ),
               ),
             ),

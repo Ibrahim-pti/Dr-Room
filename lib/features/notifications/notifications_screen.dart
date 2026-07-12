@@ -1,38 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final notifications = [
+      {
+        'title': 'Nurse is arriving soon!',
+        'message': 'Your nurse for the CBC test is 15 minutes away.',
+        'time': 'Just now',
+        'type': 'order',
+        'isRead': false,
+      },
+      {
+        'title': 'Lab Results Ready',
+        'message': 'Good news! Your Vitamin D test results are available to download.',
+        'time': '2 hours ago',
+        'type': 'result',
+        'isRead': false,
+      },
+      {
+        'title': 'Appointment Confirmed',
+        'message': 'Your video consultation with Dr. Jenny is set for tomorrow at 10:30 AM.',
+        'time': 'Yesterday',
+        'type': 'calendar',
+        'isRead': true,
+      },
+      {
+        'title': 'Special Offer 🎁',
+        'message': 'Get 20% off on all comprehensive health checkups this weekend!',
+        'time': '2 days ago',
+        'type': 'promo',
+        'isRead': true,
+      },
+      {
+        'title': 'Order Completed',
+        'message': 'Your recent Home Nursing visit has been completed successfully.',
+        'time': '3 days ago',
+        'type': 'success',
+        'isRead': true,
+      },
+    ];
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.getSurface(context),
         elevation: 0,
-        centerTitle: true,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFFF1F5F9),
-            ),
-            child: const Icon(
-              Icons.chevron_left_rounded,
-              color: Color(0xFF0F172A),
-              size: 26,
-            ),
-          ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_rounded, size: 20, color: AppColors.getTextTitle(context)),
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Notifications',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -44,213 +71,131 @@ class NotificationsScreen extends StatelessWidget {
               'Mark all read',
               style: GoogleFonts.poppins(
                 color: const Color(0xFF3B82F6),
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        children: [
-          // ── Today Section ──
-          Text(
-            'Today',
-            style: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ).animate().fadeIn(duration: 300.ms),
-          const SizedBox(height: 12),
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        itemCount: notifications.length,
+        itemBuilder: (context, index) {
+          final notif = notifications[index];
+          final type = notif['type'] as String;
+          final isRead = notif['isRead'] as bool;
 
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                _buildNotificationItem(
-                  icon: Iconsax.calendar_tick,
-                  iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.1),
-                  iconColor: const Color(0xFF10B981),
-                  title: 'Appointment Confirmed!',
-                  description: 'Your appointment with Dr. Nusrat Jahan is confirmed for tomorrow at 10:00 AM.',
-                  time: '1h ago',
-                  isUnread: true,
-                ),
-                _buildDivider(),
-                _buildNotificationItem(
-                  icon: Iconsax.message,
-                  iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                  iconColor: const Color(0xFF8B5CF6),
-                  title: 'New Message',
-                  description: 'Dr. Ahmad sent you a new message regarding your recent test results.',
-                  time: '3h ago',
-                  isUnread: true,
-                ),
-                _buildDivider(),
-                _buildNotificationItem(
-                  icon: Iconsax.card_pos,
-                  iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                  iconColor: const Color(0xFF3B82F6),
-                  title: 'Payment Successful',
-                  description: 'Your payment of \$45.00 for the consultation has been processed successfully.',
-                  time: '5h ago',
-                  isUnread: false,
-                ),
-              ],
-            ),
-          ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.05, end: 0),
+          IconData icon;
+          Color iconColor;
+          Color bgColor;
 
-          const SizedBox(height: 24),
+          switch (type) {
+            case 'order':
+              icon = Iconsax.truck;
+              iconColor = const Color(0xFFF59E0B);
+              bgColor = const Color(0xFFF59E0B).withValues(alpha: 0.1);
+              break;
+            case 'result':
+              icon = Iconsax.document_text;
+              iconColor = const Color(0xFF3B82F6);
+              bgColor = const Color(0xFF3B82F6).withValues(alpha: 0.1);
+              break;
+            case 'calendar':
+              icon = Iconsax.calendar_1;
+              iconColor = const Color(0xFF8B5CF6);
+              bgColor = const Color(0xFF8B5CF6).withValues(alpha: 0.1);
+              break;
+            case 'promo':
+              icon = Iconsax.ticket_discount;
+              iconColor = const Color(0xFFEC4899);
+              bgColor = const Color(0xFFEC4899).withValues(alpha: 0.1);
+              break;
+            case 'success':
+              icon = Iconsax.tick_circle;
+              iconColor = const Color(0xFF10B981);
+              bgColor = const Color(0xFF10B981).withValues(alpha: 0.1);
+              break;
+            default:
+              icon = Iconsax.notification;
+              iconColor = const Color(0xFF64748B);
+              bgColor = const Color(0xFF64748B).withValues(alpha: 0.1);
+          }
 
-          // ── Yesterday Section ──
-          Text(
-            'Yesterday',
-            style: GoogleFonts.poppins(
-              color: const Color(0xFF64748B),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ).animate().fadeIn(delay: 200.ms),
-          const SizedBox(height: 12),
-
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                _buildNotificationItem(
-                  icon: Iconsax.calendar_remove,
-                  iconBgColor: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                  iconColor: const Color(0xFFEF4444),
-                  title: 'Appointment Canceled',
-                  description: 'Your appointment with Dr. Sarah has been canceled. Please reschedule.',
-                  time: 'Yesterday',
-                  isUnread: false,
-                ),
-                _buildDivider(),
-                _buildNotificationItem(
-                  icon: Iconsax.security_safe,
-                  iconBgColor: const Color(0xFFF59E0B).withValues(alpha: 0.1),
-                  iconColor: const Color(0xFFF59E0B),
-                  title: 'Security Update',
-                  description: 'We have updated our privacy policy. Please review the changes in settings.',
-                  time: 'Yesterday',
-                  isUnread: false,
-                ),
-              ],
-            ),
-          ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.05, end: 0),
-          
-          const SizedBox(height: 40),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationItem({
-    required IconData icon,
-    required Color iconBgColor,
-    required Color iconColor,
-    required String title,
-    required String description,
-    required String time,
-    required bool isUnread,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: iconBgColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
+          return Container(
+            color: isRead ? Colors.transparent : const Color(0xFF3B82F6).withValues(alpha: 0.05),
+            child: InkWell(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF0F172A),
-                              fontSize: 14,
-                              fontWeight: isUnread ? FontWeight.w600 : FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        if (isUnread)
-                          Container(
-                            width: 8,
-                            height: 8,
-                            margin: const EdgeInsets.only(left: 8),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF3B82F6),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF475569),
-                        fontSize: 13,
-                        height: 1.5,
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        shape: BoxShape.circle,
                       ),
+                      child: Icon(icon, color: iconColor, size: 24),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      time,
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF94A3B8),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  notif['title'] as String,
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.getTextTitle(context),
+                                    fontSize: 16,
+                                    fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              if (!isRead)
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  margin: const EdgeInsets.only(top: 6),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF3B82F6),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            notif['message'] as String,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextSubtitle(context),
+                              fontSize: 14,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            notif['time'] as String,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.textLight,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Divider(
-        color: Color(0xFFF1F5F9),
-        height: 1,
-        thickness: 1,
+            ),
+          ).animate().fadeIn(delay: (50 * index).ms).slideX(begin: 0.1, end: 0);
+        },
       ),
     );
   }

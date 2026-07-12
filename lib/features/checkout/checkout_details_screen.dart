@@ -5,7 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
-import 'checkout_summary_screen.dart';
+import 'payment_method_screen.dart';
 
 class CheckoutDetailsScreen extends StatefulWidget {
   const CheckoutDetailsScreen({super.key});
@@ -323,7 +323,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CheckoutSummaryScreen(),
+                            builder: (context) => const PaymentMethodScreen(),
                           ),
                         );
                       }
@@ -336,7 +336,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                       elevation: 0,
                     ),
                     child: Text(
-                      'Continue to Summary',
+                      'Continue to Payment',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
