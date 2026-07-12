@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../doctors/favorite_doctors_screen.dart';
 import '../ai_assistant/ai_symptom_checker_screen.dart';
+import '../body_map/body_map_screen.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
@@ -263,6 +264,21 @@ class _MainShellState extends State<MainShell> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => const AiSymptomCheckerScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.accessibility_new_rounded,
+                    title: 'Interactive Body Map',
+                    color: const Color(0xFF3B82F6),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BodyMapScreen(),
                         ),
                       );
                     },

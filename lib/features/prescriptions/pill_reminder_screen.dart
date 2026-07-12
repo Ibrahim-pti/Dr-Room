@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_colors.dart';
+import '../pharmacy/pill_scanner_screen.dart';
 
 class PillReminderScreen extends StatelessWidget {
   const PillReminderScreen({super.key});
@@ -125,8 +126,36 @@ class PillReminderScreen extends StatelessWidget {
                 icon: Icons.circle_outlined,
                 isLast: true,
               ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
-
             ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PillScannerScreen(),
+            ),
+          ).then((added) {
+            if (added == true && context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Amoxicillin 500mg added to your reminders!'),
+                  backgroundColor: Color(0xFF10B981),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          });
+        },
+        backgroundColor: const Color(0xFF3B82F6),
+        icon: const Icon(Icons.document_scanner, color: Colors.white),
+        label: Text(
+          'Smart Scan',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
       ),
