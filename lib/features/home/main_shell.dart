@@ -139,188 +139,182 @@ class _MainShellState extends State<MainShell> {
         borderRadius: BorderRadius.horizontal(left: Radius.circular(32)),
       ),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(
-                top: 60,
-                bottom: 24,
-                left: 24,
-                right: 24,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.only(
+              top: 60,
+              bottom: 24,
+              left: 24,
+              right: 24,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.getBorder(context),
+                          width: 2,
+                        ),
+                        image: const DecorationImage(
+                          image: AssetImage(
+                            'assets/images/doctor2.png',
+                          ), // Placeholder
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    // Close Button
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
+                          color: AppColors.getSurface(context),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: AppColors.getBorder(context),
-                            width: 2,
-                          ),
-                          image: const DecorationImage(
-                            image: AssetImage(
-                              'assets/images/doctor2.png',
-                            ), // Placeholder
-                            fit: BoxFit.cover,
                           ),
                         ),
+                        child: Icon(
+                          Icons.close,
+                          color: AppColors.getTextTitle(context),
+                          size: 20,
+                        ),
                       ),
-                      // Close Button
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.getSurface(context),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.getBorder(context),
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            color: AppColors.getTextTitle(context),
-                            size: 20,
-                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Sara Ahmed',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.getTextTitle(context),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '+964 750 123 4567',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.getTextSubtitle(context),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // DrRoom Plus Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Iconsax.star_1, color: Colors.white, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'DrRoom Plus Member',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Sara Ahmed',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.receipt_2,
+                    title: 'My Orders',
+                    color: const Color(0xFF3B82F6),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const OrdersScreen(),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '+964 750 123 4567',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextSubtitle(context),
-                      fontSize: 14,
-                    ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.heart,
+                    title: 'Favorites',
+                    color: const Color(0xFFEF4444),
+                    onTap: () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: 16),
-                  // DrRoom Plus Badge
-                  Container(
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.wallet_2,
+                    title: 'Wallet & Payments',
+                    color: const Color(0xFF10B981),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.setting_2,
+                    title: 'Settings',
+                    color: const Color(0xFF64748B),
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Let the user handle where to go, or go to Profile.
+                      setState(() {
+                        _currentIndex = 4;
+                      });
+                    },
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.message_question,
+                    title: 'Help & Support',
+                    color: const Color(0xFFF59E0B),
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: 24,
+                      vertical: 16,
                     ),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Iconsax.star_1,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'DrRoom Plus Member',
-                          style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: Divider(color: AppColors.getBorder(context)),
                   ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Iconsax.logout,
+                    title: 'Logout',
+                    color: const Color(0xFFEF4444),
+                    isLogout: true,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.receipt_2,
-                      title: 'My Orders',
-                      color: const Color(0xFF3B82F6),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const OrdersScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.heart,
-                      title: 'Favorites',
-                      color: const Color(0xFFEF4444),
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.wallet_2,
-                      title: 'Wallet & Payments',
-                      color: const Color(0xFF10B981),
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.setting_2,
-                      title: 'Settings',
-                      color: const Color(0xFF64748B),
-                      onTap: () {
-                        Navigator.pop(context);
-                        // Let the user handle where to go, or go to Profile.
-                        setState(() {
-                          _currentIndex = 4;
-                        });
-                      },
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.message_question,
-                      title: 'Help & Support',
-                      color: const Color(0xFFF59E0B),
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      child: Divider(
-                        color: AppColors.getBorder(context),
-                      ),
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      icon: Iconsax.logout,
-                      title: 'Logout',
-                      color: const Color(0xFFEF4444),
-                      isLogout: true,
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
+          ),
         ],
       ),
     );
