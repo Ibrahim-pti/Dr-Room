@@ -5,9 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'personal_information_screen.dart';
-import 'family_members_screen.dart';
 import '../settings/saved_addresses_screen.dart';
-import '../prescriptions/pill_reminder_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -246,6 +244,15 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         _buildListItem(
                           context,
+                          icon: Iconsax.language_square,
+                          title: 'Language',
+                          onTap: () {
+                            _showLanguageBottomSheet(context);
+                          },
+                        ),
+                        _buildDivider(context),
+                        _buildListItem(
+                          context,
                           imagePath: 'assets/images/drawer_help.png',
                           title: 'Help & Support',
                           onTap: () {},
@@ -461,6 +468,107 @@ class SettingsScreen extends StatelessWidget {
         color: AppColors.getDivider(context),
         height: 1,
         thickness: 1,
+      ),
+    );
+  }
+
+  Widget _buildKurdishFlag() {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.grey.shade300, width: 0.5),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Expanded(child: Container(color: const Color(0xFFED2024))),
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: const Center(
+                child: Icon(Icons.wb_sunny, color: Color(0xFFF9AF1A), size: 10),
+              ),
+            ),
+          ),
+          Expanded(child: Container(color: const Color(0xFF278E43))),
+        ],
+      ),
+    );
+  }
+
+  void _showLanguageBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.getBackground(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Select Language',
+                style: GoogleFonts.poppins(
+                  color: AppColors.getTextTitle(context),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildLanguageOption(context, 'English', '🇬🇧', true),
+              const SizedBox(height: 12),
+              _buildLanguageOption(context, 'کوردی', 'kurdish', false),
+              const SizedBox(height: 12),
+              _buildLanguageOption(context, 'العربية', '🇮🇶', false),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLanguageOption(BuildContext context, String title, String flag, bool isSelected) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3B82F6).withValues(alpha: 0.1) : AppColors.getSurface(context),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF3B82F6) : AppColors.getBorder(context),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            if (flag == 'kurdish')
+              _buildKurdishFlag()
+            else
+              Text(flag, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  color: isSelected ? const Color(0xFF3B82F6) : AppColors.getTextTitle(context),
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle_rounded, color: Color(0xFF3B82F6), size: 24),
+          ],
+        ),
       ),
     );
   }
