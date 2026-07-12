@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'personal_information_screen.dart';
 import 'help_support_screen.dart';
 import '../settings/saved_addresses_screen.dart';
@@ -270,7 +271,11 @@ class SettingsScreen extends StatelessWidget {
                           context,
                           icon: Iconsax.user_add,
                           title: 'Invite Friends',
-                          onTap: () {},
+                          onTap: () {
+                            Share.shareUri(
+                              Uri.parse('https://drroom.com/download'),
+                            );
+                          },
                         ),
                       ],
                     ),
