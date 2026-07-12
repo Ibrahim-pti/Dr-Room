@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -65,7 +66,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -74,7 +75,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
         title: Text(
           'Medical Records',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -89,16 +90,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.getSurface(context),
                 borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
                   ),
-                ],
-              ),
               child: Row(
                 children: [
                   Container(
@@ -129,7 +123,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         Text(
                           'Yahya Ahmed',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF0F172A),
+                            color: AppColors.getTextTitle(context),
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -138,7 +132,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                         Text(
                           'Age: 25  •  Blood: O+',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF64748B),
+                            color: AppColors.getTextSubtitle(context),
                             fontSize: 13,
                           ),
                         ),
@@ -244,16 +238,9 @@ class _RecordsScreenState extends State<RecordsScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
+                              ),
                     child: Row(
                       children: [
                         Container(
@@ -277,7 +264,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                               Text(
                                 record['title'] as String,
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF0F172A),
+                                  color: AppColors.getTextTitle(context),
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -307,7 +294,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                                     child: Text(
                                       record['date'] as String,
                                       style: GoogleFonts.poppins(
-                                        color: const Color(0xFF94A3B8),
+                                        color: AppColors.textLight,
                                         fontSize: 12,
                                       ),
                                       maxLines: 1,
@@ -324,7 +311,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
+                            color: AppColors.getSurfaceSecondary(context),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: const Icon(

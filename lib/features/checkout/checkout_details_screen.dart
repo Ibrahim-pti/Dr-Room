@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -84,7 +85,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -100,7 +101,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         title: Text(
           'Patient Details',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -122,7 +123,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                     Text(
                       'Who is this for?',
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF0F172A),
+                        color: AppColors.getTextTitle(context),
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         height: 1.3,
@@ -132,7 +133,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                     Text(
                       'Please provide the details of the person receiving the service.',
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF64748B),
+                        color: AppColors.getTextSubtitle(context),
                         fontSize: 15,
                         height: 1.5,
                       ),
@@ -143,15 +144,9 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                     Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.getSurface(context),
                             borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 20,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            border: Border.all(color: AppColors.getBorder(context)),
                           ),
                           child: Column(
                             children: [
@@ -201,7 +196,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                     Text(
                           'Service Location',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF0F172A),
+                            color: AppColors.getTextTitle(context),
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -213,7 +208,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                     Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.getSurface(context),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: _currentAddress == 'No location selected'
@@ -221,16 +216,6 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                                   : const Color(0xFF3B82F6),
                               width: 1.5,
                             ),
-                            boxShadow: [
-                              if (_currentAddress != 'No location selected')
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFF3B82F6,
-                                  ).withValues(alpha: 0.1),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 4),
-                                ),
-                            ],
                           ),
                           child: Row(
                             children: [
@@ -256,7 +241,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                                     Text(
                                       _currentAddress,
                                       style: GoogleFonts.poppins(
-                                        color: const Color(0xFF0F172A),
+                                        color: AppColors.getTextTitle(context),
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -265,7 +250,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                                     Text(
                                       _locationDetails,
                                       style: GoogleFonts.poppins(
-                                        color: const Color(0xFF64748B),
+                                        color: AppColors.getTextSubtitle(context),
                                         fontSize: 13,
                                       ),
                                     ),
@@ -310,14 +295,8 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
+                color: AppColors.getSurface(context),
+                border: Border.all(color: AppColors.getBorder(context)),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(32),
                   topRight: Radius.circular(32),
@@ -361,7 +340,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                        color: AppColors.getSurface(context),
                       ),
                     ),
                   ),
@@ -386,7 +365,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         Text(
           label,
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -397,8 +376,8 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
           validator: (value) => value!.isEmpty ? 'Required' : null,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(color: const Color(0xFF94A3B8)),
-            prefixIcon: Icon(icon, color: const Color(0xFF94A3B8)),
+            hintStyle: GoogleFonts.poppins(color: AppColors.textLight),
+            prefixIcon: Icon(icon, color: AppColors.textLight),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
             contentPadding: const EdgeInsets.symmetric(vertical: 16),

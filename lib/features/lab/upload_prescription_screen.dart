@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -29,7 +30,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -41,7 +42,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
         title: Text(
           'Upload Prescription',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -55,7 +56,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
             Text(
               'Upload your document',
               style: GoogleFonts.poppins(
-                color: const Color(0xFF0F172A),
+                color: AppColors.getTextTitle(context),
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 height: 1.3,
@@ -65,7 +66,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
             Text(
               'Please take a clear photo of your prescription or upload it from your gallery.',
               style: GoogleFonts.poppins(
-                color: const Color(0xFF64748B),
+                color: AppColors.getTextSubtitle(context),
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -79,7 +80,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.getSurface(context),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: _imageFile == null ? const Color(0xFFE2E8F0) : const Color(0xFF3B82F6),
@@ -113,7 +114,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
                             Text(
                               'Tap to capture or upload',
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFF0F172A),
+                                color: AppColors.getTextTitle(context),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -122,7 +123,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
                             Text(
                               'JPG, PNG or PDF (Max 5MB)',
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFF94A3B8),
+                                color: AppColors.textLight,
                                 fontSize: 13,
                               ),
                             ),
@@ -137,7 +138,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppColors.getSurface(context),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -192,7 +193,7 @@ class _UploadPrescriptionScreenState extends State<UploadPrescriptionScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppColors.getSurface(context),
                   ),
                 ),
               ),

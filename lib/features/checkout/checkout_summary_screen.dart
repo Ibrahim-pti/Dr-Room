@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'order_success_screen.dart';
+import '../../core/providers/order_provider.dart';
 
 class CheckoutSummaryScreen extends StatefulWidget {
   const CheckoutSummaryScreen({super.key});
@@ -17,7 +19,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -29,7 +31,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
         title: Text(
           'Summary & Payment',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -46,7 +48,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   Text(
                     'Order Summary',
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF0F172A),
+                      color: AppColors.getTextTitle(context),
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -57,15 +59,9 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      border: Border.all(color: AppColors.getBorder(context)),
                     ),
                     child: Column(
                       children: [
@@ -91,7 +87,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   Text(
                     'Payment Method',
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF0F172A),
+                      color: AppColors.getTextTitle(context),
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -125,14 +121,8 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
+              color: AppColors.getSurface(context),
+              border: Border.all(color: AppColors.getBorder(context)),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(32),
                 topRight: Radius.circular(32),
@@ -144,6 +134,17 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
+                    // Add to OrderProvider
+                    OrderProvider().addOrder(OrderModel(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      title: 'Complete Blood Count (CBC)', // Example title based on \$65 total
+                      status: 'Pending',
+                      statusColor: const Color(0xFFF59E0B),
+                      icon: Iconsax.health,
+                      iconColor: const Color(0xFF3B82F6),
+                      price: 65.00,
+                      date: DateTime.now(),
+                    ));
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -163,7 +164,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                     ),
                   ),
                 ),
@@ -218,19 +219,12 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getSurface(context),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
             width: 2,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
         ),
         child: Row(
           children: [
@@ -251,7 +245,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF0F172A),
+                      color: AppColors.getTextTitle(context),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
@@ -260,7 +254,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   Text(
                     subtitle,
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF64748B),
+                      color: AppColors.getTextSubtitle(context),
                       fontSize: 12,
                     ),
                   ),
@@ -280,7 +274,7 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                 color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
               ),
               child: isSelected
-                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  ? Icon(Icons.check, size: 14, color: AppColors.getSurface(context))
                   : null,
             ),
           ],

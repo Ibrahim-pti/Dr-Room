@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../checkout/checkout_details_screen.dart';
@@ -26,7 +27,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
     int selectedCount = _tests.where((t) => t['selected']).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -38,7 +39,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
         title: Text(
           'Select Tests',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -54,7 +55,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                 Text(
                   'Choose your tests',
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF0F172A),
+                    color: AppColors.getTextTitle(context),
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     height: 1.3,
@@ -64,7 +65,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                 Text(
                   'Select one or more tests you want to include in your request.',
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF64748B),
+                    color: AppColors.getTextSubtitle(context),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -84,20 +85,13 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.getSurface(context),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: test['selected'] ? const Color(0xFF3B82F6) : Colors.transparent,
                       width: 2,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+                          ),
                   child: CheckboxListTile(
                     value: test['selected'],
                     onChanged: (val) {
@@ -112,7 +106,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                     title: Text(
                       test['name'],
                       style: GoogleFonts.poppins(
-                        color: const Color(0xFF0F172A),
+                        color: AppColors.getTextTitle(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -135,15 +129,8 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-              borderRadius: const BorderRadius.only(
+              color: AppColors.getSurface(context),
+                borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(32),
                 topRight: Radius.circular(32),
               ),
@@ -158,14 +145,14 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                       Text(
                         'Selected',
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF64748B),
+                          color: AppColors.getTextSubtitle(context),
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         '$selectedCount Tests',
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF0F172A),
+                          color: AppColors.getTextTitle(context),
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -200,7 +187,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.getSurface(context),
                         ),
                       ),
                     ),

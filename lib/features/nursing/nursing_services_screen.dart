@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../checkout/checkout_details_screen.dart';
@@ -48,7 +49,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
     int selectedCount = _services.where((s) => s['selected']).length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -60,7 +61,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
         title: Text(
           'Nursing Services',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -76,7 +77,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                 Text(
                   'What do you need?',
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF0F172A),
+                    color: AppColors.getTextTitle(context),
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     height: 1.3,
@@ -86,7 +87,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                 Text(
                   'Select the nursing services you require. Our professional nurses will come to your home.',
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF64748B),
+                    color: AppColors.getTextSubtitle(context),
                     fontSize: 15,
                     height: 1.5,
                   ),
@@ -115,20 +116,13 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
                         width: 2,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 15,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
+                              ),
                     child: Row(
                       children: [
                         Container(
@@ -152,7 +146,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                               Text(
                                 service['title'],
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF0F172A),
+                                  color: AppColors.getTextTitle(context),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -161,7 +155,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                               Text(
                                 service['subtitle'],
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF64748B),
+                                  color: AppColors.getTextSubtitle(context),
                                   fontSize: 12,
                                 ),
                               ),
@@ -181,7 +175,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                             color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
                           ),
                           child: isSelected
-                              ? const Icon(Icons.check, size: 14, color: Colors.white)
+                              ? Icon(Icons.check, size: 14, color: AppColors.getSurface(context))
                               : null,
                         ),
                       ],
@@ -196,15 +190,8 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                ),
-              ],
-              borderRadius: const BorderRadius.only(
+              color: AppColors.getSurface(context),
+                borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(32),
                 topRight: Radius.circular(32),
               ),
@@ -219,14 +206,14 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                       Text(
                         'Selected',
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF64748B),
+                          color: AppColors.getTextSubtitle(context),
                           fontSize: 13,
                         ),
                       ),
                       Text(
                         '$selectedCount Services',
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF0F172A),
+                          color: AppColors.getTextTitle(context),
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -261,7 +248,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppColors.getSurface(context),
                         ),
                       ),
                     ),

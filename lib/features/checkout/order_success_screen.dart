@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../home/main_shell.dart';
 
@@ -24,15 +24,15 @@ class OrderSuccessScreen extends StatelessWidget {
                       width: 120,
                       height: 120,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: AppColors.getSurface(context).withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
                         child: Container(
                           width: 80,
                           height: 80,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: AppColors.getSurface(context),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -51,7 +51,7 @@ class OrderSuccessScreen extends StatelessWidget {
                       'Request Sent\nSuccessfully!',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: AppColors.getSurface(context),
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         height: 1.2,
@@ -64,7 +64,7 @@ class OrderSuccessScreen extends StatelessWidget {
                         'Your order has been received and is being processed. Our team will contact you shortly.',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.getSurface(context).withValues(alpha: 0.8),
                           fontSize: 15,
                           height: 1.5,
                         ),
@@ -95,7 +95,7 @@ class OrderSuccessScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.getSurface(context),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(28),
                         ),
@@ -125,7 +125,7 @@ class OrderSuccessScreen extends StatelessWidget {
                     child: Text(
                       'Back to Home',
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: AppColors.getSurface(context),
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),

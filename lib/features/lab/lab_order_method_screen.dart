@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -11,7 +12,7 @@ class LabOrderMethodScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -23,7 +24,7 @@ class LabOrderMethodScreen extends StatelessWidget {
         title: Text(
           'Lab Service',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -37,7 +38,7 @@ class LabOrderMethodScreen extends StatelessWidget {
             Text(
               'How would you like to request?',
               style: GoogleFonts.poppins(
-                color: const Color(0xFF0F172A),
+                color: AppColors.getTextTitle(context),
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 height: 1.3,
@@ -47,7 +48,7 @@ class LabOrderMethodScreen extends StatelessWidget {
             Text(
               'Choose one of the methods below to proceed with your lab test request.',
               style: GoogleFonts.poppins(
-                color: const Color(0xFF64748B),
+                color: AppColors.getTextSubtitle(context),
                 fontSize: 15,
                 height: 1.5,
               ),
@@ -111,17 +112,10 @@ class LabOrderMethodScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.getSurface(context),
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
           border: Border.all(
-            color: Colors.white,
+            color: AppColors.getSurface(context),
             width: 2,
           ),
         ),
@@ -148,7 +142,7 @@ class LabOrderMethodScreen extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF0F172A),
+                      color: AppColors.getTextTitle(context),
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -157,7 +151,7 @@ class LabOrderMethodScreen extends StatelessWidget {
                   Text(
                     description,
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF64748B),
+                      color: AppColors.getTextSubtitle(context),
                       fontSize: 13,
                       height: 1.5,
                     ),
@@ -169,7 +163,7 @@ class LabOrderMethodScreen extends StatelessWidget {
             Container(
               width: 32,
               height: 32,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Color(0xFFF1F5F9),
                 shape: BoxShape.circle,
               ),

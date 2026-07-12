@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../core/providers/order_provider.dart';
+import 'order_details_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -14,58 +17,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
   int _selectedFilterIndex = 0;
   final List<String> _filters = ['All', 'In Transit', 'Pending', 'Completed'];
 
-  final List<Map<String, dynamic>> _orders = [
-    {
-      'title': 'Complete Blood Count (CBC)',
-      'status': 'In Transit',
-      'statusColor': const Color(0xFF3B82F6),
-      'icon': Iconsax.health,
-      'iconColor': const Color(0xFF3B82F6),
-      'price': '\$15.00',
-      'date': 'Today, 10:30 AM',
-    },
-    {
-      'title': 'Video Consultation',
-      'status': 'Pending',
-      'statusColor': const Color(0xFFF59E0B),
-      'icon': Iconsax.video,
-      'iconColor': const Color(0xFFF59E0B),
-      'price': '\$20.00',
-      'date': 'Tomorrow, 2:00 PM',
-    },
-    {
-      'title': 'Pharmacy Delivery',
-      'status': 'Completed',
-      'statusColor': const Color(0xFF10B981),
-      'icon': Iconsax.box_1,
-      'iconColor': const Color(0xFF10B981),
-      'price': '\$12.50',
-      'date': 'Yesterday, 6:45 PM',
-    },
-    {
-      'title': 'Nursing Home Visit',
-      'status': 'Completed',
-      'statusColor': const Color(0xFF10B981),
-      'icon': Iconsax.hospital,
-      'iconColor': const Color(0xFFEF4444),
-      'price': '\$25.00',
-      'date': '3 days ago',
-    },
-    {
-      'title': 'Chest X-Ray',
-      'status': 'Completed',
-      'statusColor': const Color(0xFF10B981),
-      'icon': Iconsax.scan,
-      'iconColor': const Color(0xFF8B5CF6),
-      'price': '\$45.00',
-      'date': 'Last week',
-    },
-  ];
+  // Removed dummy orders
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FD),
+      backgroundColor: AppColors.getBackground(context),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -74,7 +31,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         title: Text(
           'My Orders',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF0F172A),
+            color: AppColors.getTextTitle(context),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -144,46 +101,62 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
           // ── Orders List ──
           Expanded(
-            child: ListView.builder(
+            child: ValueListenableBuilder<List<OrderModel>>(
+              valueListenable: OrderProvider().ordersNotifier,
+              builder: (context, orders, child) {
+                if (orders.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No orders yet.',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.getTextSubtitle(context),
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              itemCount: _orders.length,
+              itemCount: orders.length,
               itemBuilder: (context, index) {
-                final order = _orders[index];
+                final order = orders[index];
                 
                 // Simple filtering logic
                 if (_selectedFilterIndex != 0) {
-                  if (_filters[_selectedFilterIndex] != order['status']) {
+                  if (_filters[_selectedFilterIndex] != order.status) {
                     return const SizedBox.shrink();
                   }
                 }
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailsScreen(order: order),
                         ),
-                      ],
-                    ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(24),
+                              ),
                     child: Row(
                       children: [
                         Container(
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: (order['iconColor'] as Color).withValues(alpha: 0.1),
+                            color: order.iconColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Icon(
-                            order['icon'] as IconData,
-                            color: order['iconColor'] as Color,
+                            order.icon,
+                            color: order.iconColor,
                             size: 26,
                           ),
                         ),
@@ -193,9 +166,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                order['title'] as String,
+                                order.title,
                                 style: GoogleFonts.poppins(
-                                  color: const Color(0xFF0F172A),
+                                  color: AppColors.getTextTitle(context),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -208,13 +181,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: (order['statusColor'] as Color).withValues(alpha: 0.1),
+                                      color: order.statusColor.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      order['status'] as String,
+                                      order.status,
                                       style: GoogleFonts.poppins(
-                                        color: order['statusColor'] as Color,
+                                        color: order.statusColor,
                                         fontSize: 10,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -223,9 +196,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      order['date'] as String,
+                                      '${order.date.day}/${order.date.month}/${order.date.year}',
                                       style: GoogleFonts.poppins(
-                                        color: const Color(0xFF94A3B8),
+                                        color: AppColors.textLight,
                                         fontSize: 12,
                                       ),
                                       maxLines: 1,
@@ -242,7 +215,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              order['price'] as String,
+                              '\$${order.price.toStringAsFixed(2)}',
                               style: GoogleFonts.poppins(
                                 color: const Color(0xFF3B82F6),
                                 fontSize: 16,
@@ -253,7 +226,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             Container(
                               width: 32,
                               height: 32,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: Color(0xFFF1F5F9),
                                 shape: BoxShape.circle,
                               ),
@@ -267,11 +240,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                       ],
                     ),
-                  ).animate(delay: (100 * index).ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  )).animate(delay: (100 * index).ms).fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
                 );
               },
-            ),
-          ),
+            );
+          },
+        ),
+      ),
           
           // Extra space at bottom to ensure it clears the floating bottom nav bar
           const SizedBox(height: 100),
