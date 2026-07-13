@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -56,8 +56,10 @@ class _SplashScreenState extends State<SplashScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // ── App Name ──
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Dr',
@@ -82,6 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ],
                   ).animate(delay: 200.ms).fadeIn(duration: 800.ms).slideY(begin: 0.3, end: 0, curve: Curves.easeOutCubic),
+                  ),
 
                   // ── ECG Line directly below text ──
                   AnimatedBuilder(

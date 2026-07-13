@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../checkout/checkout_details_screen.dart';
 

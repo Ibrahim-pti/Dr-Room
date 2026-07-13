@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class AppTypography {
   AppTypography._();

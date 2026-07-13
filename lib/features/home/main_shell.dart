@@ -13,7 +13,7 @@ import '../discover/discover_screen.dart';
 import '../settings/settings_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class MainShell extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../categories/all_categories_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 import '../doctors/all_doctors_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'doctor_details_screen.dart';

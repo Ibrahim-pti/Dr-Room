@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../lab/lab_order_method_screen.dart';
 import '../nursing/nursing_services_screen.dart';
