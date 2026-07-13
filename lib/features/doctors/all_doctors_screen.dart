@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'doctor_details_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AllDoctorsScreen extends StatelessWidget {
   const AllDoctorsScreen({super.key});
@@ -50,7 +51,7 @@ class AllDoctorsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Top Doctors',
+          'top_doctors'.tr(),
           style: GoogleFonts.poppins(
             color: const Color(0xFF0F172A),
             fontSize: 18,

@@ -4,6 +4,7 @@ import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/favorite_provider.dart';
 import 'chat_screen.dart';
 import 'doctor_reviews_screen.dart';
@@ -183,16 +184,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               _buildStatItem(
-                                'Patients',
+                                'patients'.tr(),
                                 '1.5k+',
                                 Iconsax.people,
                               ),
                               _buildStatItem(
-                                'Experience',
+                                'experience'.tr(),
                                 '8 yr+',
                                 Iconsax.briefcase,
                               ),
-                              _buildStatItem('Rating', '4.9', Iconsax.star),
+                              _buildStatItem('rating'.tr(), '4.9', Iconsax.star),
                             ],
                           ),
                         ],
@@ -211,7 +212,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'About Doctor',
+                        'about_doctor'.tr(),
                         style: GoogleFonts.poppins(
                           color: AppColors.getTextTitle(context),
                           fontSize: 16,
@@ -266,7 +267,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           );
                         },
                         child: Text(
-                          'See All',
+                          'see_all'.tr(),
                           style: GoogleFonts.poppins(
                             color: const Color(0xFF3B82F6),
                             fontSize: 14,
@@ -284,7 +285,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Select Date',
+                    'select_date'.tr(),
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 16,
@@ -355,7 +356,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'Available Time',
+                    'available_time'.tr(),
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 16,
@@ -479,7 +480,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           elevation: 0,
                         ),
                         child: Text(
-                          'Book Appointment',
+                          'book_appointment'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

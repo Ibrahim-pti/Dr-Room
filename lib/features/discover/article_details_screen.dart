@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ArticleDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> article;
@@ -127,7 +128,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Medical Specialist • ${article['time']}',
+                            '${"medical_specialist".tr()} • ${article['time']}',
                             style: GoogleFonts.poppins(
                               color: AppColors.getTextSubtitle(context),
                               fontSize: 13,

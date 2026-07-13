@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/providers/health_provider.dart';
 
@@ -39,7 +40,7 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Health Data Sync',
+          'health_data_sync'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -162,17 +163,17 @@ class _HealthDashboardScreenState extends State<HealthDashboardScreen> {
             else ...[
               Row(
                 children: [
-                  Expanded(child: _buildMetricCard('Steps', '${healthProvider.steps}', 'steps', Icons.directions_walk, const Color(0xFF3B82F6), healthProvider.steps / 12000)),
+                  Expanded(child: _buildMetricCard('steps'.tr(), '${healthProvider.steps}', 'steps', Icons.directions_walk, const Color(0xFF3B82F6), healthProvider.steps / 12000)),
                   const SizedBox(width: 16),
-                  Expanded(child: _buildMetricCard('Heart Rate', '${healthProvider.heartRate}', 'bpm', Iconsax.heart, const Color(0xFFEF4444), healthProvider.heartRate / 120)),
+                  Expanded(child: _buildMetricCard('heart_rate'.tr(), '${healthProvider.heartRate}', 'bpm'.tr(), Iconsax.heart, const Color(0xFFEF4444), healthProvider.heartRate / 120)),
                 ],
               ).animate(delay: 200.ms).fadeIn().slideY(begin: 0.1, end: 0),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: _buildMetricCard('Sleep', healthProvider.sleepTime, 'avg', Iconsax.moon, const Color(0xFF8B5CF6), 0.8)),
+                  Expanded(child: _buildMetricCard('sleep'.tr(), healthProvider.sleepTime, 'hours'.tr(), Iconsax.moon, const Color(0xFF8B5CF6), 0.8)),
                   const SizedBox(width: 16),
-                  Expanded(child: _buildMetricCard('Calories', '${healthProvider.calories}', 'kcal', Iconsax.flash, const Color(0xFFF59E0B), healthProvider.calories / 3000)),
+                  Expanded(child: _buildMetricCard('calories'.tr(), '${healthProvider.calories}', 'kcal'.tr(), Iconsax.flash, const Color(0xFFF59E0B), healthProvider.calories / 3000)),
                 ],
               ).animate(delay: 300.ms).fadeIn().slideY(begin: 0.1, end: 0),
               

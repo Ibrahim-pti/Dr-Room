@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 
 class DoctorReviewsScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Reviews & Ratings',
+          'reviews_ratings'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -118,7 +119,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Write a Review',
+                    'write_review'.tr(),
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -162,7 +163,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Based on 124 reviews',
+                'based_on_reviews'.tr(),
                 style: GoogleFonts.poppins(
                   color: AppColors.getTextSubtitle(context),
                   fontSize: 12,

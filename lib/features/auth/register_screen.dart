@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -239,7 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               const SizedBox(height: 16),
                               // Title
                               Text(
-                                'Create\nAccount',
+                                'create_account'.tr(),
                                 style: GoogleFonts.poppins(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w700,
@@ -250,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Sign up to get started',
+                                'sign_up_to_get_started'.tr(),
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -277,7 +278,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Full Name
                   _buildInputField(
-                    hint: 'Full Name',
+                    hint: 'full_name'.tr(),
                     icon: Icons.person_outline_rounded,
                     controller: _nameController,
                   ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
@@ -286,7 +287,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Email
                   _buildInputField(
-                    hint: 'Email Address',
+                    hint: 'email'.tr(),
                     icon: Icons.mail_outline_rounded,
                     controller: _emailController,
                   ).animate().fadeIn(delay: 350.ms).slideY(begin: 0.2, end: 0),
@@ -295,7 +296,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Phone
                   _buildInputField(
-                    hint: 'Phone Number',
+                    hint: 'phone_number'.tr(),
                     icon: Icons.phone_outlined,
                     controller: _phoneController,
                   ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
@@ -304,7 +305,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Password
                   _buildInputField(
-                    hint: 'Password',
+                    hint: 'password'.tr(),
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
                     obscure: _obscurePassword,
@@ -317,7 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   // Confirm Password
                   _buildInputField(
-                    hint: 'Confirm Password',
+                    hint: 'confirm_password'.tr(),
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
                     obscure: _obscureConfirmPassword,
@@ -376,17 +377,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               height: 1.5,
                             ),
                             children: [
-                              const TextSpan(text: 'I agree to the '),
+                              TextSpan(text: 'by_signing_up'.tr()),
                               TextSpan(
-                                text: 'Terms & Conditions',
+                                text: 'terms_of_service'.tr(),
                                 style: TextStyle(
                                   color: const Color(0xFF2563EB),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              const TextSpan(text: ' and '),
+                              TextSpan(text: 'and'.tr()),
                               TextSpan(
-                                text: 'Privacy Policy',
+                                text: 'privacy_policy'.tr(),
                                 style: TextStyle(
                                   color: const Color(0xFF2563EB),
                                   fontWeight: FontWeight.w600,
@@ -417,7 +418,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       child: Text(
-                        'Create Account',
+                        'create_account'.tr().replaceAll('\n', ' '),
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -437,7 +438,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'or continue with',
+                          'or_continue_with'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             color: const Color(0xFF94A3B8),
@@ -471,7 +472,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        'already_have_account'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: const Color(0xFF64748B),
@@ -480,7 +481,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       GestureDetector(
                         onTap: widget.onLogin,
                         child: Text(
-                          "Log In",
+                          'log_in'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

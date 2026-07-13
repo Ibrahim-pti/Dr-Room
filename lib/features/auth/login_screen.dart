@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/dr_widgets.dart';
@@ -237,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(height: 32),
                                   // Welcome Text
                                   Text(
-                                    'Welcome\nBack!',
+                                    'welcome_back'.tr(),
                                     style: GoogleFonts.poppins(
                                       fontSize: 28,
                                       fontWeight: FontWeight.w700,
@@ -248,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Sign in to continue',
+                                    'sign_in_continue'.tr(),
                                     style: GoogleFonts.poppins(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w400,
@@ -275,7 +276,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Email/Phone Input
                   _buildInputField(
-                    hint: 'Email or Phone number',
+                    hint: 'email_or_phone'.tr(),
                     icon: Icons.person_outline_rounded,
                     controller: _emailController,
                   ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
@@ -284,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Password Input
                   _buildInputField(
-                    hint: 'Password',
+                    hint: 'password'.tr(),
                     icon: Icons.lock_outline_rounded,
                     isPassword: true,
                     controller: _passwordController,
@@ -298,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: GestureDetector(
                       onTap: () {},
                       child: Text(
-                        'Forgot Password?',
+                        'forgot_password'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -328,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: Text(
-                        'Log In',
+                        'log_in'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -348,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'or continue with',
+                          'or_continue_with'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: const Color(0xFF94A3B8),
@@ -382,7 +383,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        'dont_have_account'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           color: const Color(0xFF64748B),
@@ -391,7 +392,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       GestureDetector(
                         onTap: widget.onSignUp,
                         child: Text(
-                          "Sign Up",
+                          'sign_up'.tr(),
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

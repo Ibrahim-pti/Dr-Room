@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 
 class VirtualWaitingRoomScreen extends StatefulWidget {
@@ -187,7 +188,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Virtual Waiting Room',
+          'virtual_waiting_room'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -313,7 +314,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                   child: Column(
                     children: [
                       Text(
-                        _isAlmostReady ? 'Almost Ready!' : 'Your Position',
+                        _isAlmostReady ? 'almost_ready'.tr() : 'your_position'.tr(),
                         style: GoogleFonts.poppins(
                           color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14,
@@ -366,7 +367,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                         children: [
                           _buildStatItem(
                             icon: Iconsax.clock,
-                            label: 'Est. Wait',
+                            label: 'est_wait'.tr(),
                             value: '$_estimatedMinutes min',
                           ),
                           Container(
@@ -376,7 +377,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                           ),
                           _buildStatItem(
                             icon: Iconsax.people,
-                            label: 'Ahead',
+                            label: 'ahead'.tr(),
                             value: '${_queuePosition > 0 ? _queuePosition - 1 : 0} people',
                           ),
                         ],
@@ -410,7 +411,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Live Queue',
+                        'live_queue'.tr(),
                         style: GoogleFonts.poppins(
                           color: AppColors.getTextTitle(context),
                           fontSize: 18,

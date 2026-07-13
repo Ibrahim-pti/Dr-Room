@@ -5,6 +5,7 @@ import '../categories/all_categories_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 import '../doctors/all_doctors_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'doctor_details_screen.dart';
 import '../notifications/notifications_screen.dart';
@@ -107,7 +108,7 @@ class HomeScreen extends StatelessWidget {
                                             ),
                                           ),
                                           Text(
-                                            'Good morning',
+                                            'good_morning'.tr(),
                                             style: GoogleFonts.poppins(
                                               color: Colors.white.withValues(
                                                 alpha: 0.9,
@@ -237,7 +238,7 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
-                                      'Search your doctor',
+                                      'search_doctors'.tr(),
                                       style: GoogleFonts.poppins(
                                         color: const Color(0xFF94A3B8),
                                         fontSize: 15,
@@ -288,7 +289,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Categories',
+                      'categories'.tr(),
                       style: GoogleFonts.poppins(
                         color: AppColors.getTextTitle(context),
                         fontSize: 18,
@@ -305,7 +306,7 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        'See All',
+                        'see_all'.tr(),
                         style: GoogleFonts.poppins(
                           color: const Color(0xFF3B82F6),
                           fontSize: 14,
@@ -332,7 +333,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Upcoming Schedule',
+                      'upcoming_appointments'.tr(),
                       style: GoogleFonts.poppins(
                         color: AppColors.getTextTitle(context),
                         fontSize: 18,
@@ -349,7 +350,7 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        'See All',
+                        'see_all'.tr(),
                         style: GoogleFonts.poppins(
                           color: const Color(0xFF3B82F6),
                           fontSize: 14,
@@ -497,7 +498,7 @@ class HomeScreen extends StatelessWidget {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            'Cancel',
+                                            'cancel_appointment'.tr(),
                                             style: GoogleFonts.poppins(
                                               color: const Color(0xFF3B82F6),
                                               fontWeight: FontWeight.w500,
@@ -519,7 +520,7 @@ class HomeScreen extends StatelessWidget {
                                         ),
                                         child: Center(
                                           child: Text(
-                                            'Reschedule',
+                                            'reschedule'.tr(),
                                             style: GoogleFonts.poppins(
                                               color: AppColors.getSurface(
                                                 context,
@@ -551,7 +552,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Top Doctors',
+                      'top_doctors'.tr(),
                       style: GoogleFonts.poppins(
                         color: AppColors.getTextTitle(context),
                         fontSize: 18,
@@ -568,7 +569,7 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        'See All',
+                        'see_all'.tr(),
                         style: GoogleFonts.poppins(
                           color: const Color(0xFF3B82F6),
                           fontSize: 14,

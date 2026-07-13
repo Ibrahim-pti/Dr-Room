@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SavedAddressesScreen extends StatelessWidget {
   const SavedAddressesScreen({super.key});
@@ -19,7 +20,7 @@ class SavedAddressesScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Saved Addresses',
+          'saved_addresses'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -115,7 +116,7 @@ class SavedAddressesScreen extends StatelessWidget {
               children: [
                 _buildAddressCard(
                   context: context,
-                  title: 'Home',
+                  title: 'home'.tr(),
                   address: '100M Road, English Village, Villa 45, Erbil',
                   icon: Iconsax.home_2,
                   color: const Color(0xFF3B82F6),
@@ -125,7 +126,7 @@ class SavedAddressesScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildAddressCard(
                   context: context,
-                  title: 'Work',
+                  title: 'work'.tr(),
                   address: 'Italian Village 1, Office 12, Erbil',
                   icon: Iconsax.building,
                   color: const Color(0xFF8B5CF6),
@@ -142,7 +143,7 @@ class SavedAddressesScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF3B82F6),
         icon: const Icon(Iconsax.location_add, color: Colors.white),
         label: Text(
-          'Add New Address',
+          'add_new_address'.tr(),
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontWeight: FontWeight.w600,

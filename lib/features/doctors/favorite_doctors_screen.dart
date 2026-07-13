@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/providers/favorite_provider.dart';
 import 'doctor_details_screen.dart';
@@ -19,7 +20,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Favorite Doctors',
+          'favorite_doctors'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -50,7 +51,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'No Favorites Yet',
+                    'no_favorites_yet'.tr(),
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 18,
@@ -59,7 +60,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Your favorite doctors will appear here',
+                    'favorite_doctors_desc'.tr(),
                     style: GoogleFonts.poppins(
                       color: AppColors.textLight,
                       fontSize: 14,

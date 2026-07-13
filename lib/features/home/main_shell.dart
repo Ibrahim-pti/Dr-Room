@@ -14,6 +14,7 @@ import '../settings/settings_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -124,15 +125,15 @@ class _MainShellState extends State<MainShell> {
   String _getLabelForIndex(int index) {
     switch (index) {
       case 0:
-        return 'Home';
+        return 'home_tab'.tr();
       case 1:
-        return 'Records';
+        return 'records_tab'.tr();
       case 2:
-        return 'Schedule';
+        return 'my_appointments'.tr();
       case 3:
-        return 'Discover';
+        return 'discover_tab'.tr();
       case 4:
-        return 'Profile';
+        return 'profile'.tr();
       default:
         return '';
     }
@@ -200,7 +201,7 @@ class _MainShellState extends State<MainShell> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Sara Ahmed',
+                  'sara_ahmad'.tr(),
                   textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextTitle(context),

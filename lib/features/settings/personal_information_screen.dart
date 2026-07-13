@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
@@ -49,7 +50,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Personal Information',
+          'personal_information'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 20,
@@ -108,14 +109,14 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
             // Form Fields
             _buildInputField(
-              label: 'Full Name',
+              label: 'full_name'.tr(),
               controller: _nameController,
               icon: Iconsax.user,
             ),
             const SizedBox(height: 16),
 
             _buildInputField(
-              label: 'Email Address',
+              label: 'email'.tr(),
               controller: _emailController,
               icon: Iconsax.sms,
               keyboardType: TextInputType.emailAddress,
@@ -123,7 +124,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             const SizedBox(height: 16),
 
             _buildInputField(
-              label: 'Phone Number',
+              label: 'phone_number'.tr(),
               controller: _phoneController,
               icon: Iconsax.call,
               keyboardType: TextInputType.phone,
@@ -131,7 +132,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             const SizedBox(height: 16),
 
             _buildInputField(
-              label: 'Date of Birth',
+              label: 'date_of_birth'.tr(),
               controller: _dobController,
               icon: Iconsax.calendar_1,
               readOnly: true,
@@ -146,7 +147,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Gender',
+                  'gender'.tr(),
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextSubtitle(context),
                     fontSize: 14,
@@ -156,9 +157,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildGenderOption('Male', Icons.male_rounded),
+                    _buildGenderOption('male'.tr(), Icons.male_rounded),
                     const SizedBox(width: 16),
-                    _buildGenderOption('Female', Icons.female_rounded),
+                    _buildGenderOption('female'.tr(), Icons.female_rounded),
                   ],
                 ),
               ],
@@ -182,7 +183,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                   elevation: 0,
                 ),
                 child: Text(
-                  'Save Changes',
+                  'save_changes'.tr(),
                   style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontSize: 16,
@@ -233,7 +234,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
               fontSize: 16,
             ),
             decoration: InputDecoration(
-              hintText: 'Enter $label',
+              hintText: label,
               hintStyle: GoogleFonts.poppins(
                 color: const Color(0xFF94A3B8),
                 fontSize: 14,

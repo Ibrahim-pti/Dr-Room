@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:pinput/pinput.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'dart:ui' as ui;
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/dr_widgets.dart';
@@ -148,20 +150,19 @@ class _OtpScreenState extends State<OtpScreen> {
 
               // ── Title ──
               Text(
-                'کۆدی پشتڕاستکردنەوە',
+                'verify_phone'.tr().replaceAll('\n', ' '),
                 style: AppTypography.headingLg.copyWith(
                   color: AppColors.textDark,
                 ),
-                textDirection: TextDirection.rtl,
               ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
 
               const SizedBox(height: 8),
 
               Directionality(
-                textDirection: TextDirection.rtl,
+                textDirection: ui.TextDirection.ltr,
                 child: Text.rich(
                   TextSpan(
-                    text: 'کۆدەکە نێردرا بۆ ',
+                    text: 'code_sent_to'.tr() + ' ',
                     style: AppTypography.bodyMd.copyWith(
                       color: AppColors.getTextSubtitle(context),
                       height: 1.5,
@@ -176,7 +177,6 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ],
                   ),
-                  textDirection: TextDirection.rtl,
                 ),
               ).animate(delay: 300.ms).fadeIn(duration: 400.ms),
 
@@ -184,7 +184,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
               // ── PIN Input ──
               Directionality(
-                    textDirection: TextDirection.ltr,
+                    textDirection: ui.TextDirection.ltr,
                     child: Pinput(
                       length: 6,
                       controller: _pinController,
@@ -232,7 +232,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       }
                     : null,
                 child: Text(
-                  'ناردنەوەی کۆد',
+                  'resend_code'.tr(),
                   style: AppTypography.labelMd.copyWith(
                     color: _canResend ? AppColors.primary : AppColors.textLight,
                   ),
@@ -243,7 +243,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
               // ── Verify Button ──
               DrButton(
-                text: 'پشتڕاستکردنەوە',
+                text: 'verify'.tr(),
                 isLoading: _isVerifying,
                 onPressed: _pinController.text.length == 6
                     ? () {

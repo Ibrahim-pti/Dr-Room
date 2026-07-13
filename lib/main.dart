@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'core/providers/order_provider.dart';
 import 'core/providers/checkout_provider.dart';
 import 'core/providers/favorite_provider.dart';
+import 'core/utils/ckb_localizations.dart';
 import 'core/providers/health_provider.dart';
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
@@ -14,8 +16,9 @@ import 'features/auth/register_screen.dart';
 import 'features/auth/otp_screen.dart';
 import 'features/home/main_shell.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -23,7 +26,15 @@ void main() {
       statusBarBrightness: Brightness.light,
     ),
   );
-  runApp(const DrRoomApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ar'), Locale('ckb')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('ckb'),
+      child: const DrRoomApp(),
+    ),
+  );
 }
 
 class DrRoomApp extends StatelessWidget {
@@ -47,7 +58,14 @@ class DrRoomApp extends StatelessWidget {
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: themeMode,
-            locale: const Locale('ckb'),
+            localizationsDelegates: [
+              ...context.localizationDelegates,
+              const CkbMaterialLocalizations(),
+              const CkbWidgetLocalizations(),
+              const CkbCupertinoLocalizations(),
+            ],
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
             home: const _AppFlow(),
           );
         },

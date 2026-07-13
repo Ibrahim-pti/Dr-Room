@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
@@ -72,7 +73,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Profile',
+                          'profile'.tr(),
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 18,
@@ -142,7 +143,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Sara Ahmad',
+                          'sara_ahmad'.tr(),
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextTitle(context),
                             fontSize: 18,
@@ -151,7 +152,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'sar***@gmail.com',
+                          'sar_email'.tr(),
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextSubtitle(context),
                             fontSize: 13,
@@ -179,7 +180,7 @@ class SettingsScreen extends StatelessWidget {
                     child: _buildToggleItem(
                       context,
                       imagePath: 'assets/images/settings_theme.png',
-                      title: 'Dark Mode',
+                      title: 'dark_mode'.tr(),
                       value: isDark,
                       onChanged: (val) {
                         Provider.of<ThemeProvider>(
@@ -204,7 +205,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           imagePath: 'assets/images/settings_personal.png',
-                          title: 'Personal Information',
+                          title: 'personal_information'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -220,7 +221,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           icon: Iconsax.health,
-                          title: 'Health Data Sync',
+                          title: 'health_data_sync'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -235,7 +236,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           imagePath: 'assets/images/settings_addresses.png',
-                          title: 'Address',
+                          title: 'address'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -263,7 +264,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           icon: Iconsax.language_square,
-                          title: 'Language',
+                          title: 'language'.tr(),
                           onTap: () {
                             _showLanguageBottomSheet(context);
                           },
@@ -272,7 +273,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           imagePath: 'assets/images/drawer_help.png',
-                          title: 'Help & Support',
+                          title: 'help_support'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,
@@ -286,7 +287,7 @@ class SettingsScreen extends StatelessWidget {
                         _buildListItem(
                           context,
                           icon: Iconsax.user_add,
-                          title: 'Invite Friends',
+                          title: 'invite_friends'.tr(),
                           onTap: () {
                             Share.shareUri(
                               Uri.parse('https://drroom.com/download'),
@@ -323,7 +324,7 @@ class SettingsScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Log Out',
+                              'log_out'.tr(),
                               style: GoogleFonts.poppins(
                                 color: const Color(0xFFEF4444),
                                 fontSize: 16,
@@ -534,14 +535,14 @@ class SettingsScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (context) {
+      builder: (bottomSheetContext) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Select Language',
+                'select_language'.tr(),
                 style: GoogleFonts.poppins(
                   color: AppColors.getTextTitle(context),
                   fontSize: 18,
@@ -549,11 +550,11 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildLanguageOption(context, 'English', '🇬🇧', true),
+              _buildLanguageOption(bottomSheetContext, 'English', '🇬🇧', const Locale('en')),
               const SizedBox(height: 12),
-              _buildLanguageOption(context, 'کوردی', 'kurdish', false),
+              _buildLanguageOption(bottomSheetContext, 'کوردی', 'kurdish', const Locale('ckb')),
               const SizedBox(height: 12),
-              _buildLanguageOption(context, 'العربية', '🇮🇶', false),
+              _buildLanguageOption(bottomSheetContext, 'العربية', '🇮🇶', const Locale('ar')),
             ],
           ),
         );
@@ -565,10 +566,12 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
     String title,
     String flag,
-    bool isSelected,
+    Locale locale,
   ) {
+    final isSelected = context.locale == locale;
     return InkWell(
       onTap: () {
+        context.setLocale(locale);
         Navigator.pop(context);
       },
       borderRadius: BorderRadius.circular(16),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../doctors/doctor_details_screen.dart';
 import '../queue/virtual_waiting_room_screen.dart';
 
@@ -40,7 +41,7 @@ class AllSchedulesScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'All Schedules',
+          'my_appointments'.tr(),
           style: GoogleFonts.poppins(
             color: const Color(0xFF0F172A),
             fontSize: 18,
@@ -130,7 +131,7 @@ class AllSchedulesScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                s['status']!,
+                                'upcoming'.tr(),
                                 style: GoogleFonts.poppins(
                                   color: const Color(0xFF3B82F6),
                                   fontSize: 12,
@@ -184,7 +185,7 @@ class AllSchedulesScreen extends StatelessWidget {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Cancel',
+                                    'cancel_appointment'.tr(),
                                     style: GoogleFonts.poppins(
                                       color: const Color(0xFF64748B),
                                       fontWeight: FontWeight.w500,
@@ -223,7 +224,7 @@ class AllSchedulesScreen extends StatelessWidget {
                                       const Icon(Iconsax.people, color: Colors.white, size: 18),
                                       const SizedBox(width: 8),
                                       Text(
-                                        'Join Queue',
+                                        'join_now'.tr(),
                                         style: GoogleFonts.poppins(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600,

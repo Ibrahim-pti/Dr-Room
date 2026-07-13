@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'video_call_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -110,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Online',
+                        'online'.tr(),
                         style: GoogleFonts.poppins(
                           color: const Color(0xFF10B981),
                           fontSize: 12,
@@ -228,7 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         controller: _messageController,
                         style: GoogleFonts.poppins(color: const Color(0xFF0F172A)),
                         decoration: InputDecoration(
-                          hintText: 'Type a message...',
+                          hintText: 'type_message'.tr(),
                           hintStyle: GoogleFonts.poppins(color: const Color(0xFF94A3B8)),
                           border: InputBorder.none,
                         ),

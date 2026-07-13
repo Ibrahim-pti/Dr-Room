@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 
 class HelpSupportScreen extends StatelessWidget {
@@ -24,7 +25,7 @@ class HelpSupportScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Help & Support',
+          'help_support'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 20,
@@ -64,7 +65,7 @@ class HelpSupportScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             Text(
-              'Contact Us',
+              'contact_us'.tr(),
               style: GoogleFonts.poppins(
                 color: AppColors.getTextTitle(context),
                 fontSize: 18,
@@ -106,7 +107,7 @@ class HelpSupportScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             Text(
-              'Frequently Asked Questions',
+              'faq'.tr(),
               style: GoogleFonts.poppins(
                 color: AppColors.getTextTitle(context),
                 fontSize: 18,

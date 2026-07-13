@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -114,7 +115,7 @@ class OnboardingScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Smarter Health ',
+                        'smarter_health'.tr(),
                         style: GoogleFonts.inter(
                           fontSize: 26,
                           fontWeight: FontWeight.w400,
@@ -129,7 +130,7 @@ class OnboardingScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          'Better',
+                          'better'.tr(),
                           style: GoogleFonts.inter(
                             fontSize: 24,
                             fontWeight: FontWeight.w400,
@@ -145,7 +146,7 @@ class OnboardingScreen extends StatelessWidget {
 
                   // Title: Doctors Everyday
                   Text(
-                    'Doctors Everyday',
+                    'doctors_everyday'.tr(),
                     style: GoogleFonts.inter(
                       fontSize: 26,
                       fontWeight: FontWeight.w400,
@@ -158,7 +159,7 @@ class OnboardingScreen extends StatelessWidget {
 
                   // Subtitle
                   Text(
-                    'Trusted doctors providing better\ncare for you every day.',
+                    'onboarding_subtitle'.tr(),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       fontSize: 15,
@@ -194,7 +195,7 @@ class OnboardingScreen extends StatelessWidget {
                           child: Row(
                             children: [
                               Text(
-                                'Get Started',
+                                'get_started'.tr(),
                                 style: GoogleFonts.inter(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w500,

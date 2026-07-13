@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'article_details_screen.dart';
 
 class DiscoverScreen extends StatelessWidget {
@@ -51,7 +52,7 @@ class DiscoverScreen extends StatelessWidget {
         backgroundColor: AppColors.getBackground(context),
         elevation: 0,
         title: Text(
-          'Discover Health',
+          'discover'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 24,
@@ -115,7 +116,7 @@ class DiscoverScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
-                'Featured Today',
+                'trending'.tr(),
                 style: GoogleFonts.poppins(
                   color: AppColors.getTextTitle(context),
                   fontSize: 18,
@@ -221,7 +222,7 @@ class DiscoverScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text(
-                'Recent Articles',
+                'articles'.tr(),
                 style: GoogleFonts.poppins(
                   color: AppColors.getTextTitle(context),
                   fontSize: 18,
