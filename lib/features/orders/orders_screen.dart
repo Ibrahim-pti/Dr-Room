@@ -51,7 +51,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               children: List.generate(
                 _filters.length,
                 (index) => Padding(
-                  padding: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsetsDirectional.only(end: 12),
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
@@ -135,7 +135,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 }
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsetsDirectional.only(bottom: 16),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(

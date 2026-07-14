@@ -158,20 +158,20 @@ class _ChatScreenState extends State<ChatScreen> {
                 final isMe = message['isMe'] as bool;
 
                 return Align(
-                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isMe ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: const EdgeInsetsDirectional.only(bottom: 16),
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.75,
                     ),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isMe ? const Color(0xFF3B82F6) : AppColors.getSurface(context),
-                      borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(20),
-                        topRight: const Radius.circular(20),
-                        bottomLeft: isMe ? const Radius.circular(20) : const Radius.circular(4),
-                        bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(20),
+                      borderRadius: BorderRadiusDirectional.only(
+                        topStart: const Radius.circular(20),
+                        topEnd: const Radius.circular(20),
+                        bottomStart: isMe ? const Radius.circular(20) : const Radius.circular(4),
+                        bottomEnd: isMe ? const Radius.circular(4) : const Radius.circular(20),
                       ),
                       border: isMe ? null : Border.all(color: AppColors.getBorder(context)),
                     ),

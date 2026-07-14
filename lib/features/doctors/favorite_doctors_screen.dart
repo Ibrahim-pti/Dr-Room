@@ -77,7 +77,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final doctor = favorites[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsetsDirectional.only(bottom: 16),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(

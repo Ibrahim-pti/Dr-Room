@@ -146,8 +146,8 @@ class _SosScreenState extends State<SosScreen> {
                     width: 200,
                     height: 200,
                     decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(color: const Color(0xFF3B82F6), width: 4),
+                      border: BorderDirectional(
+                        start: BorderSide(color: const Color(0xFF3B82F6), width: 4),
                         top: BorderSide(color: const Color(0xFF3B82F6), width: 4),
                       ),
                     ),
@@ -172,9 +172,9 @@ class _SosScreenState extends State<SosScreen> {
                   ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 1000.ms),
                 ),
                 // Patient Marker
-                Positioned(
+                PositionedDirectional(
                   bottom: MediaQuery.of(context).size.height / 2 - 100,
-                  right: MediaQuery.of(context).size.width / 2 - 100,
+                  end: MediaQuery.of(context).size.width / 2 - 100,
                   child: const Icon(Icons.person_pin_circle, color: Color(0xFF3B82F6), size: 40),
                 ),
               ],
@@ -183,9 +183,9 @@ class _SosScreenState extends State<SosScreen> {
         ),
         
         // Back button
-        Positioned(
+        PositionedDirectional(
           top: 50,
-          left: 20,
+          start: 20,
           child: CircleAvatar(
             backgroundColor: Colors.white,
             child: IconButton(
@@ -196,17 +196,17 @@ class _SosScreenState extends State<SosScreen> {
         ),
 
         // Bottom Sheet Info
-        Positioned(
+        PositionedDirectional(
           bottom: 0,
-          left: 0,
-          right: 0,
+          start: 0,
+          end: 0,
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: AppColors.getSurface(context),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+              borderRadius: const BorderRadiusDirectional.only(
+                topStart: Radius.circular(32),
+                topEnd: Radius.circular(32),
               ),
               boxShadow: [
                 BoxShadow(

@@ -119,10 +119,10 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
               child: Stack(
                 children: [
                   // Corner indicators
-                  _buildCorner(Alignment.topLeft),
-                  _buildCorner(Alignment.topRight),
-                  _buildCorner(Alignment.bottomLeft),
-                  _buildCorner(Alignment.bottomRight),
+                  _buildCorner(AlignmentDirectional.topStart),
+                  _buildCorner(AlignmentDirectional.topEnd),
+                  _buildCorner(AlignmentDirectional.bottomStart),
+                  _buildCorner(AlignmentDirectional.bottomEnd),
 
                   // Pill bottle placeholder icon (simulating object in view)
                   if (!_scanComplete)
@@ -139,10 +139,10 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
                     AnimatedBuilder(
                       animation: _laserController,
                       builder: (context, child) {
-                        return Positioned(
+                        return PositionedDirectional(
                           top: _laserController.value * 330, // 350 height - laser height
-                          left: 0,
-                          right: 0,
+                          start: 0,
+                          end: 0,
                           child: Container(
                             height: 4,
                             decoration: BoxDecoration(
@@ -182,10 +182,10 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
           ),
 
           // Top App Bar Elements (Overlay)
-          Positioned(
+          PositionedDirectional(
             top: 50,
-            left: 24,
-            right: 24,
+            start: 24,
+            end: 24,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -223,10 +223,10 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
           ),
 
           // Bottom Instruction Text
-          Positioned(
+          PositionedDirectional(
             bottom: 60,
-            left: 24,
-            right: 24,
+            start: 24,
+            end: 24,
             child: Column(
               children: [
                 Text(
@@ -253,7 +253,7 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
     );
   }
 
-  Widget _buildCorner(Alignment alignment) {
+  Widget _buildCorner(AlignmentDirectional alignment) {
     return Align(
       alignment: alignment,
       child: Container(
@@ -266,17 +266,17 @@ class _PillScannerScreenState extends State<PillScannerScreen> with SingleTicker
     );
   }
 
-  Border _getCornerBorder(Alignment alignment) {
+  BorderDirectional _getCornerBorder(AlignmentDirectional alignment) {
     const color = Colors.white;
     const width = 4.0;
-    if (alignment == Alignment.topLeft) {
-      return const Border(top: BorderSide(color: color, width: width), left: BorderSide(color: color, width: width));
-    } else if (alignment == Alignment.topRight) {
-      return const Border(top: BorderSide(color: color, width: width), right: BorderSide(color: color, width: width));
-    } else if (alignment == Alignment.bottomLeft) {
-      return const Border(bottom: BorderSide(color: color, width: width), left: BorderSide(color: color, width: width));
+    if (alignment == AlignmentDirectional.topStart) {
+      return const BorderDirectional(top: BorderSide(color: color, width: width), start: BorderSide(color: color, width: width));
+    } else if (alignment == AlignmentDirectional.topEnd) {
+      return const BorderDirectional(top: BorderSide(color: color, width: width), end: BorderSide(color: color, width: width));
+    } else if (alignment == AlignmentDirectional.bottomStart) {
+      return const BorderDirectional(bottom: BorderSide(color: color, width: width), start: BorderSide(color: color, width: width));
     } else {
-      return const Border(bottom: BorderSide(color: color, width: width), right: BorderSide(color: color, width: width));
+      return const BorderDirectional(bottom: BorderSide(color: color, width: width), end: BorderSide(color: color, width: width));
     }
   }
 }

@@ -47,9 +47,9 @@ class _MainShellState extends State<MainShell> {
           IndexedStack(index: _currentIndex, children: _screens),
 
           // Floating Bottom Navigation Bar
-          Positioned(
-            left: 20,
-            right: 20,
+          PositionedDirectional(
+            start: 20,
+            end: 20,
             bottom: 30, // Floats above the bottom
             child: Container(
               height: 70,
@@ -143,17 +143,17 @@ class _MainShellState extends State<MainShell> {
     return Drawer(
       backgroundColor: Colors.white, // Ultra pure white
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(left: Radius.circular(32)),
+        borderRadius: BorderRadiusDirectional.horizontal(start: Radius.circular(32)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
-            padding: const EdgeInsets.only(
+            padding: const EdgeInsetsDirectional.only(
               top: 60,
               bottom: 24,
-              left: 24,
-              right: 24,
+              start: 24,
+              end: 24,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,

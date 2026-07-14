@@ -16,7 +16,7 @@ class ShimmerLoadingList extends StatelessWidget {
       itemCount: itemCount,
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsetsDirectional.only(bottom: 16),
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(

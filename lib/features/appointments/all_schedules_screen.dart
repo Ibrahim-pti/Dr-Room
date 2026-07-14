@@ -57,7 +57,7 @@ class AllSchedulesScreen extends StatelessWidget {
             ...List.generate(schedules.length, (index) {
               final s = schedules[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsetsDirectional.only(bottom: 16),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(

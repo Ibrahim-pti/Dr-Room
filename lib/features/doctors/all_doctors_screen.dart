@@ -65,7 +65,7 @@ class AllDoctorsScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final doc = doctors[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsetsDirectional.only(bottom: 16),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -141,12 +141,12 @@ class AllDoctorsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Positioned(
-                      right: 0,
+                    PositionedDirectional(
+                      end: 0,
                       bottom: 0,
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomRight: Radius.circular(24),
+                        borderRadius: const BorderRadiusDirectional.only(
+                          bottomEnd: Radius.circular(24),
                         ),
                         child: Image.asset(
                           doc['image']!,
@@ -155,9 +155,9 @@ class AllDoctorsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Positioned(
+                    PositionedDirectional(
                       top: 16,
-                      right: 16,
+                      end: 16,
                       child: Container(
                         width: 36,
                         height: 36,

@@ -296,8 +296,8 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                       colors: _isAlmostReady
                           ? [const Color(0xFF10B981), const Color(0xFF059669)]
                           : [const Color(0xFF3B82F6), const Color(0xFF8B5CF6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+                      begin: AlignmentDirectional.topStart,
+                      end: AlignmentDirectional.bottomEnd,
                     ),
                     borderRadius: BorderRadius.circular(32),
                     boxShadow: [
@@ -457,7 +457,7 @@ class _VirtualWaitingRoomScreenState extends State<VirtualWaitingRoomScreen>
                     final isFirst = index == 0;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsetsDirectional.only(bottom: 12),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         decoration: BoxDecoration(

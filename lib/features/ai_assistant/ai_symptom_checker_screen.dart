@@ -142,9 +142,9 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
 
   Widget _buildMessageBubble(String text, bool isUser, String time) {
     return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isUser ? AlignmentDirectional.centerEnd : AlignmentDirectional.centerStart,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
+        margin: const EdgeInsetsDirectional.only(bottom: 20),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
@@ -154,7 +154,7 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
           children: [
             if (!isUser) ...[
               Container(
-                margin: const EdgeInsets.only(right: 8),
+                margin: const EdgeInsetsDirectional.only(end: 8),
                 width: 36,
                 height: 36,
                 decoration: const BoxDecoration(
@@ -170,11 +170,11 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: isUser ? const Color(0xFF3B82F6) : AppColors.getSurface(context),
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(20),
-                    topRight: const Radius.circular(20),
-                    bottomLeft: Radius.circular(isUser ? 20 : 0),
-                    bottomRight: Radius.circular(isUser ? 0 : 20),
+                  borderRadius: BorderRadiusDirectional.only(
+                    topStart: const Radius.circular(20),
+                    topEnd: const Radius.circular(20),
+                    bottomStart: Radius.circular(isUser ? 20 : 0),
+                    bottomEnd: Radius.circular(isUser ? 0 : 20),
                   ),
                   boxShadow: [
                     if (!isUser)
@@ -216,16 +216,16 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
 
   Widget _buildTypingIndicator() {
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: AlignmentDirectional.centerStart,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 20, left: 44),
+        margin: const EdgeInsetsDirectional.only(bottom: 20, start: 44),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.getSurface(context),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+          borderRadius: const BorderRadiusDirectional.only(
+            topStart: Radius.circular(20),
+            topEnd: Radius.circular(20),
+            bottomEnd: Radius.circular(20),
           ),
           boxShadow: [
             BoxShadow(
@@ -266,7 +266,7 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
   Widget _buildSuggestions() {
     return Container(
       height: 40,
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsetsDirectional.only(bottom: 16),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -275,7 +275,7 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
           return GestureDetector(
             onTap: () => _sendMessage(_suggestions[index]),
             child: Container(
-              margin: const EdgeInsets.only(right: 12),
+              margin: const EdgeInsetsDirectional.only(end: 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
@@ -301,10 +301,10 @@ class _AiSymptomCheckerScreenState extends State<AiSymptomCheckerScreen> {
 
   Widget _buildInputArea() {
     return Container(
-      padding: EdgeInsets.only(
+      padding: EdgeInsetsDirectional.only(
         top: 16,
-        left: 20,
-        right: 20,
+        start: 20,
+        end: 20,
         bottom: MediaQuery.of(context).padding.bottom > 0 ? MediaQuery.of(context).padding.bottom : 20,
       ),
       decoration: BoxDecoration(

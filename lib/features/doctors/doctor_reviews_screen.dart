@@ -75,7 +75,7 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 100),
+            padding: const EdgeInsetsDirectional.only(bottom: 100),
             child: Column(
               children: [
                 _buildRatingSummary(),
@@ -86,15 +86,15 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
           ),
           
           // ── Bottom Action ──
-          Positioned(
+          PositionedDirectional(
             bottom: 0,
-            left: 0,
-            right: 0,
+            start: 0,
+            end: 0,
             child: Container(
-              padding: EdgeInsets.only(
+              padding: EdgeInsetsDirectional.only(
                 top: 16,
-                left: 24,
-                right: 24,
+                start: 24,
+                end: 24,
                 bottom: MediaQuery.of(context).padding.bottom > 0 ? MediaQuery.of(context).padding.bottom : 16,
               ),
               decoration: BoxDecoration(
@@ -296,17 +296,17 @@ class _DoctorReviewsScreenState extends State<DoctorReviewsScreen> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
-              padding: EdgeInsets.only(
+              padding: EdgeInsetsDirectional.only(
                 top: 24,
-                left: 24,
-                right: 24,
+                start: 24,
+                end: 24,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 24,
               ),
               decoration: BoxDecoration(
                 color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+                borderRadius: const BorderRadiusDirectional.only(
+                  topStart: Radius.circular(32),
+                  topEnd: Radius.circular(32),
                 ),
               ),
               child: Column(

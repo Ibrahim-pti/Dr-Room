@@ -73,8 +73,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   // Soft blue glow behind doctor
-                  Positioned(
-                    right: 0,
+                  PositionedDirectional(
+                    end: 0,
                     top: size.height * 0.02,
                     child: Container(
                       width: size.width * 0.55,
@@ -94,8 +94,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   // Doctor Image
-                  Positioned(
-                    right: -20,
+                  PositionedDirectional(
+                    end: -20,
                     top: 60,
                     bottom: -10,
                     width: size.width * 0.55,
@@ -125,9 +125,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   // Back Button
-                  Positioned(
+                  PositionedDirectional(
                     top: 56,
-                    left: 24,
+                    start: 24,
                     child: GestureDetector(
                       onTap: widget.onLogin,
                       child: Container(
@@ -153,8 +153,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   // Title Section
-                  Positioned(
-                    left: 28,
+                  PositionedDirectional(
+                    start: 28,
                     top: 130, // Increased top padding from 105 to 130
                     child: SizedBox(
                       width: size.width * 0.42,
@@ -169,8 +169,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     height: 42,
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
+                                        begin: AlignmentDirectional.topStart,
+                                        end: AlignmentDirectional.bottomEnd,
                                         colors: [
                                           Color(0xFF60A5FA),
                                           Color(0xFF2563EB),
@@ -188,9 +188,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     ),
                                     child: Stack(
                                       children: [
-                                        Positioned(
+                                        PositionedDirectional(
                                           top: -6,
-                                          right: -6,
+                                          end: -6,
                                           child: Container(
                                             width: 20,
                                             height: 20,
@@ -337,7 +337,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       GestureDetector(
                         onTap: () => setState(() => _agreeToTerms = !_agreeToTerms),
                         child: Container(
-                          margin: const EdgeInsets.only(top: 2, right: 12),
+                          margin: const EdgeInsetsDirectional.only(top: 2, end: 12),
                           width: 22,
                           height: 22,
                           decoration: BoxDecoration(

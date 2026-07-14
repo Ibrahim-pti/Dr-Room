@@ -38,17 +38,17 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          padding: EdgeInsets.only(
+          padding: EdgeInsetsDirectional.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 24,
             top: 24,
-            left: 24,
-            right: 24,
+            start: 24,
+            end: 24,
           ),
           decoration: BoxDecoration(
             color: AppColors.getSurface(context),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(32),
+            borderRadius: const BorderRadiusDirectional.only(
+              topStart: Radius.circular(32),
+              topEnd: Radius.circular(32),
             ),
           ),
           child: Column(
@@ -166,7 +166,7 @@ class _FamilyMembersScreenState extends State<FamilyMembersScreen> {
         itemBuilder: (context, index) {
           final member = _members[index];
           return Container(
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsetsDirectional.only(bottom: 16),
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.getSurface(context),

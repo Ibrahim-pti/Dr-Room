@@ -166,9 +166,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
             color: AppColors.getSurface(context),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(32),
-              topRight: Radius.circular(32),
+            borderRadius: const BorderRadiusDirectional.only(
+              topStart: Radius.circular(32),
+              topEnd: Radius.circular(32),
             ),
           ),
           child: Column(
@@ -193,8 +193,8 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                        begin: AlignmentDirectional.topStart,
+                        end: AlignmentDirectional.bottomEnd,
                       ),
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -360,7 +360,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         ),
         const SizedBox(height: 8),
         Padding(
-          padding: const EdgeInsets.only(left: 28),
+          padding: const EdgeInsetsDirectional.only(start: 28),
           child: Text(
             content,
             style: GoogleFonts.poppins(

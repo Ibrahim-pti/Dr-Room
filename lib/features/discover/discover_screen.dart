@@ -82,7 +82,7 @@ class DiscoverScreen extends StatelessWidget {
                   final cat = _categories[index];
                   final isSelected = index == 0;
                   return Container(
-                    margin: const EdgeInsets.only(right: 12),
+                    margin: const EdgeInsetsDirectional.only(end: 12),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
@@ -244,7 +244,7 @@ class DiscoverScreen extends StatelessWidget {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => ArticleDetailsScreen(article: article)));
                   },
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 20),
+                    margin: const EdgeInsetsDirectional.only(bottom: 20),
                     child: Row(
                       children: [
                         Container(

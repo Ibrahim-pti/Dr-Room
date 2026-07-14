@@ -162,7 +162,7 @@ class NotificationsScreen extends StatelessWidget {
                                 Container(
                                   width: 8,
                                   height: 8,
-                                  margin: const EdgeInsets.only(top: 6),
+                                  margin: const EdgeInsetsDirectional.only(top: 6),
                                   decoration: const BoxDecoration(
                                     color: Color(0xFF3B82F6),
                                     shape: BoxShape.circle,

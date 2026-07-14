@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           // Extra bottom padding for the floating navigation bar
-          padding: const EdgeInsets.only(bottom: 120),
+          padding: const EdgeInsetsDirectional.only(bottom: 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -152,9 +152,9 @@ class HomeScreen extends StatelessWidget {
                                                 size: 22,
                                               ),
                                             ),
-                                            Positioned(
+                                            PositionedDirectional(
                                               top: 12,
-                                              right: 12,
+                                              end: 12,
                                               child: Container(
                                                 width: 8,
                                                 height: 8,
@@ -218,9 +218,9 @@ class HomeScreen extends StatelessWidget {
                           // ── Search Bar ──
                           Container(
                                 height: 60,
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  right: 8,
+                                padding: const EdgeInsetsDirectional.only(
+                                  start: 20,
+                                  end: 8,
                                 ),
                                 decoration: BoxDecoration(
                                   color: AppColors.getSurface(context),
@@ -652,12 +652,12 @@ class HomeScreen extends StatelessWidget {
                         ),
 
                         // Doctor Image on the right
-                        Positioned(
-                          right: 0,
+                        PositionedDirectional(
+                          end: 0,
                           bottom: 0,
                           child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              bottomRight: Radius.circular(24),
+                            borderRadius: const BorderRadiusDirectional.only(
+                              bottomEnd: Radius.circular(24),
                             ),
                             child: Image.asset(
                               'assets/images/doctor3.png',
@@ -668,9 +668,9 @@ class HomeScreen extends StatelessWidget {
                         ),
 
                         // Heart Icon
-                        Positioned(
+                        PositionedDirectional(
                           top: 16,
-                          right: 16,
+                          end: 16,
                           child: Container(
                             width: 36,
                             height: 36,
@@ -865,9 +865,9 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           if (!isActive)
-            Positioned(
+            PositionedDirectional(
               top: -6,
-              right: -6,
+              end: -6,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(

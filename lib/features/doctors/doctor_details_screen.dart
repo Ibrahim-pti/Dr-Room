@@ -114,24 +114,24 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 120),
+            padding: const EdgeInsetsDirectional.only(bottom: 120),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ── Header Profile ──
                 Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.only(
+                      padding: const EdgeInsetsDirectional.only(
                         top: 70,
                         bottom: 20,
-                        left: 24,
-                        right: 24,
+                        start: 24,
+                        end: 24,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.getSurface(context),
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(40),
-                          bottomRight: Radius.circular(40),
+                        borderRadius: const BorderRadiusDirectional.only(
+                          bottomStart: Radius.circular(40),
+                          bottomEnd: Radius.circular(40),
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -413,15 +413,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           ),
 
           // ── Bottom Action Bar ──
-          Positioned(
+          PositionedDirectional(
             bottom: 0,
-            left: 0,
-            right: 0,
+            start: 0,
+            end: 0,
             child: Container(
-              padding: EdgeInsets.only(
+              padding: EdgeInsetsDirectional.only(
                 top: 0,
-                left: 24,
-                right: 24,
+                start: 24,
+                end: 24,
                 bottom: 0,
               ),
               child: Row(

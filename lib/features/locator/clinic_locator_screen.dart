@@ -27,9 +27,9 @@ class ClinicLocatorScreen extends StatelessWidget {
                     ),
                   ),
                   // User Location
-                  Positioned(
+                  PositionedDirectional(
                     top: MediaQuery.of(context).size.height * 0.4,
-                    left: MediaQuery.of(context).size.width * 0.3,
+                    start: MediaQuery.of(context).size.width * 0.3,
                     child: Column(
                       children: [
                         Container(
@@ -60,16 +60,16 @@ class ClinicLocatorScreen extends StatelessWidget {
                     ),
                   ),
                   // Clinic Location Pin 1
-                  Positioned(
+                  PositionedDirectional(
                     top: MediaQuery.of(context).size.height * 0.3,
-                    right: MediaQuery.of(context).size.width * 0.2,
+                    end: MediaQuery.of(context).size.width * 0.2,
                     child: _buildMapPin(context, 'City Hospital', '2.5 km', isActive: true)
                         .animate().slideY(begin: -0.5, end: 0, duration: 400.ms).fadeIn(),
                   ),
                   // Clinic Location Pin 2
-                  Positioned(
+                  PositionedDirectional(
                     top: MediaQuery.of(context).size.height * 0.55,
-                    left: MediaQuery.of(context).size.width * 0.15,
+                    start: MediaQuery.of(context).size.width * 0.15,
                     child: _buildMapPin(context, 'Dr-Room Clinic', '5.1 km')
                         .animate().slideY(begin: -0.5, end: 0, duration: 500.ms).fadeIn(),
                   ),
@@ -124,17 +124,17 @@ class ClinicLocatorScreen extends StatelessWidget {
           ),
 
           // ── Bottom Info Card ──
-          Positioned(
+          PositionedDirectional(
             bottom: 0,
-            left: 0,
-            right: 0,
+            start: 0,
+            end: 0,
             child: Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+                borderRadius: const BorderRadiusDirectional.only(
+                  topStart: Radius.circular(32),
+                  topEnd: Radius.circular(32),
                 ),
                 boxShadow: [
                   BoxShadow(

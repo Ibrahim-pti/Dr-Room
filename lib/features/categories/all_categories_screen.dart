@@ -125,9 +125,9 @@ class AllCategoriesScreen extends StatelessWidget {
             ],
           ),
           if (!isActive)
-            Positioned(
+            PositionedDirectional(
               top: -6,
-              right: -6,
+              end: -6,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(

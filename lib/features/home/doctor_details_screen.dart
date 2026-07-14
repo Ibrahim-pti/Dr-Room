@@ -46,8 +46,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ),
 
                   // Doctor Image
-                  Positioned(
-                    right: -15,
+                  PositionedDirectional(
+                    end: -15,
                     bottom: 85, // Moved up to look better
                     width: size.width * 0.72,
                     child:
@@ -62,10 +62,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ),
 
                   // White Background Curve
-                  Positioned(
+                  PositionedDirectional(
                     bottom: 0,
-                    left: 0,
-                    right: 0,
+                    start: 0,
+                    end: 0,
                     height: 60,
                     child: Container(
                       decoration: const BoxDecoration(
@@ -220,9 +220,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ),
 
                   // ── Stats Card ──
-                  Positioned(
-                    left: 24,
-                    right: 24,
+                  PositionedDirectional(
+                    start: 24,
+                    end: 24,
                     bottom: 10,
                     child:
                         Container(

@@ -105,8 +105,8 @@ class _RecordsScreenState extends State<RecordsScreen> {
                           const Color(0xFF3B82F6).withValues(alpha: 0.15),
                           const Color(0xFF60A5FA).withValues(alpha: 0.15),
                         ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                        begin: AlignmentDirectional.topStart,
+                        end: AlignmentDirectional.bottomEnd,
                       ),
                       border: Border.all(
                         color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
@@ -169,7 +169,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
               children: List.generate(
                 _filters.length,
                 (index) => Padding(
-                  padding: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsetsDirectional.only(end: 12),
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
@@ -234,7 +234,7 @@ class _RecordsScreenState extends State<RecordsScreen> {
                 }
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsetsDirectional.only(bottom: 16),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(

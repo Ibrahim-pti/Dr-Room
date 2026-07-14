@@ -208,7 +208,7 @@ class PillReminderScreen extends StatelessWidget {
           // Content Card
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(bottom: 24),
+              margin: const EdgeInsetsDirectional.only(bottom: 24),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.getSurface(context),
@@ -343,7 +343,7 @@ class PillReminderScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: EdgeInsets.only(
+        padding: EdgeInsetsDirectional.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         decoration: BoxDecoration(

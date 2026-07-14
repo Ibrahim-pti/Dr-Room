@@ -113,7 +113,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                     });
                   },
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: const EdgeInsetsDirectional.only(bottom: 16),
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: AppColors.getSurface(context),
@@ -191,9 +191,9 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+                borderRadius: const BorderRadiusDirectional.only(
+                topStart: Radius.circular(32),
+                topEnd: Radius.circular(32),
               ),
             ),
             child: SafeArea(

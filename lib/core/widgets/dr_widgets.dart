@@ -31,8 +31,8 @@ class DrButton extends StatelessWidget {
           gradient: onPressed != null
               ? const LinearGradient(
                   colors: [AppColors.primary, AppColors.primaryLight],
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
+                  begin: AlignmentDirectional.centerEnd,
+                  end: AlignmentDirectional.centerStart,
                 )
               : null,
           color: onPressed == null ? AppColors.textLight.withValues(alpha: 0.3) : null,

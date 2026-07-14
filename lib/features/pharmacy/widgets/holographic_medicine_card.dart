@@ -12,9 +12,9 @@ class HolographicMedicineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
+      borderRadius: const BorderRadiusDirectional.only(
+        topStart: Radius.circular(32),
+        topEnd: Radius.circular(32),
       ),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),

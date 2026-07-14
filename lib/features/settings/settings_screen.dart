@@ -48,10 +48,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
 
                   // Background Curve
-                  Positioned(
+                  PositionedDirectional(
                     top: 155,
-                    left: 0,
-                    right: 0,
+                    start: 0,
+                    end: 0,
                     height: 40,
                     child: Container(
                       decoration: BoxDecoration(
@@ -85,10 +85,10 @@ class SettingsScreen extends StatelessWidget {
                   ),
 
                   // Profile Picture & Name
-                  Positioned(
+                  PositionedDirectional(
                     top: 100,
-                    left: 0,
-                    right: 0,
+                    start: 0,
+                    end: 0,
                     child: Column(
                       children: [
                         Stack(
@@ -116,9 +116,9 @@ class SettingsScreen extends StatelessWidget {
                                     : const Color(0xFF94A3B8),
                               ),
                             ),
-                            Positioned(
+                            PositionedDirectional(
                               bottom: 0,
-                              right: 2,
+                              end: 2,
                               child: Container(
                                 width: 28,
                                 height: 28,

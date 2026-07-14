@@ -35,10 +35,10 @@ class OnboardingScreen extends StatelessWidget {
           ),
 
           // ── Background Circles (Behind Doctor) ──
-          Positioned(
+          PositionedDirectional(
             top: size.height * 0.1,
-            left: -size.width * 0.1,
-            right: -size.width * 0.1,
+            start: -size.width * 0.1,
+            end: -size.width * 0.1,
             child: Container(
               height: size.width * 1.2,
               decoration: BoxDecoration(
@@ -47,10 +47,10 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
+          PositionedDirectional(
             top: size.height * 0.15,
-            left: size.width * 0.05,
-            right: size.width * 0.05,
+            start: size.width * 0.05,
+            end: size.width * 0.05,
             child: Container(
               height: size.width * 0.9,
               decoration: BoxDecoration(
@@ -59,10 +59,10 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
+          PositionedDirectional(
             top: size.height * 0.22,
-            left: size.width * 0.2,
-            right: size.width * 0.2,
+            start: size.width * 0.2,
+            end: size.width * 0.2,
             child: Container(
               height: size.width * 0.6,
               decoration: BoxDecoration(
@@ -73,10 +73,10 @@ class OnboardingScreen extends StatelessWidget {
           ),
 
           // ── Doctor Image ──
-          Positioned(
+          PositionedDirectional(
             top: size.height * 0.08,
-            left: -20,
-            right: -20,
+            start: -20,
+            end: -20,
             bottom: size.height * 0.38, // Moved up from 0.35
             child: ShaderMask(
               shaderCallback: (rect) {
@@ -97,16 +97,16 @@ class OnboardingScreen extends StatelessWidget {
           ),
 
           // ── Bottom Content ──
-          Positioned(
+          PositionedDirectional(
             bottom: 0,
-            left: 0,
-            right: 0,
+            start: 0,
+            end: 0,
             child: Container(
               color: Colors.transparent,
               child: SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(28, 0, 28, 24),
+                  padding: const EdgeInsetsDirectional.fromSTEB(28, 0, 28, 24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -191,7 +191,7 @@ class OnboardingScreen extends StatelessWidget {
                         onTap: onFinished,
                         borderRadius: BorderRadius.circular(32),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 24, right: 8),
+                          padding: const EdgeInsetsDirectional.only(start: 24, end: 8),
                           child: Row(
                             children: [
                               Text(

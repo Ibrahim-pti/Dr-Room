@@ -56,10 +56,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ),
 
           // ── Top Bar ──
-          Positioned(
+          PositionedDirectional(
             top: MediaQuery.of(context).padding.top + 16,
-            left: 24,
-            right: 24,
+            start: 24,
+            end: 24,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -108,9 +108,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ).animate().slideY(begin: -0.5, end: 0).fadeIn(),
 
           // ── My Video Thumbnail ──
-          Positioned(
+          PositionedDirectional(
             top: MediaQuery.of(context).padding.top + 90,
-            right: 24,
+            end: 24,
             child: Container(
               width: 100,
               height: 140,
@@ -140,10 +140,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ).animate(delay: 500.ms).slideX(begin: 0.5, end: 0).fadeIn(),
 
           // ── Bottom Controls ──
-          Positioned(
+          PositionedDirectional(
             bottom: 40,
-            left: 0,
-            right: 0,
+            start: 0,
+            end: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

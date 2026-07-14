@@ -82,9 +82,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                       ),
                     ),
                   ),
-                  Positioned(
+                  PositionedDirectional(
                     bottom: 0,
-                    right: 0,
+                    end: 0,
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(

@@ -66,8 +66,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   // Soft blue glow behind doctor
-                  Positioned(
-                    right: 0,
+                  PositionedDirectional(
+                    end: 0,
                     top: size.height * 0.05,
                     child: Container(
                       width: size.width * 0.6,
@@ -87,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   // Doctor Image (Aligned tightly to the right, fading at bottom)
-                  Positioned(
-                    right: -20,
+                  PositionedDirectional(
+                    end: -20,
                     top: 90,
                     bottom: 0,
                     width: size.width * 0.65,
@@ -119,9 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   // Back Button
-                  Positioned(
+                  PositionedDirectional(
                     top: 60, // Adjusted to match status bar
-                    left: 24,
+                    start: 24,
                     child: GestureDetector(
                       onTap: () {},
                       child: Container(
@@ -149,8 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
 
                   // DrRoom Logo & Welcome Text
-                  Positioned(
-                    left: 28,
+                  PositionedDirectional(
+                    start: 28,
                     top: 120,
                     child: SizedBox(
                       width:
@@ -166,8 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 58,
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
+                                        begin: AlignmentDirectional.topStart,
+                                        end: AlignmentDirectional.bottomEnd,
                                         colors: [
                                           Color(0xFF60A5FA),
                                           Color(0xFF2563EB),
@@ -186,9 +186,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: Stack(
                                       children: [
                                         // Decorative circle
-                                        Positioned(
+                                        PositionedDirectional(
                                           top: -8,
-                                          right: -8,
+                                          end: -8,
                                           child: Container(
                                             width: 28,
                                             height: 28,
@@ -295,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Forgot Password
                   Align(
-                    alignment: Alignment.centerRight,
+                    alignment: AlignmentDirectional.centerEnd,
                     child: GestureDetector(
                       onTap: () {},
                       child: Text(

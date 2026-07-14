@@ -120,9 +120,9 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
             decoration: BoxDecoration(
               color: AppColors.getSurface(context),
               border: Border.all(color: AppColors.getBorder(context)),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+              borderRadius: const BorderRadiusDirectional.only(
+                topStart: Radius.circular(32),
+                topEnd: Radius.circular(32),
               ),
             ),
             child: SafeArea(

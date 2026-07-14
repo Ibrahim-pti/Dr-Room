@@ -59,9 +59,9 @@ class ArticleDetailsScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: article['color'],
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(40),
-                      bottomRight: Radius.circular(40),
+                    borderRadius: const BorderRadiusDirectional.only(
+                      bottomStart: Radius.circular(40),
+                      bottomEnd: Radius.circular(40),
                     ),
                   ),
                   child: Center(

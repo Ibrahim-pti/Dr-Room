@@ -85,9 +85,9 @@ class SavedAddressesScreen extends StatelessWidget {
                   ),
                 ),
                 // Current Location Button
-                Positioned(
+                PositionedDirectional(
                   bottom: 16,
-                  right: 16,
+                  end: 16,
                   child: Container(
                     width: 48,
                     height: 48,

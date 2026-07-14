@@ -90,8 +90,8 @@ class _PromoCarouselState extends State<PromoCarousel> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [promo['color1'], promo['color2']],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    begin: AlignmentDirectional.topStart,
+                    end: AlignmentDirectional.bottomEnd,
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
@@ -105,8 +105,8 @@ class _PromoCarouselState extends State<PromoCarousel> {
                 child: Stack(
                   children: [
                     // Decorative circle 1
-                    Positioned(
-                      right: -30,
+                    PositionedDirectional(
+                      end: -30,
                       top: -30,
                       child: Container(
                         width: 120,
@@ -118,8 +118,8 @@ class _PromoCarouselState extends State<PromoCarousel> {
                       ),
                     ),
                     // Decorative circle 2
-                    Positioned(
-                      right: 40,
+                    PositionedDirectional(
+                      end: 40,
                       bottom: -40,
                       child: Container(
                         width: 100,

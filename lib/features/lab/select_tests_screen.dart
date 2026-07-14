@@ -83,7 +83,7 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
               itemBuilder: (context, index) {
                 final test = _tests[index];
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsetsDirectional.only(bottom: 12),
                   decoration: BoxDecoration(
                     color: AppColors.getSurface(context),
                     borderRadius: BorderRadius.circular(16),
@@ -130,9 +130,9 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
+                borderRadius: const BorderRadiusDirectional.only(
+                topStart: Radius.circular(32),
+                topEnd: Radius.circular(32),
               ),
             ),
             child: SafeArea(

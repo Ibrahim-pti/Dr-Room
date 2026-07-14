@@ -153,7 +153,7 @@ class MedicalRecordsScreen extends StatelessWidget {
   Widget _buildFolderCard(BuildContext context, String title, String subtitle, Color color, IconData icon) {
     return Container(
       width: 140,
-      margin: const EdgeInsets.only(right: 16),
+      margin: const EdgeInsetsDirectional.only(end: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
@@ -202,7 +202,7 @@ class MedicalRecordsScreen extends StatelessWidget {
 
   Widget _buildFileItem(BuildContext context, String title, String subtitle, String size, IconData icon) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsetsDirectional.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.getSurface(context),

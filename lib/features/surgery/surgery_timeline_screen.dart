@@ -133,8 +133,8 @@ class _SurgeryTimelineScreenState extends State<SurgeryTimelineScreen> {
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: AlignmentDirectional.topStart,
+                  end: AlignmentDirectional.bottomEnd,
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
@@ -274,7 +274,7 @@ class _SurgeryTimelineScreenState extends State<SurgeryTimelineScreen> {
                   // Phase Card
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsetsDirectional.only(bottom: 24),
                       child: GestureDetector(
                         onTap: () => _showPhaseDetails(context, phase, isCompleted, isCurrent),
                         child: Container(
@@ -358,7 +358,7 @@ class _SurgeryTimelineScreenState extends State<SurgeryTimelineScreen> {
                               ),
                               const SizedBox(height: 6),
                               Padding(
-                                padding: const EdgeInsets.only(left: 32),
+                                padding: const EdgeInsetsDirectional.only(start: 32),
                                 child: Text(
                                   phase['subtitle'],
                                   style: GoogleFonts.poppins(
@@ -370,7 +370,7 @@ class _SurgeryTimelineScreenState extends State<SurgeryTimelineScreen> {
                               if (isCurrent) ...[
                                 const SizedBox(height: 12),
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 32),
+                                  padding: const EdgeInsetsDirectional.only(start: 32),
                                   child: Text(
                                     'Tap to see tasks →',
                                     style: GoogleFonts.poppins(
@@ -419,9 +419,9 @@ class _SurgeryTimelineScreenState extends State<SurgeryTimelineScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               decoration: BoxDecoration(
                 color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+                borderRadius: const BorderRadiusDirectional.only(
+                  topStart: Radius.circular(32),
+                  topEnd: Radius.circular(32),
                 ),
               ),
               child: Column(
