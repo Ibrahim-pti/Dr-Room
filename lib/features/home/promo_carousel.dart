@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class PromoCarousel extends StatefulWidget {
-  const PromoCarousel({super.key});
+  final List<dynamic> banners;
+  const PromoCarousel({super.key, this.banners = const []});
 
   @override
   State<PromoCarousel> createState() => _PromoCarouselState();
@@ -14,28 +15,18 @@ class _PromoCarouselState extends State<PromoCarousel> {
   Timer? _timer;
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _promos = [
+  final List<Map<String, dynamic>> _fallbackPromos = [
     {
       'title': 'Get 20% Off on Full\nBody Checkup',
       'subtitle': 'Valid until 30th Nov',
       'color1': const Color(0xFF3B82F6),
       'color2': const Color(0xFF2563EB),
-      'image': 'assets/images/placeholder.png', // Replace with real asset later if needed
-      'icon': Icons.medical_services_rounded,
     },
     {
       'title': 'Free Virtual\nConsultation',
       'subtitle': 'For first-time users',
       'color1': const Color(0xFF8B5CF6),
       'color2': const Color(0xFF6D28D9),
-      'icon': Icons.video_camera_front_rounded,
-    },
-    {
-      'title': 'Home Nursing\nServices',
-      'subtitle': 'We bring care to you',
-      'color1': const Color(0xFF10B981),
-      'color2': const Color(0xFF059669),
-      'icon': Icons.home_repair_service_rounded,
     },
   ];
 
@@ -50,7 +41,8 @@ class _PromoCarouselState extends State<PromoCarousel> {
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
       if (_pageController.hasClients) {
         int nextPage = _currentPage + 1;
-        if (nextPage >= _promos.length) {
+        int itemsCount = widget.banners.isNotEmpty ? widget.banners.length : _fallbackPromos.length;
+        if (nextPage >= itemsCount) {
           nextPage = 0;
         }
         _pageController.animateToPage(
@@ -71,6 +63,8 @@ class _PromoCarouselState extends State<PromoCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final itemsCount = widget.banners.isNotEmpty ? widget.banners.length : _fallbackPromos.length;
+    
     return Column(
       children: [
         SizedBox(
@@ -82,9 +76,69 @@ class _PromoCarouselState extends State<PromoCarousel> {
                 _currentPage = index;
               });
             },
-            itemCount: _promos.length,
+            itemCount: itemsCount,
             itemBuilder: (context, index) {
-              final promo = _promos[index];
+              final isApiData = widget.banners.isNotEmpty;
+              final promo = isApiData ? widget.banners[index] : _fallbackPromos[index];
+              
+              if (isApiData && promo['image_path'] != null) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    image: DecorationImage(
+                      image: NetworkImage('http://127.0.0.1:8000/storage/${promo['image_path']}'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Dark overlay for text readability
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.6),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (promo['title'] != null && promo['title'].toString().isNotEmpty)
+                              Text(
+                                promo['title'],
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.2,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // Fallback UI
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 decoration: BoxDecoration(
@@ -160,27 +214,35 @@ class _PromoCarouselState extends State<PromoCarousel> {
                                   promo['title'],
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
-                                    fontSize: 14,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     height: 1.2,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
+                                const SizedBox(height: 4),
                                 Text(
                                   promo['subtitle'],
                                   style: GoogleFonts.poppins(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    fontSize: 11,
+                                    color: Colors.white.withValues(alpha: 0.9),
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Icon(
-                            promo['icon'],
-                            color: Colors.white.withValues(alpha: 0.8),
-                            size: 48,
-                          ),
+                          if (promo['icon'] != null)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                promo['icon'],
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -190,11 +252,11 @@ class _PromoCarouselState extends State<PromoCarousel> {
             },
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            _promos.length,
+            itemsCount,
             (index) => AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4),

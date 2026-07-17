@@ -1,10 +1,11 @@
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
-  final VoidCallback onFinished;
+  final void Function(bool isLoggedIn, bool isAdmin) onFinished;
 
   const SplashScreen({super.key, required this.onFinished});
 
@@ -25,9 +26,15 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 1800),
     )..forward();
 
-    // Remove splash screen after delay
-    Future.delayed(const Duration(milliseconds: 2200), () {
-      if (mounted) widget.onFinished();
+    // Remove splash screen after delay and check auth
+    Future.delayed(const Duration(milliseconds: 2200), () async {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      final isAdmin = prefs.getBool('is_admin') ?? false;
+
+      if (mounted) {
+        widget.onFinished(token != null && token.isNotEmpty, isAdmin);
+      }
     });
   }
 

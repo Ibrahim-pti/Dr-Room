@@ -6,16 +6,19 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/favorite_provider.dart';
+import '../../core/utils/api_client.dart';
 import 'chat_screen.dart';
 import 'doctor_reviews_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
+  final int doctorId;
   final String name;
   final String specialty;
   final String image;
 
   const DoctorDetailsScreen({
     super.key,
+    required this.doctorId,
     required this.name,
     required this.specialty,
     required this.image,
@@ -28,6 +31,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   int _selectedDateIndex = 0;
   int _selectedTimeIndex = -1;
+  bool _isBooking = false;
 
   final List<Map<String, String>> _dates = [
     {'day': 'Mon', 'date': '12'},
@@ -46,6 +50,66 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     '02:30 PM',
     '04:00 PM',
   ];
+
+  Future<void> _bookAppointment() async {
+    setState(() {
+      _isBooking = true;
+    });
+
+    try {
+      // Mocking a valid future date based on selection
+      final date = _dates[_selectedDateIndex]['date']!;
+      final timeStr = _times[_selectedTimeIndex];
+      // Simple parse to make a valid date for API (e.g. 2026-11-XX HH:MM)
+      // Just a dummy conversion for the sake of the API
+      final isPM = timeStr.contains('PM');
+      var hour = int.parse(timeStr.split(':')[0]);
+      if (isPM && hour != 12) hour += 12;
+      if (!isPM && hour == 12) hour = 0;
+      
+      final minute = timeStr.split(':')[1].substring(0, 2);
+      final formattedDate = '2026-11-$date ${hour.toString().padLeft(2, '0')}:$minute:00';
+
+      final response = await ApiClient.post('/appointments', body: {
+        'doctor_id': widget.doctorId,
+        'appointment_date': formattedDate,
+        'type': 'in_person',
+      });
+
+      if (response.statusCode == 201) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Appointment booked successfully!'),
+            backgroundColor: Color(0xFF10B981),
+          ),
+        );
+        Navigator.pop(context); // Go back after booking
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to book appointment: ${response.body}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isBooking = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +145,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 shape: BoxShape.circle,
               ),
               child: Consumer<FavoriteProvider>(
-                builder: (context, favoriteProvider, _) {
-                  final isFavorite = favoriteProvider.isFavorite(widget.name);
+                builder: (context, favoriteProvider, child) {
+                  final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
                   return IconButton(
                     icon: Icon(
                       isFavorite ? Icons.favorite : Iconsax.heart,
@@ -90,6 +154,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     ),
                     onPressed: () {
                       favoriteProvider.toggleFavorite({
+                        'id': widget.doctorId,
                         'doctor': widget.name,
                         'specialty': widget.specialty,
                         'image': widget.image,
@@ -456,18 +521,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     child: SizedBox(
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: _selectedTimeIndex != -1
-                            ? () {
-                                // Booking Action
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Appointment booked successfully!',
-                                    ),
-                                    backgroundColor: Color(0xFF10B981),
-                                  ),
-                                );
-                              }
+                        onPressed: (_selectedTimeIndex != -1 && !_isBooking)
+                            ? _bookAppointment
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF3B82F6),
@@ -479,14 +534,23 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
-                          'book_appointment'.tr(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isBooking
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'book_appointment'.tr(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     ),
                   ),

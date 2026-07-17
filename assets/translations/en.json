@@ -51,6 +51,9 @@
   "verify": "Verify",
 
   "profile": "Profile",
+  "hello": "Hello",
+  "guest_user": "User",
+  "app_name": "Dr. Room",
   "dark_mode": "Dark Mode",
   "personal_information": "Personal Information",
   "health_data_sync": "Health Data Sync",

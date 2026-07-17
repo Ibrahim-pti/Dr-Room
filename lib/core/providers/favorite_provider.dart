@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class FavoriteProvider extends ChangeNotifier {
-  final List<Map<String, String>> _favoriteDoctors = [];
+  final List<Map<String, dynamic>> _favoriteDoctors = [];
 
-  List<Map<String, String>> get favoriteDoctors => _favoriteDoctors;
+  List<Map<String, dynamic>> get favoriteDoctors => _favoriteDoctors;
 
-  bool isFavorite(String doctorName) {
-    return _favoriteDoctors.any((doc) => doc['doctor'] == doctorName);
+  bool isFavorite(int doctorId) {
+    return _favoriteDoctors.any((doc) => doc['id'] == doctorId);
   }
 
-  void toggleFavorite(Map<String, String> doctor) {
-    final index = _favoriteDoctors.indexWhere((doc) => doc['doctor'] == doctor['doctor']);
+  void toggleFavorite(Map<String, dynamic> doctor) {
+    final index = _favoriteDoctors.indexWhere((doc) => doc['id'] == doctor['id']);
     if (index >= 0) {
       _favoriteDoctors.removeAt(index);
     } else {

@@ -7,27 +7,91 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/dr_widgets.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/utils/api_client.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
-  final VoidCallback onLogin;
+  final void Function(String phone) onOtpSent;
   final VoidCallback onSignUp;
 
-  const LoginScreen({super.key, required this.onLogin, required this.onSignUp});
+  const LoginScreen({
+    super.key,
+    required this.onOtpSent,
+    required this.onSignUp,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final phone = _phoneController.text.trim();
+    final password = _passwordController.text;
+    if (phone.isEmpty || phone.length != 11 || password.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'تکایە دڵنیابە لە داخڵکردنی ١١ ژمارە بۆ مۆبایلەکە وە پاسۆرد',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await ApiClient.post(
+        '/login',
+        body: {'phone': phone, 'password': password},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final otp = data['otp']; // For development
+        debugPrint('OTP is: $otp');
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('کۆدەکە: $otp')));
+        }
+        widget.onOtpSent(phone);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('ژمارە مۆبایل یان وشەی تێپەڕ هەڵەیە')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('هەڵە لە پەیوەندیکردن بە سێرڤەر: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -153,9 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     start: 28,
                     top: 120,
                     child: SizedBox(
-                      width:
-                          size.width *
-                          0.40,
+                      width: size.width * 0.40,
                       child:
                           Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +239,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       borderRadius: BorderRadius.circular(20),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                                          color: const Color(
+                                            0xFF2563EB,
+                                          ).withValues(alpha: 0.35),
                                           blurRadius: 20,
                                           offset: const Offset(0, 8),
                                         ),
@@ -194,7 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                             height: 28,
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              color: Colors.white.withValues(alpha: 0.15),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.15,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -274,11 +340,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const SizedBox(height: 28),
 
-                  // Email/Phone Input
+                  // Phone Input
                   _buildInputField(
-                    hint: 'email_or_phone'.tr(),
-                    icon: Icons.person_outline_rounded,
-                    controller: _emailController,
+                    hint: 'phone_number'.tr(),
+                    icon: Icons.phone_android_rounded,
+                    controller: _phoneController,
+                    isPhone: true,
                   ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2, end: 0),
 
                   const SizedBox(height: 16),
@@ -305,7 +372,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF2563EB),
                           decoration: TextDecoration.underline,
-                          decorationColor: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                          decorationColor: const Color(
+                            0xFF2563EB,
+                          ).withValues(alpha: 0.3),
                         ),
                       ),
                     ),
@@ -318,12 +387,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: widget.onLogin,
+                      onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1D4ED8),
                         foregroundColor: Colors.white,
                         elevation: 4,
-                        shadowColor: const Color(0xFF1D4ED8).withValues(alpha: 0.3),
+                        shadowColor: const Color(
+                          0xFF1D4ED8,
+                        ).withValues(alpha: 0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -337,44 +408,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2, end: 0),
-
-                  const SizedBox(height: 32),
-
-                  // Or Continue With
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(color: Color(0xFFE2E8F0), thickness: 1),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'or_continue_with'.tr(),
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: const Color(0xFF94A3B8),
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        child: Divider(color: Color(0xFFE2E8F0), thickness: 1),
-                      ),
-                    ],
-                  ).animate().fadeIn(delay: 700.ms),
-
-                  const SizedBox(height: 24),
-
-                  // Social Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildSocialButton(_googleSvg),
-                      const SizedBox(width: 16),
-                      _buildSocialButton(_appleSvg),
-                      const SizedBox(width: 16),
-                      _buildSocialButton(_facebookSvg),
-                    ],
-                  ).animate().fadeIn(delay: 800.ms),
 
                   const SizedBox(height: 32),
 
@@ -417,31 +450,59 @@ class _LoginScreenState extends State<LoginScreen> {
     required String hint,
     required IconData icon,
     bool isPassword = false,
+    bool isPhone = false,
     required TextEditingController controller,
   }) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFE2E8F0),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
+        keyboardType: isPhone ? TextInputType.phone : TextInputType.text,
+        inputFormatters: isPhone
+            ? [FilteringTextInputFormatter.digitsOnly]
+            : null,
+        maxLength: isPhone ? 11 : null,
         style: GoogleFonts.poppins(
           fontSize: 15,
           color: const Color(0xFF1E293B),
+          letterSpacing: isPhone ? 1.5 : 0,
         ),
         decoration: InputDecoration(
+          counterText: '',
           hintText: hint,
           hintStyle: GoogleFonts.poppins(
             fontSize: 15,
             color: const Color(0xFF94A3B8),
+            letterSpacing: 0,
           ),
-          prefixIcon: Icon(icon, color: AppColors.primary, size: 22),
+          prefixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(width: 12),
+              Icon(icon, color: AppColors.primary, size: 22),
+              if (isPhone) ...[
+                const SizedBox(width: 8),
+                Text(
+                  '+964',
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(width: 1, height: 24, color: const Color(0xFFE2E8F0)),
+                const SizedBox(width: 12),
+              ] else ...[
+                const SizedBox(width: 12),
+              ],
+            ],
+          ),
           suffixIcon: isPassword
               ? GestureDetector(
                   onTap: () {
@@ -469,52 +530,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-  Widget _buildSocialButton(String svgData) {
-    return Expanded(
-      child: Container(
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFFE2E8F0),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Center(child: SvgPicture.string(svgData, width: 28, height: 28)),
-      ),
-    );
-  }
 }
-
-const String _googleSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-</svg>
-''';
-
-const String _appleSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-  <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
-</svg>
-''';
-
-const String _facebookSvg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-  <path fill="#1877F2" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
-</svg>
-''';
 
 const String _drRoomIconSvg = '''
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">

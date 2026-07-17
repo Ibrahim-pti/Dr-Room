@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../main.dart';
 import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
@@ -11,8 +13,33 @@ import 'help_support_screen.dart';
 import '../health_sync/health_dashboard_screen.dart';
 import '../settings/saved_addresses_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _userName = '';
+  String _userPhone = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        final un = prefs.getString('user_name') ?? '';
+        _userName = un.isNotEmpty ? un : 'guest_user'.tr();
+        _userPhone = prefs.getString('user_phone') ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'sara_ahmad'.tr(),
+                          _userName,
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextTitle(context),
                             fontSize: 18,
@@ -152,7 +179,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'sar_email'.tr(),
+                          _userPhone.isNotEmpty ? '+964 $_userPhone' : '',
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextSubtitle(context),
                             fontSize: 13,
@@ -313,7 +340,20 @@ class SettingsScreen extends StatelessWidget {
                       color: Colors.transparent,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () {},
+                        onTap: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.remove('auth_token');
+                          await prefs.remove('is_admin');
+                          await prefs.remove('user_name');
+                          await prefs.remove('user_phone');
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => const AppFlow()),
+                              (route) => false,
+                            );
+                          }
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

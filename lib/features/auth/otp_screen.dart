@@ -7,10 +7,13 @@ import 'dart:ui' as ui;
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/dr_widgets.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/utils/api_client.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
-  final VoidCallback onVerified;
+  final void Function(bool isAdmin) onVerified;
   final VoidCallback onBack;
 
   const OtpScreen({
@@ -55,6 +58,48 @@ class _OtpScreenState extends State<OtpScreen> {
     _timer?.cancel();
     _pinController.dispose();
     super.dispose();
+  }
+
+  Future<void> _verifyOtp() async {
+    final code = _pinController.text;
+    if (code.length != 4) return;
+    
+    setState(() => _isVerifying = true);
+
+    try {
+      final response = await ApiClient.post('/verify-otp', body: {
+        'phone': widget.phoneNumber,
+        'otp_code': code,
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['access_token'];
+        final isAdmin = data['user']['is_admin'] == 1 || data['user']['is_admin'] == true;
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+        await prefs.setBool('is_admin', isAdmin);
+        await prefs.setString('user_name', data['user']['name'] ?? '');
+        await prefs.setString('user_phone', data['user']['phone'] ?? '');
+
+        widget.onVerified(isAdmin);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('کۆدەکە هەڵەیە یان بەسەرچووە')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('هەڵە لە پەیوەندیکردن بە سێرڤەر: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isVerifying = false);
+    }
   }
 
   @override
@@ -186,7 +231,7 @@ class _OtpScreenState extends State<OtpScreen> {
               Directionality(
                     textDirection: ui.TextDirection.ltr,
                     child: Pinput(
-                      length: 6,
+                      length: 4,
                       controller: _pinController,
                       defaultPinTheme: defaultPinTheme,
                       focusedPinTheme: focusedPinTheme,
@@ -194,13 +239,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       separatorBuilder: (i) => const SizedBox(width: 10),
                       hapticFeedbackType: HapticFeedbackType.lightImpact,
                       onCompleted: (pin) {
-                        setState(() => _isVerifying = true);
-                        Future.delayed(const Duration(milliseconds: 1500), () {
-                          if (mounted) {
-                            setState(() => _isVerifying = false);
-                            widget.onVerified();
-                          }
-                        });
+                        _verifyOtp();
                       },
                       cursor: Container(
                         width: 2,
@@ -245,16 +284,8 @@ class _OtpScreenState extends State<OtpScreen> {
               DrButton(
                 text: 'verify'.tr(),
                 isLoading: _isVerifying,
-                onPressed: _pinController.text.length == 6
-                    ? () {
-                        setState(() => _isVerifying = true);
-                        Future.delayed(const Duration(milliseconds: 1500), () {
-                          if (mounted) {
-                            setState(() => _isVerifying = false);
-                            widget.onVerified();
-                          }
-                        });
-                      }
+                onPressed: _pinController.text.length == 4
+                    ? _verifyOtp
                     : null,
               ).animate(delay: 600.ms).fadeIn(duration: 400.ms),
             ],

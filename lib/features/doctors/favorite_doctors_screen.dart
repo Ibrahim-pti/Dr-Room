@@ -84,6 +84,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => DoctorDetailsScreen(
+                          doctorId: doctor['id'] ?? 1,
                           name: doctor['doctor']!,
                           specialty: doctor['specialty']!,
                           image: doctor['image']!,

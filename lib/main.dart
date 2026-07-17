@@ -15,6 +15,7 @@ import 'features/auth/login_screen.dart';
 import 'features/auth/register_screen.dart';
 import 'features/auth/otp_screen.dart';
 import 'features/home/main_shell.dart';
+import 'features/admin/admin_dashboard_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,7 +67,7 @@ class DrRoomApp extends StatelessWidget {
             ],
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            home: const _AppFlow(),
+            home: const AppFlow(),
           );
         },
       ),
@@ -75,14 +76,14 @@ class DrRoomApp extends StatelessWidget {
 }
 
 /// Manages the app flow: Splash → Onboarding → Login ↔ Register → Home
-class _AppFlow extends StatefulWidget {
-  const _AppFlow();
+class AppFlow extends StatefulWidget {
+  const AppFlow({super.key});
 
   @override
-  State<_AppFlow> createState() => _AppFlowState();
+  State<AppFlow> createState() => AppFlowState();
 }
 
-class _AppFlowState extends State<_AppFlow> {
+class AppFlowState extends State<AppFlow> {
   _FlowState _state = _FlowState.splash;
   String _phoneNumber = '';
 
@@ -111,7 +112,13 @@ class _AppFlowState extends State<_AppFlow> {
       case _FlowState.splash:
         return SplashScreen(
           key: const ValueKey('splash'),
-          onFinished: () => _goTo(_FlowState.onboarding),
+          onFinished: (bool isLoggedIn, bool isAdmin) {
+            if (isLoggedIn) {
+              _goTo(isAdmin ? _FlowState.admin : _FlowState.home);
+            } else {
+              _goTo(_FlowState.onboarding);
+            }
+          },
         );
 
       case _FlowState.onboarding:
@@ -123,29 +130,39 @@ class _AppFlowState extends State<_AppFlow> {
       case _FlowState.login:
         return LoginScreen(
           key: const ValueKey('login'),
-          onLogin: () => _goTo(_FlowState.home),
+          onOtpSent: (String phone) {
+            _phoneNumber = phone;
+            _goTo(_FlowState.otp);
+          },
           onSignUp: () => _goTo(_FlowState.register),
         );
         
       case _FlowState.register:
         return RegisterScreen(
           key: const ValueKey('register'),
-          onRegister: () => _goTo(_FlowState.home),
+          onOtpSent: (String phone) {
+            _phoneNumber = phone;
+            _goTo(_FlowState.otp);
+          },
           onLogin: () => _goTo(_FlowState.login),
         );
 
       case _FlowState.otp:
-        // Keep OTP state in case it's needed later for verification flow
         return OtpScreen(
           key: const ValueKey('otp'),
           phoneNumber: _phoneNumber,
-          onVerified: () => _goTo(_FlowState.home),
+          onVerified: (bool isAdmin) => _goTo(isAdmin ? _FlowState.admin : _FlowState.home),
           onBack: () => _goTo(_FlowState.login),
         );
 
       case _FlowState.home:
         return const MainShell(
           key: ValueKey('home'),
+        );
+        
+      case _FlowState.admin:
+        return const AdminDashboardShell(
+          key: ValueKey('admin'),
         );
     }
   }
@@ -158,4 +175,5 @@ enum _FlowState {
   register,
   otp,
   home,
+  admin, // newly added
 }

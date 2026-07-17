@@ -7,7 +7,7 @@ import '../doctors/all_doctors_screen.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'doctor_details_screen.dart';
+import '../doctors/doctor_details_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../lab/lab_order_method_screen.dart';
 import '../nursing/nursing_services_screen.dart';
@@ -16,16 +16,61 @@ import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
 import '../locator/clinic_locator_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'dart:convert';
+import '../../core/utils/api_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = true;
+  List<dynamic> _banners = [];
+  List<dynamic> _topDoctors = [];
+  String _userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHomeData();
+  }
+
+  Future<void> _fetchHomeData() async {
+    setState(() => _isLoading = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final un = prefs.getString('user_name') ?? '';
+      final userName = un.isNotEmpty ? un : 'guest_user'.tr();
+      
+      final response = await ApiClient.get('/home');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            _banners = data['banners'] ?? [];
+            _topDoctors = data['top_doctors'] ?? [];
+            _userName = userName;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching home data: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(
-        context,
-      ).scaffoldBackgroundColor, // Very light blue-grey background
-      body: SingleChildScrollView(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: RefreshIndicator(
+        onRefresh: _fetchHomeData,
+        child: SingleChildScrollView(
         child: Padding(
           // Extra bottom padding for the floating navigation bar
           padding: const EdgeInsetsDirectional.only(bottom: 120),
@@ -98,7 +143,7 @@ class HomeScreen extends StatelessWidget {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Hi, Sara',
+                                            '${'hello'.tr()}، $_userName',
                                             style: GoogleFonts.poppins(
                                               color: AppColors.getSurface(
                                                 context,
@@ -273,11 +318,14 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
 
-              // ── Promo Carousel ──
-              const PromoCarousel()
+              // ── Banners / Promo Carousel ──
+              if (_isLoading)
+                const SizedBox(height: 130, child: Center(child: CircularProgressIndicator()))
+              else
+                PromoCarousel(banners: _banners)
                   .animate()
-                  .fadeIn(delay: 300.ms)
-                  .slideY(begin: 0.1, end: 0),
+                  .fadeIn(duration: 600.ms, delay: 200.ms)
+                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
 
 
               const SizedBox(height: 32),
@@ -584,116 +632,146 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
               // ── Doctor List Card ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DoctorDetailsScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.getBorder(context)),
-                    ),
-                    child: Stack(
-                      children: [
-                        // Text Info on the left
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Dr. Nusrat\nJahan',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getTextTitle(context),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Pediatrician Specialist',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getTextSubtitle(context),
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const Spacer(),
-                              // Rating
-                              Row(
+              if (_topDoctors.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Center(child: Text('No doctors available right now.')),
+                )
+              else
+                ..._topDoctors.map((doc) {
+                  final name = doc['user'] != null ? doc['user']['name'] : 'Doctor';
+                  final specialty = doc['specialty'] ?? 'Specialist';
+                  final rating = doc['rating']?.toString() ?? '5.0';
+                  final image = (doc['image_path'] != null)
+                      ? 'http://127.0.0.1:8000/storage/${doc['image_path']}'
+                      : 'assets/images/doctor1.png';
+                  final doctorId = doc['id'];
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DoctorDetailsScreen(
+                              doctorId: doctorId,
+                              name: name,
+                              specialty: specialty,
+                              image: image,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 160,
+                        decoration: BoxDecoration(
+                          color: AppColors.getSurface(context),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: AppColors.getBorder(context)),
+                        ),
+                        child: Stack(
+                          children: [
+                            // Text Info on the left
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
-                                    Icons.star_rounded,
-                                    color: Color(0xFFFBBF24),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 4),
                                   Text(
-                                    '4.9',
+                                    name.replaceFirst(' ', '\n'),
                                     style: GoogleFonts.poppins(
                                       color: AppColors.getTextTitle(context),
-                                      fontSize: 14,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.w600,
+                                      height: 1.2,
                                     ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    specialty,
+                                    style: GoogleFonts.poppins(
+                                      color: AppColors.getTextSubtitle(context),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  // Rating
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        color: Color(0xFFFBBF24),
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        rating,
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextTitle(context),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
 
-                        // Doctor Image on the right
-                        PositionedDirectional(
-                          end: 0,
-                          bottom: 0,
-                          child: ClipRRect(
-                            borderRadius: const BorderRadiusDirectional.only(
-                              bottomEnd: Radius.circular(24),
+                            // Doctor Image on the right
+                            PositionedDirectional(
+                              end: 0,
+                              bottom: 0,
+                              child: ClipRRect(
+                                borderRadius: const BorderRadiusDirectional.only(
+                                  bottomEnd: Radius.circular(24),
+                                ),
+                                child: doc['image_path'] != null
+                                    ? Image.network(
+                                        image,
+                                        height: 150,
+                                        width: 120,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        image,
+                                        height: 150,
+                                        width: 120,
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
                             ),
-                            child: Image.asset(
-                              'assets/images/doctor3.png',
-                              height: 150,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
 
-                        // Heart Icon
-                        PositionedDirectional(
-                          top: 16,
-                          end: 16,
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF0F4FD),
-                              shape: BoxShape.circle,
+                            // Heart Icon
+                            PositionedDirectional(
+                              top: 16,
+                              end: 16,
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF0F4FD),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.favorite,
+                                  color: Color(0xFF3B82F6),
+                                  size: 18,
+                                ),
+                              ),
                             ),
-                            child: const Icon(
-                              Icons.favorite,
-                              color: Color(0xFF3B82F6),
-                              size: 18,
-                            ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+                  ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0);
+                }),
             ],
           ),
         ),
       ),
+    ),
     );
   }
 
