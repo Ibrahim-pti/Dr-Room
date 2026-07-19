@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -15,29 +16,29 @@ class NursingServicesScreen extends StatefulWidget {
 class _NursingServicesScreenState extends State<NursingServicesScreen> {
   final List<Map<String, dynamic>> _services = [
     {
-      'title': 'Injection',
-      'subtitle': 'IM, IV, or Subcutaneous injections at home',
+      'titleKey': 'injection',
+      'subtitleKey': 'injection_desc',
       'icon': Iconsax.health,
       'color': const Color(0xFF3B82F6),
       'selected': false,
     },
     {
-      'title': 'Cannula Insertion',
-      'subtitle': 'Professional IV cannula insertion and care',
+      'titleKey': 'cannula',
+      'subtitleKey': 'cannula_desc',
       'icon': Iconsax.activity,
       'color': const Color(0xFF10B981),
       'selected': false,
     },
     {
-      'title': 'Wound Dressing',
-      'subtitle': 'Cleaning and dressing for wounds and post-surgery',
+      'titleKey': 'wound_dressing',
+      'subtitleKey': 'wound_desc',
       'icon': Icons.healing_outlined,
       'color': const Color(0xFFF59E0B),
       'selected': false,
     },
     {
-      'title': 'Quick Care',
-      'subtitle': 'Basic checkup, blood pressure, and vitals monitoring',
+      'titleKey': 'quick_care',
+      'subtitleKey': 'quick_care_desc',
       'icon': Iconsax.heart,
       'color': const Color(0xFFEF4444),
       'selected': false,
@@ -59,7 +60,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Nursing Services',
+          'nursing_services'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -75,7 +76,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'What do you need?',
+                  'what_do_you_need'.tr(),
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextTitle(context),
                     fontSize: 22,
@@ -85,7 +86,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                 ).animate().fadeIn().slideX(begin: -0.1, end: 0),
                 const SizedBox(height: 8),
                 Text(
-                  'Select the nursing services you require. Our professional nurses will come to your home.',
+                  'select_nursing_services'.tr(),
                   style: GoogleFonts.poppins(
                     color: AppColors.getTextSubtitle(context),
                     fontSize: 15,
@@ -144,19 +145,19 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                service['title'],
+                                service['titleKey'].toString().tr(),
                                 style: GoogleFonts.poppins(
-                                  color: AppColors.getTextTitle(context),
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.getTextTitle(context),
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                service['subtitle'],
+                                service['subtitleKey'].toString().tr(),
                                 style: GoogleFonts.poppins(
+                                  fontSize: 13,
                                   color: AppColors.getTextSubtitle(context),
-                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -204,14 +205,14 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Selected',
+                        'selected_items'.tr(),
                         style: GoogleFonts.poppins(
                           color: AppColors.getTextSubtitle(context),
                           fontSize: 13,
                         ),
                       ),
                       Text(
-                        '$selectedCount Services',
+                        '$selectedCount ${'services_count'.tr()}',
                         style: GoogleFonts.poppins(
                           color: AppColors.getTextTitle(context),
                           fontSize: 18,
@@ -244,7 +245,7 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                         elevation: 0,
                       ),
                       child: Text(
-                        'Continue',
+                        'continue_btn'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

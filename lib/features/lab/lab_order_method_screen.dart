@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -22,7 +23,7 @@ class LabOrderMethodScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Lab Service',
+          'lab_service'.tr(),
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 18,
@@ -36,7 +37,7 @@ class LabOrderMethodScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'How would you like to request?',
+              'how_to_request'.tr(),
               style: GoogleFonts.poppins(
                 color: AppColors.getTextTitle(context),
                 fontSize: 22,
@@ -46,7 +47,7 @@ class LabOrderMethodScreen extends StatelessWidget {
             ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
             const SizedBox(height: 12),
             Text(
-              'Choose one of the methods below to proceed with your lab test request.',
+              'choose_lab_method'.tr(),
               style: GoogleFonts.poppins(
                 color: AppColors.getTextSubtitle(context),
                 fontSize: 15,
@@ -58,8 +59,8 @@ class LabOrderMethodScreen extends StatelessWidget {
             // Method 1: Upload Prescription
             _buildMethodCard(
               context,
-              title: 'Upload Prescription',
-              description: 'Take a photo or upload your doctor\'s prescription. We will do the rest.',
+              title: 'upload_prescription'.tr(),
+              description: 'upload_prescription_desc'.tr(),
               icon: Iconsax.document_upload,
               color: const Color(0xFF3B82F6),
               delay: 200,
@@ -78,8 +79,8 @@ class LabOrderMethodScreen extends StatelessWidget {
             // Method 2: Select Tests Manually
             _buildMethodCard(
               context,
-              title: 'Select Tests Manually',
-              description: 'Browse and choose the specific tests you need from our comprehensive list.',
+              title: 'select_tests_manually'.tr(),
+              description: 'select_tests_desc'.tr(),
               icon: Iconsax.health,
               color: const Color(0xFF10B981),
               delay: 300,

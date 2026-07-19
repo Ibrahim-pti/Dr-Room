@@ -787,51 +787,59 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         _buildGridCard(
           context,
-          imagePath: 'assets/images/doctor.png',
-          title: 'Doctor',
-          isActive: true,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/medicine.png',
-          title: 'Pharmacy',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
           imagePath: 'assets/images/lab.png',
-          title: 'Lab',
+          titleKey: 'cat_lab',
+          id: 'lab',
           isActive: true,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/xray.png',
-          title: 'X-Ray',
-          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/doctor_bag.png',
-          title: 'Nursing',
+          titleKey: 'cat_nursing',
+          id: 'nursing',
           isActive: true,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/doctor.png',
+          titleKey: 'cat_doctor',
+          id: 'doctor',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/medicine.png',
+          titleKey: 'cat_pharmacy',
+          id: 'pharmacy',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/xray.png',
+          titleKey: 'cat_xray',
+          id: 'xray',
+          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/report.png',
-          title: 'Records',
-          isActive: true,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/apps.png',
-          title: 'Locator',
-          isActive: true,
+          titleKey: 'cat_news',
+          id: 'news',
+          isActive: false,
         ),
         _buildGridCard(
           context,
           imagePath: 'assets/images/add.png',
-          title: 'Ambulance',
-          isActive: true,
+          titleKey: 'cat_ambulance',
+          id: 'ambulance',
+          isActive: false,
+        ),
+        _buildGridCard(
+          context,
+          imagePath: 'assets/images/apps.png',
+          titleKey: 'cat_more',
+          id: 'more',
+          isActive: false,
         ),
       ],
     );
@@ -840,67 +848,148 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildGridCard(
     BuildContext context, {
     required String imagePath,
-    required String title,
+    required String titleKey,
+    required String id,
     required bool isActive,
   }) {
     return GestureDetector(
       onTap: () {
         if (!isActive) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'ئەم بەشە لە قۆناغی ئامادەکارییە و بەم زووانە دەکەوێتە خزمەتت.',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) {
+              return Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.getSurface(context),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
                 ),
-              ),
-              backgroundColor: const Color(0xFF0F172A),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              duration: const Duration(seconds: 3),
-            ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Drag handle
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Icon
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Image.asset(imagePath, fit: BoxFit.cover),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Title
+                    Text(
+                      titleKey.tr(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.getTextTitle(context),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // Description from translations (e.g., desc_doctor)
+                    Text(
+                      'desc_$id'.tr(),
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: AppColors.getTextTitle(context),
+                        fontWeight: FontWeight.w500,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Coming soon box
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline, color: Color(0xFF3B82F6), size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'coming_soon_msg'.tr(),
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: const Color(0xFF1D4ED8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // OK Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3B82F6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'ok'.tr(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+              );
+            },
           );
         } else {
-          if (title == 'Lab') {
+          if (id == 'lab') {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const LabOrderMethodScreen(),
               ),
             );
-          } else if (title == 'Nursing') {
+          } else if (id == 'nursing') {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const NursingServicesScreen(),
               ),
             );
-          } else if (title == 'Doctor') {
+          } else if (id == 'doctor') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AllDoctorsScreen()),
-            );
-          } else if (title == 'Records') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MedicalRecordsScreen(),
-              ),
-            );
-          } else if (title == 'Locator') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const ClinicLocatorScreen(),
-              ),
-            );
-          } else if (title == 'Ambulance') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SosScreen()),
             );
           }
         }
@@ -928,7 +1017,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                titleKey.tr(),
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -949,17 +1038,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: AppColors.getSurface(context),
-                    width: 1.5,
-                  ),
+                  color: const Color(0xFF3B82F6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white, width: 2),
                 ),
                 child: Text(
-                  'Soon',
+                  'coming_soon'.tr(),
                   style: GoogleFonts.poppins(
-                    color: const Color(0xFF94A3B8),
+                    color: Colors.white,
                     fontSize: 8,
                     fontWeight: FontWeight.w600,
                   ),
