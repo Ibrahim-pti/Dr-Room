@@ -63,9 +63,7 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/icons/
     - assets/translations/
-    - assets/animations/
     - assets/bodyMap/
     - assets/bodyMap/css/
     - assets/bodyMap/img/
