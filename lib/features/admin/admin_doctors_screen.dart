@@ -75,9 +75,9 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
   @override
   Widget build(BuildContext context) {
     final pendingDoctors =
-        _doctors.where((d) => d['is_approved'] == false).toList();
+        _doctors.where((d) => d['status'] == 'pending').toList();
     final approvedDoctors =
-        _doctors.where((d) => d['is_approved'] == true).toList();
+        _doctors.where((d) => d['status'] == 'approved').toList();
 
     return SafeArea(
       child: Column(

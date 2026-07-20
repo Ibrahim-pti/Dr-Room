@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
-  final void Function(bool isLoggedIn, bool isAdmin) onFinished;
+  final void Function(bool isLoggedIn, String role) onFinished;
 
   const SplashScreen({super.key, required this.onFinished});
 
@@ -30,10 +30,10 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(milliseconds: 2200), () async {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
-      final isAdmin = prefs.getBool('is_admin') ?? false;
+      final role = prefs.getString('user_role') ?? 'patient';
 
       if (mounted) {
-        widget.onFinished(token != null && token.isNotEmpty, isAdmin);
+        widget.onFinished(token != null && token.isNotEmpty, role);
       }
     });
   }

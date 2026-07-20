@@ -112,9 +112,13 @@ class AppFlowState extends State<AppFlow> {
       case _FlowState.splash:
         return SplashScreen(
           key: const ValueKey('splash'),
-          onFinished: (bool isLoggedIn, bool isAdmin) {
+          onFinished: (bool isLoggedIn, String role) {
             if (isLoggedIn) {
-              _goTo(isAdmin ? _FlowState.admin : _FlowState.home);
+              if (role == 'admin') {
+                _goTo(_FlowState.admin);
+              } else {
+                _goTo(_FlowState.home);
+              }
             } else {
               _goTo(_FlowState.onboarding);
             }
@@ -151,7 +155,13 @@ class AppFlowState extends State<AppFlow> {
         return OtpScreen(
           key: const ValueKey('otp'),
           phoneNumber: _phoneNumber,
-          onVerified: (bool isAdmin) => _goTo(isAdmin ? _FlowState.admin : _FlowState.home),
+          onVerified: (String role) {
+            if (role == 'admin') {
+              _goTo(_FlowState.admin);
+            } else {
+              _goTo(_FlowState.home);
+            }
+          },
           onBack: () => _goTo(_FlowState.login),
         );
 

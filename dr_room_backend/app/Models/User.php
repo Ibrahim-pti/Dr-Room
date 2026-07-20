@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'is_admin', 'is_doctor', 'is_nurse', 'is_blocked', 'otp_code', 'otp_expires_at'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'role', 'status', 'otp_code', 'otp_expires_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,11 +28,27 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_admin' => 'boolean',
-            'is_doctor' => 'boolean',
-            'is_nurse' => 'boolean',
-            'is_blocked' => 'boolean',
         ];
+    }
+
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function getIsDoctorAttribute(): bool
+    {
+        return $this->role === 'doctor';
+    }
+
+    public function getIsNurseAttribute(): bool
+    {
+        return $this->role === 'nurse';
+    }
+
+    public function getIsBlockedAttribute(): bool
+    {
+        return $this->status === 'blocked';
     }
 
     public function doctor()

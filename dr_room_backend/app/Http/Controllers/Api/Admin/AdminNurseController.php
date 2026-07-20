@@ -6,34 +6,45 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Nurse;
 
+use App\Models\User;
+
 class AdminNurseController extends Controller
 {
     public function index()
     {
-        $nurses = Nurse::with('user')->get();
+        $nurses = User::where('role', 'nurse')->with('nurse')->get();
         return response()->json($nurses);
     }
 
     public function approve($id)
     {
-        $nurse = Nurse::with('user')->findOrFail($id);
-        $nurse->update(['is_approved' => true]);
+        $user = User::where('role', 'nurse')->findOrFail($id);
+        $user->update(['status' => 'approved']);
 
-        return response()->json(['message' => 'Nurse approved successfully', 'nurse' => $nurse]);
+        if (!$user->nurse) {
+            $user->nurse()->create([
+                // Add any default nurse fields if necessary
+            ]);
+        }
+
+        return response()->json(['message' => 'Nurse approved successfully', 'user' => $user->load('nurse')]);
     }
 
     public function reject($id)
     {
-        $nurse = Nurse::with('user')->findOrFail($id);
-        $nurse->update(['is_approved' => false]);
+        $user = User::where('role', 'nurse')->findOrFail($id);
+        $user->update(['status' => 'rejected']);
 
-        return response()->json(['message' => 'Nurse rejected successfully', 'nurse' => $nurse]);
+        return response()->json(['message' => 'Nurse rejected successfully', 'user' => $user]);
     }
 
     public function destroy($id)
     {
-        $nurse = Nurse::findOrFail($id);
-        $nurse->delete();
+        $user = User::where('role', 'nurse')->findOrFail($id);
+        if ($user->nurse) {
+            $user->nurse->delete();
+        }
+        $user->delete();
 
         return response()->json(null, 204);
     }

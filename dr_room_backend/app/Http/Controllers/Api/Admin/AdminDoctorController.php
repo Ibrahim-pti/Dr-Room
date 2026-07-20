@@ -11,38 +11,40 @@ class AdminDoctorController extends Controller
 {
     public function index()
     {
-        $doctors = Doctor::with('user')->get();
+        $doctors = User::where('role', 'doctor')->with('doctor')->get();
         return response()->json($doctors);
     }
 
     public function approve($id)
     {
-        $doctor = Doctor::with('user')->findOrFail($id);
-        $doctor->update(['is_approved' => true]);
+        $user = User::where('role', 'doctor')->findOrFail($id);
+        $user->update(['status' => 'approved']);
         
-        if ($doctor->user) {
-            $doctor->user->update(['is_doctor' => true]);
+        if (!$user->doctor) {
+            $user->doctor()->create([
+                'specialty' => 'General', // Default, they can update later
+                // Add other default doctor fields here if necessary
+            ]);
         }
 
-        return response()->json(['message' => 'Doctor approved successfully', 'doctor' => $doctor]);
+        return response()->json(['message' => 'Doctor approved successfully', 'user' => $user->load('doctor')]);
     }
 
     public function reject($id)
     {
-        $doctor = Doctor::with('user')->findOrFail($id);
-        $doctor->update(['is_approved' => false]);
+        $user = User::where('role', 'doctor')->findOrFail($id);
+        $user->update(['status' => 'rejected']);
         
-        if ($doctor->user) {
-            $doctor->user->update(['is_doctor' => false]);
-        }
-
-        return response()->json(['message' => 'Doctor rejected successfully', 'doctor' => $doctor]);
+        return response()->json(['message' => 'Doctor rejected successfully', 'user' => $user]);
     }
 
     public function destroy($id)
     {
-        $doctor = Doctor::findOrFail($id);
-        $doctor->delete();
+        $user = User::where('role', 'doctor')->findOrFail($id);
+        if ($user->doctor) {
+            $user->doctor->delete();
+        }
+        $user->delete();
 
         return response()->json(null, 204);
     }

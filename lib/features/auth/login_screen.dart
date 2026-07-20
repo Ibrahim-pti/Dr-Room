@@ -75,9 +75,11 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         widget.onOtpSent(phone);
       } else {
+        final err = jsonDecode(response.body);
+        final msg = err['message'] ?? 'هەڵە ڕوویدا';
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ژمارە مۆبایل یان وشەی تێپەڕ هەڵەیە')),
+            SnackBar(content: Text(msg)),
           );
         }
       }

@@ -25,6 +25,18 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if ($user->status === 'pending') {
+            return response()->json([
+                'message' => 'هەژمارەکەت لەژێر پێداچوونەوەی ئەدمیندایە. تکایە چاوەڕێ بکە.'
+            ], 403);
+        }
+
+        if ($user->status === 'blocked') {
+            return response()->json([
+                'message' => 'هەژمارەکەت بلۆک کراوە.'
+            ], 403);
+        }
+
         $otp = rand(1000, 9999);
         $user->otp_code = $otp;
         $user->otp_expires_at = now()->addMinutes(5);
@@ -43,16 +55,20 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|unique:users',
             'password' => 'required|string|min:6',
+            'role' => 'nullable|string|in:patient,doctor,nurse,lab,pharmacy,admin'
         ]);
 
         $otp = rand(1000, 9999);
+        
+        $role = $request->role ?? 'patient';
+        $status = ($role === 'patient') ? 'approved' : 'pending';
 
         $user = User::create([
             'name' => $request->name,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'is_admin' => false,
-            'is_doctor' => false,
+            'role' => $role,
+            'status' => $status,
             'otp_code' => $otp,
             'otp_expires_at' => now()->addMinutes(5)
         ]);
@@ -79,6 +95,18 @@ class AuthController extends Controller
             ], 400);
         }
 
+        if ($user->status === 'pending') {
+            return response()->json([
+                'message' => 'هەژمارەکەت لەژێر پێداچوونەوەی ئەدمیندایە. تکایە چاوەڕێ بکە.'
+            ], 403);
+        }
+
+        if ($user->status === 'blocked') {
+            return response()->json([
+                'message' => 'هەژمارەکەت بلۆک کراوە.'
+            ], 403);
+        }
+
         // Clear OTP
         $user->otp_code = null;
         $user->otp_expires_at = null;
@@ -93,7 +121,9 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'phone' => $user->phone,
-                'is_admin' => $user->is_admin,
+                'role' => $user->role,
+                'status' => $user->status,
+                'is_admin' => $user->isAdmin(), // kept for backward compatibility if needed in UI
             ]
         ]);
     }

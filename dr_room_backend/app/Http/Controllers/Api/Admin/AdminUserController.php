@@ -10,14 +10,14 @@ class AdminUserController extends Controller
 {
     public function index()
     {
-        $users = User::where('is_admin', false)->where('is_doctor', false)->get();
+        $users = User::where('role', 'patient')->get();
         return response()->json($users);
     }
 
     public function block($id)
     {
         $user = User::findOrFail($id);
-        $user->update(['is_blocked' => true]);
+        $user->update(['status' => 'blocked']);
 
         return response()->json(['message' => 'User blocked successfully', 'user' => $user]);
     }
@@ -25,7 +25,10 @@ class AdminUserController extends Controller
     public function unblock($id)
     {
         $user = User::findOrFail($id);
-        $user->update(['is_blocked' => false]);
+        // Assuming unblocking a user returns them to approved status, 
+        // if they were pending, maybe they shouldn't be blocked in the first place, or should go back to pending.
+        // For simplicity, we assume unblock -> approved.
+        $user->update(['status' => 'approved']);
 
         return response()->json(['message' => 'User unblocked successfully', 'user' => $user]);
     }

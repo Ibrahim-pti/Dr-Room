@@ -75,9 +75,9 @@ class _AdminNursesScreenState extends State<AdminNursesScreen>
   @override
   Widget build(BuildContext context) {
     final pendingNurses =
-        _nurses.where((n) => n['is_approved'] == false).toList();
+        _nurses.where((n) => n['status'] == 'pending').toList();
     final approvedNurses =
-        _nurses.where((n) => n['is_approved'] == true).toList();
+        _nurses.where((n) => n['status'] == 'approved').toList();
 
     return SafeArea(
       child: Column(

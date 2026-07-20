@@ -13,7 +13,7 @@ import '../../core/utils/api_client.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
-  final void Function(bool isAdmin) onVerified;
+  final void Function(String role) onVerified;
   final VoidCallback onBack;
 
   const OtpScreen({
@@ -75,15 +75,15 @@ class _OtpScreenState extends State<OtpScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['access_token'];
-        final isAdmin = data['user']['is_admin'] == 1 || data['user']['is_admin'] == true;
+        final role = data['user']['role'] ?? 'patient';
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
-        await prefs.setBool('is_admin', isAdmin);
+        await prefs.setString('user_role', role);
         await prefs.setString('user_name', data['user']['name'] ?? '');
         await prefs.setString('user_phone', data['user']['phone'] ?? '');
 
-        widget.onVerified(isAdmin);
+        widget.onVerified(role);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
