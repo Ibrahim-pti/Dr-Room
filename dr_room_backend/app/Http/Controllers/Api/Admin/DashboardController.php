@@ -12,13 +12,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalUsers = User::where('is_admin', false)->where('is_doctor', false)->count();
+        $totalUsers = User::whereNotIn('role', ['admin', 'doctor', 'nurse', 'lab', 'pharmacy'])->count(); // basically 'patient'
         $totalDoctors = Doctor::count();
-        $pendingDoctors = Doctor::where('is_approved', false)->count();
+        $pendingDoctors = User::where('role', 'doctor')->where('status', 'pending')->count();
         $totalNurses = \App\Models\Nurse::count();
         $totalAppointments = Appointment::count();
         
-        $recentAppointments = Appointment::with(['user', 'doctor.user'])
+        $recentAppointments = Appointment::with(['patient', 'doctor.user'])
             ->orderBy('id', 'desc')
             ->take(5)
             ->get();

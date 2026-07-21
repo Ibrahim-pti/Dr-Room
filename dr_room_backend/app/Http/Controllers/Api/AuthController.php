@@ -12,6 +12,7 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
+        \Log::info('login hit', $request->all());
         $request->validate([
             'phone' => 'required|string',
             'password' => 'required|string',
@@ -37,7 +38,7 @@ class AuthController extends Controller
             ], 403);
         }
 
-        $otp = rand(1000, 9999);
+        $otp = 1234; // کۆدەکە جێگیر کراوە بۆ تێستکردن
         $user->otp_code = $otp;
         $user->otp_expires_at = now()->addMinutes(5);
         $user->save();
@@ -58,7 +59,7 @@ class AuthController extends Controller
             'role' => 'nullable|string|in:patient,doctor,nurse,lab,pharmacy,admin'
         ]);
 
-        $otp = rand(1000, 9999);
+        $otp = 1234; // کۆدەکە جێگیر کراوە بۆ تێستکردن
         
         $role = $request->role ?? 'patient';
         $status = ($role === 'patient') ? 'approved' : 'pending';
@@ -82,6 +83,7 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
+        \Log::info('verifyOtp hit', $request->all());
         $request->validate([
             'phone' => 'required|string',
             'otp_code' => 'required|string'
@@ -123,7 +125,7 @@ class AuthController extends Controller
                 'phone' => $user->phone,
                 'role' => $user->role,
                 'status' => $user->status,
-                'is_admin' => $user->isAdmin(), // kept for backward compatibility if needed in UI
+                'is_admin' => $user->is_admin, // kept for backward compatibility if needed in UI
             ]
         ]);
     }
