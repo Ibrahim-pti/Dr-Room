@@ -21,7 +21,6 @@
   "doctors_everyday": "Doctors Everyday",
   "onboarding_subtitle": "Trusted doctors providing better\ncare for you every day.",
   "get_started": "Get Started",
-
   "cat_lab": "Lab Tests",
   "cat_nursing": "Nursing",
   "cat_doctor": "Doctor",
@@ -30,7 +29,6 @@
   "cat_more": "More",
   "cat_news": "Health News",
   "cat_ambulance": "Ambulance",
-
   "desc_lab": "Request tests and draw blood at home.",
   "desc_nursing": "Injection, cannula, dressing, and quick care.",
   "desc_doctor": "Online consultation or booking an appointment.",
@@ -39,11 +37,9 @@
   "desc_more": "General checkup, fitness, diabetes care, etc.",
   "desc_news": "Read the latest health news and articles.",
   "desc_ambulance": "Request a quick ambulance for emergencies.",
-
   "coming_soon": "Coming soon",
   "coming_soon_msg": "This section is in preparation and will be available soon.",
   "ok": "OK",
-
   "lab_service": "Lab Service",
   "how_to_request": "How would you like to request?",
   "choose_lab_method": "Choose one of the methods below to proceed with your lab test request.",
@@ -51,7 +47,6 @@
   "upload_prescription_desc": "Take a photo or upload your doctor's prescription. We will do the rest.",
   "select_tests_manually": "Select Tests Manually",
   "select_tests_desc": "Browse and choose the specific tests you need from our comprehensive list.",
-
   "nursing_services": "Nursing Services",
   "what_do_you_need": "What do you need?",
   "select_nursing_services": "Select the nursing services you require. Our professional nurses will come to your home.",
@@ -63,7 +58,6 @@
   "wound_desc": "Cleaning and dressing for wounds and post-surgery",
   "quick_care": "Quick Care",
   "quick_care_desc": "Basic checkup, blood pressure, and vitals monitoring",
-
   "selected_items": "Selected",
   "services_count": "Services",
   "continue_btn": "Continue",
@@ -81,7 +75,6 @@
   "please_fetch_location_first": "Please fetch your location first.",
   "continue_to_payment": "Continue to Payment",
   "required": "Required",
-
   "welcome_back": "Welcome\nBack!",
   "sign_in_continue": "Sign in to continue",
   "email_or_phone": "Email or Phone number",
@@ -91,7 +84,6 @@
   "or_continue_with": "or continue with",
   "dont_have_account": "Don't have an account? ",
   "sign_up": "Sign Up",
-
   "create_account": "Create\nAccount",
   "sign_up_to_get_started": "Sign up to get started",
   "full_name": "Full Name",
@@ -103,13 +95,11 @@
   "and": " and ",
   "privacy_policy": "Privacy Policy",
   "already_have_account": "Already have an account? ",
-
   "verify_phone": "Verify Your\nPhone Number",
   "code_sent_to": "We sent a verification code to",
   "didnt_receive_code": "Didn't receive the code? ",
   "resend_code": "Resend Code",
   "verify": "Verify",
-
   "profile": "Profile",
   "hello": "Hello",
   "guest_user": "User",
@@ -123,17 +113,14 @@
   "invite_friends": "Invite Friends",
   "log_out": "Log Out",
   "select_language": "Select Language",
-
   "personal_info": "Personal Info",
   "first_name": "First Name",
   "last_name": "Last Name",
   "date_of_birth": "Date of Birth",
-  "gender": "Gender",
   "male": "Male",
   "female": "Female",
   "blood_type": "Blood Type",
   "save_changes": "Save Changes",
-
   "saved_addresses": "Saved Addresses",
   "add_new_address": "Add New Address",
   "home": "Home",
@@ -141,19 +128,15 @@
   "other": "Other",
   "no_saved_addresses": "No saved addresses yet",
   "add_address_subtitle": "Add your first address to get started",
-
   "family_members": "Family Members",
   "add_member": "Add Member",
   "relation": "Relation",
-  "age": "Age",
   "years": "years",
-
   "help_and_support": "Help & Support",
   "faq": "FAQ",
   "contact_us": "Contact Us",
   "about_app": "About App",
   "rate_app": "Rate App",
-
   "health_dashboard": "Health Dashboard",
   "steps": "Steps",
   "heart_rate": "Heart Rate",
@@ -165,13 +148,11 @@
   "connect_device": "Connect Device",
   "sync_now": "Sync Now",
   "last_synced": "Last Synced",
-
   "home_tab": "Home",
   "discover_tab": "Discover",
   "records_tab": "Records",
   "orders_tab": "Orders",
   "settings_tab": "Settings",
-
   "good_morning": "Good Morning",
   "good_afternoon": "Good Afternoon",
   "good_evening": "Good Evening",
@@ -188,7 +169,6 @@
   "heart": "Heart",
   "brain": "Brain",
   "bone": "Bone",
-
   "all_doctors": "All Doctors",
   "filter": "Filter",
   "sort_by": "Sort By",
@@ -202,28 +182,23 @@
   "about": "About",
   "working_hours": "Working Hours",
   "location": "Location",
-
   "chat": "Chat",
   "type_message": "Type a message...",
   "send": "Send",
   "online": "Online",
   "offline": "Offline",
-
   "video_call": "Video Call",
   "mute": "Mute",
   "speaker": "Speaker",
   "end_call": "End Call",
   "camera": "Camera",
-
   "favorite_doctors": "Favorite Doctors",
   "no_favorites": "No favorite doctors yet",
   "add_favorites_subtitle": "Add your favorite doctors for quick access",
-
   "write_review": "Write a Review",
   "submit_review": "Submit Review",
   "your_review": "Your Review",
   "all_reviews": "All Reviews",
-
   "my_appointments": "My Appointments",
   "upcoming": "Upcoming",
   "completed": "Completed",
@@ -231,7 +206,6 @@
   "cancel_appointment": "Cancel Appointment",
   "reschedule": "Reschedule",
   "no_appointments": "No Appointments",
-
   "virtual_waiting_room": "Virtual Waiting Room",
   "your_position": "Your Position",
   "estimated_wait": "Estimated Wait",
@@ -240,7 +214,6 @@
   "doctor_is_ready": "Doctor is ready for you!",
   "join_now": "Join Now",
   "leave_queue": "Leave Queue",
-
   "pharmacy": "Pharmacy",
   "scan_pill": "Scan Pill",
   "pill_info": "Pill Information",
@@ -250,7 +223,6 @@
   "scan_another": "Scan Another",
   "take_photo": "Take Photo",
   "choose_gallery": "Choose from Gallery",
-
   "pill_reminder": "Pill Reminder",
   "add_reminder": "Add Reminder",
   "medicine_name": "Medicine Name",
@@ -264,10 +236,8 @@
   "taken": "Taken",
   "missed": "Missed",
   "skip": "Skip",
-
   "lab_tests": "Lab Tests",
   "select_tests": "Select Tests",
-  "upload_prescription": "Upload Prescription",
   "order_method": "Order Method",
   "home_visit": "Home Visit",
   "visit_lab": "Visit Lab",
@@ -283,7 +253,6 @@
   "lipid_profile": "Lipid Profile",
   "vitamin_d": "Vitamin D",
   "iron_test": "Iron Test",
-
   "checkout": "Checkout",
   "order_summary": "Order Summary",
   "payment_method": "Payment Method",
@@ -297,7 +266,6 @@
   "order_success_msg": "Your order has been placed successfully",
   "track_order": "Track Order",
   "back_to_home": "Back to Home",
-
   "my_orders": "My Orders",
   "active": "Active",
   "order_details": "Order Details",
@@ -309,7 +277,6 @@
   "shipped": "Shipped",
   "delivered": "Delivered",
   "items": "Items",
-
   "discover": "Discover",
   "trending": "Trending",
   "health_tips": "Health Tips",
@@ -319,7 +286,6 @@
   "bookmark": "Bookmark",
   "min_read": "min read",
   "related_articles": "Related Articles",
-
   "emergency": "Emergency",
   "sos": "SOS",
   "call_ambulance": "Call Ambulance",
@@ -327,17 +293,13 @@
   "add_contact": "Add Contact",
   "send_location": "Send Location",
   "nearest_hospital": "Nearest Hospital",
-
-  "nursing_services": "Nursing Services",
   "request_nurse": "Request Nurse",
   "nurse_at_home": "Nurse at Home",
-  "injection": "Injection",
   "wound_care": "Wound Care",
   "iv_therapy": "IV Therapy",
   "blood_pressure": "Blood Pressure",
   "blood_draw": "Blood Draw",
   "elderly_care": "Elderly Care",
-
   "surgery": "Surgery",
   "surgery_timeline": "Surgery Timeline",
   "pre_surgery": "Pre-Surgery",
@@ -347,7 +309,6 @@
   "surgeon": "Surgeon",
   "anesthesiologist": "Anesthesiologist",
   "operation_room": "Operation Room",
-
   "body_map": "Body Map",
   "select_body_part": "Select Body Part",
   "head": "Head",
@@ -359,7 +320,6 @@
   "pain_level": "Pain Level",
   "symptoms": "Symptoms",
   "duration_pain": "Duration",
-
   "ai_assistant": "AI Assistant",
   "symptom_checker": "Symptom Checker",
   "describe_symptoms": "Describe your symptoms...",
@@ -367,14 +327,12 @@
   "possible_conditions": "Possible Conditions",
   "disclaimer": "This is not a medical diagnosis. Please consult a doctor.",
   "consult_doctor": "Consult a Doctor",
-
   "notifications": "Notifications",
   "today": "Today",
   "yesterday": "Yesterday",
   "this_week": "This Week",
   "mark_all_read": "Mark All as Read",
   "no_notifications": "No notifications yet",
-
   "all_categories": "All Categories",
   "clinic_locator": "Clinic Locator",
   "search_clinic": "Search clinic...",
@@ -383,10 +341,16 @@
   "closed": "Closed",
   "get_directions": "Get Directions",
   "call": "Call",
-
   "files": "files",
   "free": "Free",
   "dr": "Dr.",
   "sar_email": "sar***@gmail.com",
-  "sara_ahmad": "Sara Ahmad"
+  "sara_ahmad": "Sara Ahmad",
+  "health_profile_title": "Health Profile",
+  "health_profile_subtitle": "Your information helps us provide better service.",
+  "select": "Select",
+  "weight_kg": "Weight (kg)",
+  "height_cm": "Height (cm)",
+  "save_and_continue": "Save & Continue",
+  "fill_all_fields": "Please fill in all fields"
 }

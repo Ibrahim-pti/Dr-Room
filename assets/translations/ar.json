@@ -21,7 +21,6 @@
   "doctors_everyday": "أطباء كل يوم",
   "onboarding_subtitle": "أطباء موثوقون يقدمون لك\nرعاية أفضل كل يوم.",
   "get_started": "البدء",
-
   "cat_lab": "مختبر",
   "cat_nursing": "تمريض",
   "cat_doctor": "طبيب",
@@ -30,7 +29,6 @@
   "cat_more": "المزيد",
   "cat_news": "أخبار",
   "cat_ambulance": "إسعاف",
-
   "desc_lab": "طلب فحوصات وسحب دم في المنزل.",
   "desc_nursing": "حقن، كانيولا، تضميد وعناية سريعة.",
   "desc_doctor": "استشارة عبر الإنترنت أو حجز موعد.",
@@ -39,11 +37,9 @@
   "desc_more": "فحص شامل، لياقة، رعاية مرضى السكري، إلخ.",
   "desc_news": "قراءة أحدث الأخبار والمقالات الطبية.",
   "desc_ambulance": "طلب سيارة إسعاف سريعة للحالات الطارئة.",
-
   "coming_soon": "قريباً",
   "coming_soon_msg": "هذا القسم قيد التجهيز وسيكون متاحاً قريباً.",
   "ok": "حسناً",
-
   "lab_service": "خدمة المختبر",
   "how_to_request": "كيف تود تقديم الطلب؟",
   "choose_lab_method": "اختر إحدى الطرق أدناه لمتابعة طلب فحص المختبر.",
@@ -51,11 +47,10 @@
   "upload_prescription_desc": "التقط صورة أو قم برفع وصفة طبيبك. نحن سنتولى الباقي.",
   "select_tests_manually": "اختيار الفحوصات يدوياً",
   "select_tests_desc": "تصفح واختر الفحوصات المحددة التي تحتاجها من قائمتنا الشاملة.",
-
   "nursing_services": "خدمات التمريض",
   "what_do_you_need": "ماذا تحتاج؟",
   "select_nursing_services": "اختر خدمات التمريض التي تحتاجها. ممرضونا المحترفون سيأتون إلى منزلك.",
-  "injection": "الحقن",
+  "injection": "إبرة/حقنة",
   "injection_desc": "حقن عضلي، وريدي، أو تحت الجلد في المنزل",
   "cannula": "تركيب الكانيولا",
   "cannula_desc": "تركيب وعناية احترافية بالكانيولا الوريدية",
@@ -63,7 +58,6 @@
   "wound_desc": "تنظيف وتضميد الجروح وما بعد الجراحة",
   "quick_care": "رعاية سريعة",
   "quick_care_desc": "فحص أساسي، ضغط الدم، ومراقبة العلامات الحيوية",
-
   "selected_items": "محدد",
   "services_count": "خدمات",
   "continue_btn": "متابعة",
@@ -81,7 +75,6 @@
   "please_fetch_location_first": "يرجى جلب موقعك أولاً.",
   "continue_to_payment": "المتابعة للدفع",
   "required": "مطلوب",
-
   "welcome_back": "مرحباً بعودتك!",
   "sign_in_continue": "تسجيل الدخول للمتابعة",
   "email_or_phone": "البريد الإلكتروني أو رقم الهاتف",
@@ -91,7 +84,6 @@
   "or_continue_with": "أو المتابعة باستخدام",
   "dont_have_account": "ليس لديك حساب؟ ",
   "sign_up": "إنشاء حساب",
-
   "create_account": "إنشاء\nحساب",
   "sign_up_to_get_started": "أنشئ حساباً للبدء",
   "full_name": "الاسم الكامل",
@@ -106,13 +98,11 @@
   "and": " و ",
   "privacy_policy": "سياسة الخصوصية",
   "already_have_account": "لديك حساب بالفعل؟ ",
-
   "verify_phone": "التحقق من\nرقم الهاتف",
   "code_sent_to": "أرسلنا رمز التحقق إلى",
   "didnt_receive_code": "لم تتلقَ الرمز؟ ",
   "resend_code": "إعادة إرسال الرمز",
   "verify": "تحقق",
-
   "profile": "الملف الشخصي",
   "dark_mode": "الوضع الداكن",
   "personal_information": "المعلومات الشخصية",
@@ -123,17 +113,14 @@
   "invite_friends": "دعوة الأصدقاء",
   "log_out": "تسجيل الخروج",
   "select_language": "اختر اللغة",
-
   "personal_info": "المعلومات الشخصية",
   "first_name": "الاسم الأول",
   "last_name": "الاسم الأخير",
   "date_of_birth": "تاريخ الميلاد",
-  "gender": "الجنس",
   "male": "ذكر",
   "female": "أنثى",
   "blood_type": "فصيلة الدم",
   "save_changes": "حفظ التغييرات",
-
   "saved_addresses": "العناوين المحفوظة",
   "add_new_address": "إضافة عنوان جديد",
   "home": "المنزل",
@@ -141,19 +128,15 @@
   "other": "أخرى",
   "no_saved_addresses": "لا توجد عناوين محفوظة",
   "add_address_subtitle": "أضف عنوانك الأول للبدء",
-
   "family_members": "أفراد العائلة",
   "add_member": "إضافة فرد",
   "relation": "صلة القرابة",
-  "age": "العمر",
   "years": "سنوات",
-
   "help_and_support": "المساعدة والدعم",
   "faq": "الأسئلة الشائعة",
   "contact_us": "اتصل بنا",
   "about_app": "حول التطبيق",
   "rate_app": "تقييم التطبيق",
-
   "health_dashboard": "لوحة المعلومات الصحية",
   "steps": "الخطوات",
   "heart_rate": "معدل ضربات القلب",
@@ -165,13 +148,11 @@
   "connect_device": "توصيل جهاز",
   "sync_now": "مزامنة الآن",
   "last_synced": "آخر مزامنة",
-
   "home_tab": "الرئيسية",
   "discover_tab": "اكتشف",
   "records_tab": "السجلات",
   "orders_tab": "الطلبات",
   "settings_tab": "الإعدادات",
-
   "good_morning": "صباح الخير",
   "good_afternoon": "مساء الخير",
   "good_evening": "مساء الخير",
@@ -188,7 +169,6 @@
   "heart": "قلب",
   "brain": "مخ وأعصاب",
   "bone": "عظام",
-
   "all_doctors": "جميع الأطباء",
   "filter": "تصفية",
   "sort_by": "ترتيب حسب",
@@ -202,28 +182,23 @@
   "about": "حول",
   "working_hours": "ساعات العمل",
   "location": "الموقع",
-
   "chat": "محادثة",
   "type_message": "اكتب رسالة...",
   "send": "إرسال",
   "online": "متصل",
   "offline": "غير متصل",
-
   "video_call": "مكالمة فيديو",
   "mute": "كتم الصوت",
   "speaker": "مكبر الصوت",
   "end_call": "إنهاء المكالمة",
   "camera": "الكاميرا",
-
   "favorite_doctors": "الأطباء المفضلون",
   "no_favorites": "لا يوجد أطباء مفضلون",
   "add_favorites_subtitle": "أضف أطباءك المفضلين للوصول السريع",
-
   "write_review": "كتابة تقييم",
   "submit_review": "إرسال التقييم",
   "your_review": "تقييمك",
   "all_reviews": "جميع التقييمات",
-
   "my_appointments": "مواعيدي",
   "upcoming": "القادمة",
   "completed": "المكتملة",
@@ -231,7 +206,6 @@
   "cancel_appointment": "إلغاء الموعد",
   "reschedule": "إعادة جدولة",
   "no_appointments": "لا توجد مواعيد",
-
   "virtual_waiting_room": "غرفة الانتظار الافتراضية",
   "your_position": "دورك",
   "estimated_wait": "وقت الانتظار المقدر",
@@ -240,7 +214,6 @@
   "doctor_is_ready": "الطبيب جاهز لاستقبالك!",
   "join_now": "انضم الآن",
   "leave_queue": "مغادرة الطابور",
-
   "pharmacy": "الصيدلية",
   "scan_pill": "مسح حبة الدواء",
   "pill_info": "معلومات الدواء",
@@ -250,7 +223,6 @@
   "scan_another": "مسح دواء آخر",
   "take_photo": "التقاط صورة",
   "choose_gallery": "اختيار من المعرض",
-
   "pill_reminder": "منبه الدواء",
   "add_reminder": "إضافة منبه",
   "medicine_name": "اسم الدواء",
@@ -264,10 +236,8 @@
   "taken": "تم تناوله",
   "missed": "تم نسيانه",
   "skip": "تخطي",
-
   "lab_tests": "الفحوصات المخبرية",
   "select_tests": "تحديد الفحوصات",
-  "upload_prescription": "رفع الوصفة الطبية",
   "order_method": "طريقة الطلب",
   "home_visit": "زيارة منزلية",
   "visit_lab": "زيارة المختبر",
@@ -283,7 +253,6 @@
   "lipid_profile": "فحص الدهون",
   "vitamin_d": "فيتامين د",
   "iron_test": "فحص الحديد",
-
   "checkout": "إتمام الدفع",
   "order_summary": "ملخص الطلب",
   "payment_method": "طريقة الدفع",
@@ -297,7 +266,6 @@
   "order_success_msg": "تم تقديم طلبك بنجاح",
   "track_order": "تتبع الطلب",
   "back_to_home": "العودة للرئيسية",
-
   "my_orders": "طلباتي",
   "active": "نشطة",
   "order_details": "تفاصيل الطلب",
@@ -309,7 +277,6 @@
   "shipped": "تم الشحن",
   "delivered": "تم التوصيل",
   "items": "العناصر",
-
   "discover": "اكتشف",
   "trending": "الشائعة",
   "health_tips": "نصائح صحية",
@@ -319,7 +286,6 @@
   "bookmark": "حفظ",
   "min_read": "دقائق قراءة",
   "related_articles": "مقالات ذات صلة",
-
   "emergency": "طوارئ",
   "sos": "نداء استغاثة",
   "call_ambulance": "الاتصال بالإسعاف",
@@ -327,17 +293,13 @@
   "add_contact": "إضافة جهة اتصال",
   "send_location": "إرسال الموقع",
   "nearest_hospital": "أقرب مستشفى",
-
-  "nursing_services": "خدمات التمريض",
   "request_nurse": "طلب ممرض/ة",
   "nurse_at_home": "ممرض/ة في المنزل",
-  "injection": "إبرة/حقنة",
   "wound_care": "العناية بالجروح",
   "iv_therapy": "العلاج الوريدي",
   "blood_pressure": "قياس ضغط الدم",
   "blood_draw": "سحب الدم",
   "elderly_care": "رعاية كبار السن",
-
   "surgery": "جراحة",
   "surgery_timeline": "الجدول الزمني للجراحة",
   "pre_surgery": "قبل الجراحة",
@@ -347,7 +309,6 @@
   "surgeon": "الجراح",
   "anesthesiologist": "طبيب التخدير",
   "operation_room": "غرفة العمليات",
-
   "body_map": "خريطة الجسم",
   "select_body_part": "اختر جزءاً من الجسم",
   "head": "الرأس",
@@ -359,7 +320,6 @@
   "pain_level": "مستوى الألم",
   "symptoms": "الأعراض",
   "duration_pain": "المدة",
-
   "ai_assistant": "المساعد الذكي",
   "symptom_checker": "فاحص الأعراض",
   "describe_symptoms": "صف أعراضك...",
@@ -367,14 +327,12 @@
   "possible_conditions": "الحالات المحتملة",
   "disclaimer": "هذا ليس تشخيصاً طبياً. يرجى استشارة طبيب.",
   "consult_doctor": "استشارة طبيب",
-
   "notifications": "الإشعارات",
   "today": "اليوم",
   "yesterday": "أمس",
   "this_week": "هذا الأسبوع",
   "mark_all_read": "تحديد الكل كمقروء",
   "no_notifications": "لا توجد إشعارات",
-
   "all_categories": "جميع الفئات",
   "clinic_locator": "دليل العيادات",
   "search_clinic": "ابحث عن عيادة...",
@@ -383,10 +341,16 @@
   "closed": "مغلق",
   "get_directions": "الحصول على الاتجاهات",
   "call": "اتصال",
-
   "files": "ملف",
   "free": "مجاناً",
   "dr": "د.",
   "sar_email": "sar***@gmail.com",
-  "sara_ahmad": "سارة أحمد"
+  "sara_ahmad": "سارة أحمد",
+  "health_profile_title": "الملف الصحي",
+  "health_profile_subtitle": "معلوماتك تساعدنا في تقديم خدمة أفضل.",
+  "select": "اختر",
+  "weight_kg": "الوزن (كجم)",
+  "height_cm": "الطول (سم)",
+  "save_and_continue": "حفظ ومتابعة",
+  "fill_all_fields": "يرجى ملء جميع الحقول"
 }

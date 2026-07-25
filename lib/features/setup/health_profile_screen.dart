@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
@@ -33,6 +34,24 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
   ];
 
   Future<void> _completeSetup() async {
+    if (_selectedGender == null ||
+        _selectedBloodType == null ||
+        _ageController.text.isEmpty ||
+        _weightController.text.isEmpty ||
+        _heightController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'fill_all_fields'.tr(),
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_completed_setup', true);
 
@@ -48,12 +67,6 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     if (_heightController.text.isNotEmpty)
       await prefs.setString('guest_height', _heightController.text);
 
-    widget.onFinished();
-  }
-
-  Future<void> _skipSetup() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_completed_setup', true);
     widget.onFinished();
   }
 
@@ -79,20 +92,6 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           ),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          TextButton(
-            onPressed: _skipSetup,
-            child: Text(
-              'skip'.tr(),
-              style: GoogleFonts.poppins(
-                color: const Color(0xFF64748B),
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -100,25 +99,55 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'health_profile_title'.tr(),
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
-                ),
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
+              // Medical Header Icon
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Iconsax.health_copy,
+                    size: 48,
+                    color: Color(0xFF3B82F6),
+                  ),
+                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+              ),
+              const SizedBox(height: 24),
+
+              Center(
+                child: Text(
+                  'health_profile_title'.tr(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
+              ),
 
               const SizedBox(height: 8),
 
-              Text(
-                'health_profile_subtitle'.tr(),
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: const Color(0xFF64748B),
-                  height: 1.5,
-                ),
-              ).animate().fadeIn(delay: 100.ms),
+              Center(
+                child: Text(
+                  'health_profile_subtitle'.tr(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: const Color(0xFF64748B),
+                    height: 1.5,
+                  ),
+                ).animate().fadeIn(delay: 100.ms),
+              ),
 
               const SizedBox(height: 32),
 
@@ -139,6 +168,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                       'male'.tr(),
                       Icons.male_rounded,
                       'Male',
+                      delay: 250,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -147,10 +177,11 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                       'female'.tr(),
                       Icons.female_rounded,
                       'Female',
+                      delay: 300,
                     ),
                   ),
                 ],
-              ).animate().fadeIn(delay: 300.ms),
+              ),
 
               const SizedBox(height: 24),
 
@@ -161,8 +192,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     child: _buildInputField(
                       label: 'age'.tr(),
                       controller: _ageController,
-                      icon: Iconsax.calendar_1,
+                      icon: Iconsax.calendar_1_copy,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       delay: 400,
                     ),
                   ),
@@ -180,10 +212,15 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     child: _buildInputField(
                       label: 'weight_kg'.tr(),
                       controller: _weightController,
-                      icon: Iconsax.weight,
+                      icon: Iconsax.weight_copy,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d*'),
+                        ),
+                      ],
                       delay: 600,
                     ),
                   ),
@@ -192,10 +229,15 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     child: _buildInputField(
                       label: 'height_cm'.tr(),
                       controller: _heightController,
-                      icon: Iconsax.ruler,
+                      icon: Iconsax.ruler_copy,
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d*'),
+                        ),
+                      ],
                       delay: 700,
                     ),
                   ),
@@ -216,7 +258,8 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 0,
+                    elevation: 4,
+                    shadowColor: const Color(0xFF3B82F6).withValues(alpha: 0.4),
                   ),
                   child: Text(
                     'save_and_continue'.tr(),
@@ -236,7 +279,12 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     );
   }
 
-  Widget _buildGenderCard(String title, IconData icon, String value) {
+  Widget _buildGenderCard(
+    String title,
+    IconData icon,
+    String value, {
+    required int delay,
+  }) {
     final isSelected = _selectedGender == value;
     return GestureDetector(
       onTap: () => setState(() => _selectedGender = value),
@@ -244,7 +292,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B82F6) : Colors.white,
+          color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected
@@ -255,7 +303,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
+                    color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -266,21 +314,25 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           children: [
             Icon(
               icon,
-              size: 32,
-              color: isSelected ? Colors.white : const Color(0xFF64748B),
+              size: 40,
+              color: isSelected
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFF94A3B8),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               title,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : const Color(0xFF1E293B),
+                color: isSelected
+                    ? const Color(0xFF3B82F6)
+                    : const Color(0xFF64748B),
               ),
             ),
           ],
         ),
       ),
-    );
+    ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.1);
   }
 
   Widget _buildInputField({
@@ -288,6 +340,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     required TextEditingController controller,
     required IconData icon,
     required TextInputType keyboardType,
+    List<TextInputFormatter>? inputFormatters,
     required int delay,
   }) {
     return Column(
@@ -311,6 +364,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             style: GoogleFonts.poppins(color: const Color(0xFF1E293B)),
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -318,7 +372,11 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                 horizontal: 16,
                 vertical: 14,
               ),
-              prefixIcon: Icon(icon, color: const Color(0xFF94A3B8), size: 20),
+              prefixIcon: Icon(
+                icon,
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.7),
+                size: 22,
+              ),
             ),
           ),
         ),
@@ -340,7 +398,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
@@ -349,9 +407,19 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: _selectedBloodType,
-              hint: Text(
-                'select'.tr(),
-                style: GoogleFonts.poppins(color: const Color(0xFF94A3B8)),
+              hint: Row(
+                children: [
+                  const Icon(
+                    Icons.water_drop_rounded,
+                    color: Colors.redAccent,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'select'.tr(),
+                    style: GoogleFonts.poppins(color: const Color(0xFF94A3B8)),
+                  ),
+                ],
               ),
               isExpanded: true,
               icon: const Icon(
@@ -361,12 +429,22 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
               items: _bloodTypes.map((String type) {
                 return DropdownMenuItem<String>(
                   value: type,
-                  child: Text(
-                    type,
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF1E293B),
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.water_drop_rounded,
+                        color: Colors.redAccent,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        type,
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF1E293B),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }).toList(),
