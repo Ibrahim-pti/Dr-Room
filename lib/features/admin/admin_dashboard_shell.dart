@@ -27,7 +27,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
   ];
 
   final List<_NavItem> _navItems = const [
-    _NavItem(icon: Iconsax.chart_square, label: 'ئامارەکان'),
+    _NavItem(icon: Iconsax.category_2, label: 'سەرەکی'),
     _NavItem(icon: Iconsax.health, label: 'پزیشکەکان'),
     _NavItem(icon: Iconsax.profile_2user, label: 'پەرستارەکان'),
     _NavItem(icon: Iconsax.book_1, label: 'وتارەکان'),

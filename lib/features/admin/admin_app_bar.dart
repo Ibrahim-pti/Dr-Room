@@ -3,20 +3,28 @@ import '../../core/theme/app_colors.dart';
 
 class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final String subtitle;
-  final IconData icon;
+  final String? subtitle;
+  final IconData? icon;
   final Color iconColor;
   final Color iconBackgroundColor;
   final List<Widget>? actions;
+  final String? imagePath;
+  final String? titleFontFamily;
+  final TextStyle? titleStyle;
+  final Widget? titleWidget;
 
   const AdminAppBar({
     super.key,
     required this.title,
-    required this.subtitle,
-    required this.icon,
+    this.subtitle,
+    this.icon,
     required this.iconColor,
     required this.iconBackgroundColor,
     this.actions,
+    this.imagePath,
+    this.titleFontFamily,
+    this.titleStyle,
+    this.titleWidget,
   });
 
   @override
@@ -40,49 +48,64 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: iconBackgroundColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: iconColor.withValues(alpha: 0.2),
-                width: 1.5,
+          if (imagePath != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                imagePath!,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
               ),
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 26,
+            const SizedBox(width: 4),
+          ] else if (icon != null) ...[
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: iconBackgroundColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: iconColor.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: 26,
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                titleWidget ?? Text(
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Rabar',
+                  style: titleStyle ?? TextStyle(
+                    fontFamily: titleFontFamily ?? 'Rabar',
                     color: AppColors.getTextTitle(context),
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Rabar',
-                    color: AppColors.getTextSubtitle(context),
-                    fontSize: 13,
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'Rabar',
+                      color: AppColors.getTextSubtitle(context),
+                      fontSize: 13,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
