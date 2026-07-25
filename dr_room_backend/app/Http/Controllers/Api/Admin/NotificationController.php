@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AppNotification;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class NotificationController extends Controller
 {
@@ -31,8 +32,21 @@ class NotificationController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('notifications', 'public');
-            $data['image_path'] = $path;
+            $data['image_path'] = $request->file('image')->store('notifications', 'public');
+        }
+
+        try {
+            $tr = new GoogleTranslate();
+            $data['title_en'] = $tr->setTarget('en')->translate($request->title);
+            $tr2 = new GoogleTranslate();
+            $data['title_ar'] = $tr2->setTarget('ar')->translate($request->title);
+            
+            $tr3 = new GoogleTranslate();
+            $data['message_en'] = $tr3->setTarget('en')->translate($request->message);
+            $tr4 = new GoogleTranslate();
+            $data['message_ar'] = $tr4->setTarget('ar')->translate($request->message);
+        } catch (\Exception $e) {
+            \Log::error('Translation error: ' . $e->getMessage());
         }
 
         $notification = AppNotification::create($data);
@@ -58,7 +72,31 @@ class NotificationController extends Controller
             'user_id' => 'nullable|exists:users,id'
         ]);
 
-        $notification->update($request->all());
+        $data = $request->all();
+
+        if ($request->has('title') && $request->title != $notification->title) {
+            try {
+                $tr = new GoogleTranslate();
+                $data['title_en'] = $tr->setTarget('en')->translate($request->title);
+                $tr2 = new GoogleTranslate();
+                $data['title_ar'] = $tr2->setTarget('ar')->translate($request->title);
+            } catch (\Exception $e) {
+                \Log::error('Translation error: ' . $e->getMessage());
+            }
+        }
+
+        if ($request->has('message') && $request->message != $notification->message) {
+            try {
+                $tr = new GoogleTranslate();
+                $data['message_en'] = $tr->setTarget('en')->translate($request->message);
+                $tr2 = new GoogleTranslate();
+                $data['message_ar'] = $tr2->setTarget('ar')->translate($request->message);
+            } catch (\Exception $e) {
+                \Log::error('Translation error: ' . $e->getMessage());
+            }
+        }
+
+        $notification->update($data);
 
         return response()->json($notification);
     }

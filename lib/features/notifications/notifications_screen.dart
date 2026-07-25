@@ -4,48 +4,55 @@ import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-class NotificationsScreen extends StatelessWidget {
+import 'package:easy_localization/easy_localization.dart';
+import 'dart:convert';
+import '../../core/utils/api_client.dart';
+
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  List<dynamic> notifications = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  Future<void> _fetchNotifications() async {
+    try {
+      final response = await ApiClient.get('/notifications');
+      if (response.statusCode == 200 && mounted) {
+        setState(() {
+          notifications = jsonDecode(response.body);
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  String _getTranslated(dynamic notif, String field, String langCode) {
+    if (langCode == 'en' && notif['${field}_en'] != null) {
+      return notif['${field}_en'];
+    }
+    if (langCode == 'ar' && notif['${field}_ar'] != null) {
+      return notif['${field}_ar'];
+    }
+    return notif[field] ?? '';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final notifications = [
-      {
-        'title': 'Nurse is arriving soon!',
-        'message': 'Your nurse for the CBC test is 15 minutes away.',
-        'time': 'Just now',
-        'type': 'order',
-        'isRead': false,
-      },
-      {
-        'title': 'Lab Results Ready',
-        'message': 'Good news! Your Vitamin D test results are available to download.',
-        'time': '2 hours ago',
-        'type': 'result',
-        'isRead': false,
-      },
-      {
-        'title': 'Appointment Confirmed',
-        'message': 'Your video consultation with Dr. Jenny is set for tomorrow at 10:30 AM.',
-        'time': 'Yesterday',
-        'type': 'calendar',
-        'isRead': true,
-      },
-      {
-        'title': 'Special Offer 🎁',
-        'message': 'Get 20% off on all comprehensive health checkups this weekend!',
-        'time': '2 days ago',
-        'type': 'promo',
-        'isRead': true,
-      },
-      {
-        'title': 'Order Completed',
-        'message': 'Your recent Home Nursing visit has been completed successfully.',
-        'time': '3 days ago',
-        'type': 'success',
-        'isRead': true,
-      },
-    ];
+    final langCode = context.locale.languageCode;
+
 
     return Scaffold(
       backgroundColor: AppColors.getBackground(context),
@@ -78,13 +85,26 @@ class NotificationsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView.builder(
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
+          : notifications.isEmpty
+            ? Center(
+                child: Text(
+                  'No notifications yet',
+                  style: GoogleFonts.poppins(color: AppColors.getTextSubtitle(context)),
+                ),
+              )
+            : ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 16),
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           final notif = notifications[index];
-          final type = notif['type'] as String;
-          final isRead = notif['isRead'] as bool;
+          final type = (notif['type'] ?? 'general') as String;
+          final isRead = notif['is_read'] == 1 || notif['is_read'] == true;
+          
+          final timeString = notif['created_at'] != null 
+              ? notif['created_at'].toString().substring(0, 10)
+              : 'Just now';
 
           IconData icon;
           Color iconColor;
@@ -172,7 +192,7 @@ class NotificationsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            notif['message'] as String,
+                            _getTranslated(notif, 'message', langCode),
                             style: GoogleFonts.poppins(
                               color: AppColors.getTextSubtitle(context),
                               fontSize: 14,
@@ -181,7 +201,7 @@ class NotificationsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            notif['time'] as String,
+                            timeString,
                             style: GoogleFonts.poppins(
                               color: AppColors.textLight,
                               fontSize: 12,

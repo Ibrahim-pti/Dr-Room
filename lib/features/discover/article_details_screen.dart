@@ -10,8 +10,20 @@ class ArticleDetailsScreen extends StatelessWidget {
 
   const ArticleDetailsScreen({super.key, required this.article});
 
+  String _getTranslated(Map<String, dynamic> data, String field, String langCode) {
+    if (langCode == 'en' && data['${field}_en'] != null) {
+      return data['${field}_en'];
+    }
+    if (langCode == 'ar' && data['${field}_ar'] != null) {
+      return data['${field}_ar'];
+    }
+    return data[field] ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final langCode = context.locale.languageCode;
+    final color = article['color'] ?? const Color(0xFF3B82F6);
     return Scaffold(
       backgroundColor: AppColors.getBackground(context),
       body: CustomScrollView(
@@ -58,7 +70,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                 tag: article['title'],
                 child: Container(
                   decoration: BoxDecoration(
-                    color: article['color'],
+                    color: color,
                     borderRadius: const BorderRadiusDirectional.only(
                       bottomStart: Radius.circular(40),
                       bottomEnd: Radius.circular(40),
@@ -80,13 +92,13 @@ class ArticleDetailsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: (article['color'] as Color).withValues(alpha: 0.1),
+                      color: color.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      (article['category'] as String).toUpperCase(),
+                      (article['category'] ?? 'ARTICLE').toString().toUpperCase(),
                       style: GoogleFonts.poppins(
-                        color: article['color'],
+                        color: color,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
@@ -95,7 +107,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                   ).animate().fadeIn().slideY(begin: 0.2, end: 0),
                   const SizedBox(height: 16),
                   Text(
-                    article['title'],
+                    _getTranslated(article, 'title', langCode),
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 28,
@@ -120,7 +132,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            article['author'],
+                            article['author'] ?? 'Dr. Room',
                             style: GoogleFonts.poppins(
                               color: AppColors.getTextTitle(context),
                               fontSize: 16,
@@ -128,7 +140,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${"medical_specialist".tr()} • ${article['time']}',
+                            '${"medical_specialist".tr()} • ${article['time'] ?? '5 min'}',
                             style: GoogleFonts.poppins(
                               color: AppColors.getTextSubtitle(context),
                               fontSize: 13,
@@ -142,33 +154,14 @@ class ArticleDetailsScreen extends StatelessWidget {
                   const Divider(),
                   const SizedBox(height: 24),
                   
-                  // Mock Article Content
                   Text(
-                    'Vitamin D is a crucial nutrient that plays a significant role in maintaining overall health. It is unique because your body can produce it when your skin is exposed to sunlight. However, despite this natural ability, many people around the world suffer from Vitamin D deficiency.',
+                    _getTranslated(article, 'content', langCode),
                     style: GoogleFonts.poppins(
                       color: AppColors.getTextTitle(context),
                       fontSize: 16,
                       height: 1.8,
                     ),
                   ).animate().fadeIn(delay: 300.ms),
-                  const SizedBox(height: 24),
-                  Text(
-                    '1. Bone Health and Beyond',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ).animate().fadeIn(delay: 400.ms),
-                  const SizedBox(height: 16),
-                  Text(
-                    'The most well-known benefit of Vitamin D is its role in promoting calcium absorption in the gut. Without sufficient Vitamin D, bones can become thin, brittle, or misshapen. It prevents rickets in children and osteomalacia in adults.',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 16,
-                      height: 1.8,
-                    ),
-                  ).animate().fadeIn(delay: 500.ms),
                   const SizedBox(height: 40),
                 ],
               ),

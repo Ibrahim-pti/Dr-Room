@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PromoCarousel extends StatefulWidget {
   final List<dynamic> banners;
@@ -14,6 +15,16 @@ class _PromoCarouselState extends State<PromoCarousel> {
   late PageController _pageController;
   Timer? _timer;
   int _currentPage = 0;
+
+  String _getTranslated(dynamic data, String field, String langCode) {
+    if (langCode == 'en' && data['${field}_en'] != null) {
+      return data['${field}_en'];
+    }
+    if (langCode == 'ar' && data['${field}_ar'] != null) {
+      return data['${field}_ar'];
+    }
+    return data[field] ?? '';
+  }
 
   final List<Map<String, dynamic>> _fallbackPromos = [
     {
@@ -63,6 +74,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final langCode = context.locale.languageCode;
     final itemsCount = widget.banners.isNotEmpty ? widget.banners.length : _fallbackPromos.length;
     
     return Column(
@@ -122,7 +134,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
                           children: [
                             if (promo['title'] != null && promo['title'].toString().isNotEmpty)
                               Text(
-                                promo['title'],
+                                isApiData ? _getTranslated(promo, 'title', langCode) : promo['title'],
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontSize: 18,

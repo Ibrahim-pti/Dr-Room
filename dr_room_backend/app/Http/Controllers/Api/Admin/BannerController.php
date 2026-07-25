@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Storage;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class BannerController extends Controller
 {
@@ -26,8 +27,23 @@ class BannerController extends Controller
 
         $path = $request->file('image')->store('banners', 'public');
 
+        $title_en = null;
+        $title_ar = null;
+        if ($request->title) {
+            try {
+                $tr = new GoogleTranslate();
+                $title_en = $tr->setTarget('en')->translate($request->title);
+                $tr2 = new GoogleTranslate();
+                $title_ar = $tr2->setTarget('ar')->translate($request->title);
+            } catch (\Exception $e) {
+                \Log::error('Translation error: ' . $e->getMessage());
+            }
+        }
+
         $banner = Banner::create([
             'title' => $request->title,
+            'title_en' => $title_en,
+            'title_ar' => $title_ar,
             'image_path' => $path,
             'link_url' => $request->link_url,
             'is_active' => $request->is_active ?? true,
@@ -55,11 +71,26 @@ class BannerController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($banner->image_path);
+            if ($banner->image_path) {
+                Storage::disk('public')->delete($banner->image_path);
+            }
             $banner->image_path = $request->file('image')->store('banners', 'public');
         }
 
-        $banner->update($request->except('image'));
+        $data = $request->except('image');
+
+        if ($request->has('title') && $request->title && $request->title != $banner->title) {
+            try {
+                $tr = new GoogleTranslate();
+                $data['title_en'] = $tr->setTarget('en')->translate($request->title);
+                $tr2 = new GoogleTranslate();
+                $data['title_ar'] = $tr2->setTarget('ar')->translate($request->title);
+            } catch (\Exception $e) {
+                \Log::error('Translation error: ' . $e->getMessage());
+            }
+        }
+
+        $banner->update($data);
 
         return response()->json($banner);
     }
