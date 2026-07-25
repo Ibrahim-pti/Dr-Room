@@ -34,11 +34,27 @@ class DoctorProfileController extends Controller
         ]);
 
         if ($doctor) {
-            $doctor->update([
+            $updateData = [
                 'specialty' => $request->specialty,
                 'bio' => $request->bio,
                 'consultation_fee' => $request->consultation_fee,
-            ]);
+            ];
+
+            try {
+                $tr = new \Stichoza\GoogleTranslate\GoogleTranslate();
+                if ($request->specialty) {
+                    $updateData['specialty_en'] = $tr->setTarget('en')->translate($request->specialty);
+                    $updateData['specialty_ar'] = $tr->setTarget('ar')->translate($request->specialty);
+                }
+                if ($request->bio) {
+                    $updateData['bio_en'] = $tr->setTarget('en')->translate($request->bio);
+                    $updateData['bio_ar'] = $tr->setTarget('ar')->translate($request->bio);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Translation failed: ' . $e->getMessage());
+            }
+
+            $doctor->update($updateData);
         }
 
         return back()->with('success', 'زانیارییەکانی پڕۆفایل نوێکرانەوە.');

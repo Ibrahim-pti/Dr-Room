@@ -196,6 +196,7 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
                         );
                         var res = await request.send();
                         if (res.statusCode == 201) {
+                          if (!ctx.mounted) return;
                           Navigator.pop(ctx);
                           _fetchBanners();
                         }

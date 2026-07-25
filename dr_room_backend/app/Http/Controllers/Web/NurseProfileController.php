@@ -33,10 +33,26 @@ class NurseProfileController extends Controller
         ]);
 
         if ($nurse) {
-            $nurse->update([
+            $updateData = [
                 'specialty' => $request->specialty,
                 'bio' => $request->bio,
-            ]);
+            ];
+
+            try {
+                $tr = new \Stichoza\GoogleTranslate\GoogleTranslate();
+                if ($request->specialty) {
+                    $updateData['specialty_en'] = $tr->setTarget('en')->translate($request->specialty);
+                    $updateData['specialty_ar'] = $tr->setTarget('ar')->translate($request->specialty);
+                }
+                if ($request->bio) {
+                    $updateData['bio_en'] = $tr->setTarget('en')->translate($request->bio);
+                    $updateData['bio_ar'] = $tr->setTarget('ar')->translate($request->bio);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Translation failed: ' . $e->getMessage());
+            }
+
+            $nurse->update($updateData);
         }
 
         return back()->with('success', 'زانیارییەکانی پڕۆفایل نوێکرانەوە.');

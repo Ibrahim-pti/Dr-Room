@@ -177,6 +177,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                           
                           var res = await request.send();
                           if (res.statusCode == 201) {
+                            if (!ctx.mounted) return;
                             Navigator.pop(ctx);
                             _fetchNotifications();
                           }

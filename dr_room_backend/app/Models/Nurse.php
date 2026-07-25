@@ -6,14 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Nurse extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'specialty',
-        'image_path',
-        'bio',
-        'phone',
-        'is_approved',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'is_approved' => 'boolean',

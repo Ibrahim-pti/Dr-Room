@@ -6,17 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lab extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'image_path',
-        'bio',
-        'rating',
-        'total_reviews',
-        'phone',
-        'location',
-        'available_days',
-        'is_approved',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'available_days' => 'array',
