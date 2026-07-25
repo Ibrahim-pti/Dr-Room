@@ -9,7 +9,7 @@ class AppNotification extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['title', 'message', 'type', 'user_id', 'is_read'];
+    protected $fillable = ['title', 'message', 'type', 'user_id', 'is_read', 'image_path'];
     
     protected $casts = [
         'is_read' => 'boolean',

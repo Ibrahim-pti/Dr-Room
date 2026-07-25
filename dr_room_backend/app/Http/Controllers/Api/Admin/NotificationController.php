@@ -19,15 +19,23 @@ class NotificationController extends Controller
             'title' => 'required|string',
             'message' => 'required|string',
             'type' => 'nullable|string',
-            'user_id' => 'nullable|exists:users,id'
+            'user_id' => 'nullable|exists:users,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $notification = AppNotification::create([
+        $data = [
             'title' => $request->title,
             'message' => $request->message,
             'type' => $request->type ?? 'general',
             'user_id' => $request->user_id,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('notifications', 'public');
+            $data['image_path'] = $path;
+        }
+
+        $notification = AppNotification::create($data);
 
         // Here we would trigger Firebase Cloud Messaging (FCM) or APNS to send the push notification to mobile devices.
 

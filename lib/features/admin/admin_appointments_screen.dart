@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
+import '../../core/theme/app_colors.dart';
 
 class AdminAppointmentsScreen extends StatefulWidget {
   const AdminAppointmentsScreen({super.key});
@@ -40,20 +41,20 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
   Color _statusColor(String? status) {
     switch (status) {
       case 'completed':
-        return const Color(0xFF10B981);
+        return AppColors.success;
       case 'cancelled':
-        return const Color(0xFFEF4444);
+        return AppColors.error;
       case 'confirmed':
-        return const Color(0xFF3B82F6);
+        return AppColors.primary;
       default:
-        return const Color(0xFFF59E0B);
+        return AppColors.warning;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.getBackground(context),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,236 +70,259 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
                       margin: const EdgeInsets.only(left: 12),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        color: AppColors.getSurface(context),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.getTextTitle(context),
                         size: 20,
                       ),
                     ),
                   ),
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Iconsax.calendar_tick,
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'چاوپێکەوتنەکان',
-                      style: TextStyle(
-                        color: const Color(0xFF1E293B),
-                        fontFamily: 'Rabar',
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${_appointments.length} total',
-                      style: TextStyle(
-                        color: const Color(0xFF64748B),
-                        fontFamily: 'Rabar',
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: _fetchAppointments,
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
+                  Container(
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Icon(
-                      Icons.refresh_rounded,
-                      color: Color(0xFF94A3B8),
-                      size: 20,
+                      Iconsax.calendar_tick,
+                      color: Color(0xFF8B5CF6),
+                      size: 24,
                     ),
                   ),
-                ),
-              ],
-            ).animate().fadeIn().slideY(begin: -0.1, end: 0),
-          ),
-
-          // List
-          Expanded(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
-                  )
-                : _appointments.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Iconsax.calendar_remove,
-                          color: Color(0xFFE2E8F0),
-                          size: 56,
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'چاوپێکەوتنەکان',
+                        style: TextStyle(
+                          color: AppColors.getTextTitle(context),
+                          fontFamily: 'Rabar',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No appointments yet',
-                          style: TextStyle(
-                            color: const Color(0xFF64748B),
-                            fontFamily: 'Rabar',
-                            fontSize: 16,
+                      ),
+                      Text(
+                        '${_appointments.length} total',
+                        style: TextStyle(
+                          color: AppColors.getTextSubtitle(context),
+                          fontFamily: 'Rabar',
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: _fetchAppointments,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.getSurface(context),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.refresh_rounded,
+                        color: AppColors.getTextSubtitle(context),
+                        size: 20,
+                      ),
                     ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: _fetchAppointments,
-                    color: const Color(0xFF3B82F6),
-                    backgroundColor: Colors.white,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
-                      itemCount: _appointments.length,
-                      itemBuilder: (context, index) {
-                        final appt = _appointments[index];
-                        final userName = appt['user'] != null
-                            ? appt['user']['name']
-                            : 'Patient';
-                        final doctorName =
-                            (appt['doctor'] != null &&
-                                appt['doctor']['user'] != null)
-                            ? appt['doctor']['user']['name']
-                            : 'Doctor';
-                        final status = appt['status'] ?? 'pending';
-                        final date = appt['appointment_date'] ?? '';
-                        final time = appt['appointment_time'] ?? '';
-                        final statusColor = _statusColor(status);
+                  ),
+                ],
+              ).animate().fadeIn().slideY(begin: -0.1, end: 0),
+            ),
 
-                        return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
+            // List
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    )
+                  : _appointments.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getTextSubtitle(context).withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Iconsax.calendar_remove,
+                                  color: AppColors.getTextSubtitle(context),
+                                  size: 48,
                                 ),
                               ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: statusColor.withValues(
-                                        alpha: 0.15,
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Icon(
-                                      Iconsax.calendar_1,
-                                      color: statusColor,
-                                      size: 22,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          userName,
-                                          style: TextStyle(
-                                            color: const Color(0xFF1E293B),
-                                            fontFamily: 'Rabar',
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Dr. $doctorName',
-                                          style: TextStyle(
-                                            color: const Color(0xFF64748B),
-                                            fontFamily: 'Rabar',
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        if (date.isNotEmpty) ...[
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Iconsax.clock,
-                                                size: 12,
-                                                color: Color(0xFF475569),
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                '$date${time.isNotEmpty ? ' • $time' : ''}',
-                                                style: TextStyle(
-                                                  color: const Color(
-                                                    0xFF475569,
-                                                  ),
-                                                  fontFamily: 'Rabar',
-                                                  fontSize: 11,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: statusColor.withValues(
-                                        alpha: 0.15,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      status,
-                                      style: TextStyle(
-                                        color: statusColor,
-                                        fontFamily: 'Rabar',
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 16),
+                              Text(
+                                'هیچ چاوپێکەوتنێک نییە',
+                                style: TextStyle(
+                                  color: AppColors.getTextTitle(context),
+                                  fontFamily: 'Rabar',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            )
-                            .animate(delay: Duration(milliseconds: index * 60))
-                            .fadeIn()
-                            .slideX(begin: 0.05, end: 0);
-                      },
-                    ),
-                  ),
-          ),
-        ],
-      ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'تائێستا هیچ نۆرەیەک نەگیراوە',
+                                style: TextStyle(
+                                  color: AppColors.getTextSubtitle(context),
+                                  fontFamily: 'Rabar',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _fetchAppointments,
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.getSurface(context),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
+                            itemCount: _appointments.length,
+                            itemBuilder: (context, index) {
+                              final appt = _appointments[index];
+                              final userName = appt['user'] != null
+                                  ? appt['user']['name']
+                                  : 'Patient';
+                              final doctorName = (appt['doctor'] != null &&
+                                      appt['doctor']['user'] != null)
+                                  ? appt['doctor']['user']['name']
+                                  : 'Doctor';
+                              final status = appt['status'] ?? 'pending';
+                              final date = appt['appointment_date'] ?? '';
+                              final time = appt['appointment_time'] ?? '';
+                              final statusColor = _statusColor(status);
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 14),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getSurface(context),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 52,
+                                      height: 52,
+                                      decoration: BoxDecoration(
+                                        color: statusColor.withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Icon(
+                                        Iconsax.calendar_1,
+                                        color: statusColor,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            userName,
+                                            style: TextStyle(
+                                              color: AppColors.getTextTitle(context),
+                                              fontFamily: 'Rabar',
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Dr. $doctorName',
+                                            style: TextStyle(
+                                              color: AppColors.getTextSubtitle(context),
+                                              fontFamily: 'Rabar',
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          if (date.isNotEmpty) ...[
+                                            const SizedBox(height: 6),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Iconsax.clock,
+                                                  size: 14,
+                                                  color: AppColors.getTextSubtitle(context),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  '$date${time.isNotEmpty ? ' • $time' : ''}',
+                                                  style: TextStyle(
+                                                    color: AppColors.getTextSubtitle(context),
+                                                    fontFamily: 'Rabar',
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: statusColor.withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        status,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontFamily: 'Rabar',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                                  .animate(delay: Duration(milliseconds: index * 60))
+                                  .fadeIn()
+                                  .slideX(begin: 0.05, end: 0);
+                            },
+                          ),
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }

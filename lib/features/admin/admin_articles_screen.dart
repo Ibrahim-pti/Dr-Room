@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import '../../core/utils/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/theme/app_colors.dart';
 
 class AdminArticlesScreen extends StatefulWidget {
   const AdminArticlesScreen({super.key});
@@ -62,9 +63,9 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
-              decoration: const BoxDecoration(
-                color: const Color(0xFF1E293B),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              decoration: BoxDecoration(
+                color: AppColors.getSurface(context),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
               ),
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -82,24 +83,25 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                         width: 40,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE2E8F0),
+                          color: AppColors.getBorder(context),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Write New Article',
+                      'نووسینی وتاری نوێ',
                       style: TextStyle(
-                        color: const Color(0xFF1E293B),
-                        fontFamily: 'Rabar', fontSize: 18,
+                        color: AppColors.getTextTitle(context),
+                        fontFamily: 'Rabar',
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildDarkInput(controller: titleController, hint: 'Article Title'),
+                    _buildDarkInput(controller: titleController, hint: 'ناونیشانی وتار', context: context),
                     const SizedBox(height: 12),
-                    _buildDarkInput(controller: contentController, hint: 'Article Content', maxLines: 5),
+                    _buildDarkInput(controller: contentController, hint: 'ناوەڕۆکی وتار', maxLines: 5, context: context),
                     const SizedBox(height: 16),
                     GestureDetector(
                       onTap: () async {
@@ -117,12 +119,12 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                         height: 140,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF8FAFC),
+                          color: AppColors.getBackground(context),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                             color: selectedImage != null
                                 ? const Color(0xFF10B981)
-                                : const Color(0xFFE2E8F0),
+                                : AppColors.getBorder(context),
                             width: 1.5,
                           ),
                         ),
@@ -137,8 +139,12 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                                   const Icon(Iconsax.add_circle, color: Color(0xFF10B981), size: 30),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Add cover image (optional)',
-                                    style: TextStyle(color: const Color(0xFF64748B), fontFamily: 'Rabar', fontSize: 13),
+                                    'وێنەی بەرگ زیاد بکە (ئارەزوومەندانە)',
+                                    style: TextStyle(
+                                      color: AppColors.getTextSubtitle(context),
+                                      fontFamily: 'Rabar',
+                                      fontSize: 13,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -147,7 +153,6 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
-                      height: 52,
                       child: ElevatedButton(
                         onPressed: () async {
                           if (titleController.text.isEmpty || contentController.text.isEmpty) return;
@@ -175,12 +180,22 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF10B981),
                           foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           elevation: 0,
                         ),
-                        child: Text(
-                          'Publish Article',
-                          style: TextStyle(fontFamily: 'Rabar', fontSize: 15, fontWeight: FontWeight.bold),
+                        child: const Padding(
+                          padding: EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            'بڵاوکردنەوەی وتار',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Rabar', 
+                              fontSize: 16, 
+                              fontWeight: FontWeight.bold,
+                              height: 1.2,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -197,21 +212,29 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
   Widget _buildDarkInput({
     required TextEditingController controller,
     required String hint,
+    required BuildContext context,
     int maxLines = 1,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.getBackground(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.getBorder(context)),
       ),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
-        style: TextStyle(color: const Color(0xFF1E293B), fontFamily: 'Rabar', fontSize: 14),
+        style: TextStyle(
+          color: AppColors.getTextTitle(context),
+          fontFamily: 'Rabar',
+          fontSize: 14,
+        ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: const Color(0xFF64748B)),
+          hintStyle: TextStyle(
+            color: AppColors.getTextSubtitle(context),
+            fontFamily: 'Rabar',
+          ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
@@ -222,7 +245,7 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.getBackground(context),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,179 +261,235 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                       margin: const EdgeInsets.only(left: 12),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        color: AppColors.getSurface(context),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: Color(0xFF1E293B),
+                        color: AppColors.getTextTitle(context),
                         size: 20,
                       ),
                     ),
                   ),
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF10B981), Color(0xFF059669)],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Iconsax.book_1, color: Colors.white, size: 22),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'وتارەکان',
-                      style: TextStyle(
-                        color: const Color(0xFF1E293B),
-                        fontFamily: 'Rabar', fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${_articles.length} published',
-                      style: TextStyle(color: const Color(0xFF64748B), fontFamily: 'Rabar', fontSize: 13),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                GestureDetector(
-                  onTap: _showAddArticleModal,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  Container(
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF059669)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.add, color: Colors.white, size: 18),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Write',
-                          style: TextStyle(
-                            color: const Color(0xFF1E293B),
-                            fontFamily: 'Rabar', fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    child: const Icon(Iconsax.book_1, color: Color(0xFF10B981), size: 22),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'وتارەکان',
+                        style: TextStyle(
+                          color: AppColors.getTextTitle(context),
+                          fontFamily: 'Rabar',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
+                      ),
+                      Text(
+                        '${_articles.length} published',
+                        style: TextStyle(
+                          color: AppColors.getTextSubtitle(context),
+                          fontFamily: 'Rabar',
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: _showAddArticleModal,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.add, color: Color(0xFF10B981), size: 18),
+                          const SizedBox(width: 4),
+                          Text(
+                            'نوێ',
+                            style: TextStyle(
+                              color: const Color(0xFF10B981),
+                              fontFamily: 'Rabar',
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ).animate().fadeIn().slideY(begin: -0.1, end: 0),
-          ),
+                ],
+              ).animate().fadeIn().slideY(begin: -0.1, end: 0),
+            ),
 
-          // Content
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
-                : _articles.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Iconsax.book, color: Color(0xFFE2E8F0), size: 56),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No articles yet',
-                              style: TextStyle(color: const Color(0xFF64748B), fontFamily: 'Rabar', fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: _fetchArticles,
-                        color: const Color(0xFF10B981),
-                        backgroundColor: Colors.white,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
-                          itemCount: _articles.length,
-                          itemBuilder: (context, index) {
-                            final article = _articles[index];
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+            // Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
+                  : _articles.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getTextSubtitle(context).withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Iconsax.book,
+                                  color: AppColors.getTextSubtitle(context),
+                                  size: 48,
+                                ),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (article['image_path'] != null)
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                                      child: Image.network(
-                                        'http://127.0.0.1:8000/storage/${article['image_path']}',
-                                        height: 130,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (c, e, s) => const SizedBox.shrink(),
+                              const SizedBox(height: 16),
+                              Text(
+                                'هیچ وتارێک نییە',
+                                style: TextStyle(
+                                  color: AppColors.getTextTitle(context),
+                                  fontFamily: 'Rabar',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'تائێستا هیچ بابەتێک بڵاونەکراوەتەوە',
+                                style: TextStyle(
+                                  color: AppColors.getTextSubtitle(context),
+                                  fontFamily: 'Rabar',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _fetchArticles,
+                          color: const Color(0xFF10B981),
+                          backgroundColor: AppColors.getSurface(context),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
+                            itemCount: _articles.length,
+                            itemBuilder: (context, index) {
+                              final article = _articles[index];
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getSurface(context),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (article['image_path'] != null)
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                        child: Image.network(
+                                          'http://127.0.0.1:8000/storage/${article['image_path']}',
+                                          height: 130,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (c, e, s) => Container(
+                                            height: 130,
+                                            color: AppColors.getBackground(context),
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.image_not_supported,
+                                                color: AppColors.getBorder(context),
+                                                size: 32,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  article['title'] ?? 'بێ ناونیشان',
+                                                  style: TextStyle(
+                                                    color: AppColors.getTextTitle(context),
+                                                    fontFamily: 'Rabar',
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 6),
+                                                Text(
+                                                  article['content'] ?? '',
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: AppColors.getTextSubtitle(context),
+                                                    fontFamily: 'Rabar',
+                                                    fontSize: 12,
+                                                    height: 1.4,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          GestureDetector(
+                                            onTap: () => _deleteArticle(article['id']),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.error.withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: const Icon(
+                                                Iconsax.trash,
+                                                color: AppColors.error,
+                                                size: 18,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                article['title'] ?? 'No Title',
-                                                style: TextStyle(
-                                                  color: const Color(0xFF1E293B),
-                                                  fontFamily: 'Rabar', fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                article['content'] ?? '',
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: const Color(0xFF64748B),
-                                                  fontFamily: 'Rabar', fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        GestureDetector(
-                                          onTap: () => _deleteArticle(article['id']),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            child: const Icon(Iconsax.trash, color: Color(0xFFEF4444), size: 18),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ).animate(delay: Duration(milliseconds: index * 70)).fadeIn().slideY(begin: 0.08, end: 0);
-                          },
+                                  ],
+                                ),
+                              ).animate(delay: Duration(milliseconds: index * 70)).fadeIn().slideY(begin: 0.08, end: 0);
+                            },
+                          ),
                         ),
-                      ),
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
       ),
     );
   }
