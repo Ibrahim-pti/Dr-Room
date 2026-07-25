@@ -13,7 +13,7 @@
     </div>
 @endif
 
-<form action="{{ route('nurse.profile.update') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 max-w-3xl">
+<form id="profile-form" action="{{ route('nurse.profile.update') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 max-w-3xl">
     @csrf
     @method('PUT')
     
@@ -66,10 +66,19 @@
         @endif
 
         <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30">
+            <button id="submit-btn" type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30 flex items-center justify-center min-w-[140px]">
                 پاشەکەوتکردن
             </button>
         </div>
     </div>
 </form>
+
+<script>
+    document.getElementById('profile-form').addEventListener('submit', function() {
+        var btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> چاوەڕێ بکە...';
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+    });
+</script>
 @endsection
