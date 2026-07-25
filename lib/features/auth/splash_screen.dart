@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
-  final void Function(bool isLoggedIn, String role) onFinished;
+  final void Function(bool isLoggedIn, String role, bool isFirstTime) onFinished;
 
   const SplashScreen({super.key, required this.onFinished});
 
@@ -31,9 +31,10 @@ class _SplashScreenState extends State<SplashScreen>
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
       final role = prefs.getString('user_role') ?? 'patient';
+      final hasCompletedSetup = prefs.getBool('has_completed_setup') ?? false;
 
       if (mounted) {
-        widget.onFinished(token != null && token.isNotEmpty, role);
+        widget.onFinished(token != null && token.isNotEmpty, role, !hasCompletedSetup);
       }
     });
   }

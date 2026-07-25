@@ -16,6 +16,7 @@ import 'features/auth/register_screen.dart';
 import 'features/auth/otp_screen.dart';
 import 'features/home/main_shell.dart';
 import 'features/admin/admin_dashboard_shell.dart';
+import 'features/setup/language_selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -118,8 +119,10 @@ class AppFlowState extends State<AppFlow> {
       case _FlowState.splash:
         return SplashScreen(
           key: const ValueKey('splash'),
-          onFinished: (bool isLoggedIn, String role) {
-            if (isLoggedIn) {
+          onFinished: (bool isLoggedIn, String role, bool isFirstTime) {
+            if (isFirstTime) {
+              _goTo(_FlowState.setup);
+            } else if (isLoggedIn) {
               if (role == 'admin') {
                 _goTo(_FlowState.admin);
               } else {
@@ -129,6 +132,12 @@ class AppFlowState extends State<AppFlow> {
               _goTo(_FlowState.home);
             }
           },
+        );
+
+      case _FlowState.setup:
+        return LanguageSelectionScreen(
+          key: const ValueKey('setup_language'),
+          onFinished: () => _goTo(_FlowState.home),
         );
 
       case _FlowState.onboarding:
@@ -182,10 +191,11 @@ class AppFlowState extends State<AppFlow> {
 
 enum _FlowState {
   splash,
+  setup,
   onboarding,
   login,
   register,
   otp,
   home,
-  admin, // newly added
+  admin,
 }
