@@ -82,12 +82,13 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AdminAppBar(
+      appBar: const AdminAppBar(
         title: 'تیشک و سۆنەر',
-        subtitle: '${pendingXRays.length} چاوەڕێکراو',
+        subtitle: 'سەنتەرەکانی تیشک و سۆنەر',
         icon: Iconsax.scan,
-        iconColor: const Color(0xFF10B981),
-        iconBackgroundColor: const Color(0xFFECFDF5),
+        iconColor: Colors.white,
+        iconBackgroundColor: Color(0xFF10B981),
+        showBackButton: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

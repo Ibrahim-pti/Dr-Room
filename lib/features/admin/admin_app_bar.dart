@@ -12,6 +12,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? titleFontFamily;
   final TextStyle? titleStyle;
   final Widget? titleWidget;
+  final bool showBackButton;
 
   const AdminAppBar({
     super.key,
@@ -25,6 +26,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleFontFamily,
     this.titleStyle,
     this.titleWidget,
+    this.showBackButton = false,
   });
 
   @override
@@ -48,6 +50,26 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       child: Row(
         children: [
+          if (showBackButton) ...[
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Color(0xFF1E293B),
+                  size: 20,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+          ],
           if (imagePath != null) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(8),

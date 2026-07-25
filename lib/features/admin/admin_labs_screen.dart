@@ -82,12 +82,13 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AdminAppBar(
+      appBar: const AdminAppBar(
         title: 'تاقیگەکان',
-        subtitle: '${pendingLabs.length} چاوەڕێکراو',
-        icon: Iconsax.microscope,
-        iconColor: const Color(0xFF8B5CF6),
-        iconBackgroundColor: const Color(0xFFF5F3FF),
+        subtitle: 'بینین و قبوڵکردنی تاقیگەکان',
+        icon: Icons.science_rounded,
+        iconColor: Colors.white,
+        iconBackgroundColor: Color(0xFF8B5CF6),
+        showBackButton: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

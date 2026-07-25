@@ -82,12 +82,13 @@ class _AdminPharmaciesScreenState extends State<AdminPharmaciesScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      appBar: AdminAppBar(
+      appBar: const AdminAppBar(
         title: 'دەرمانخانەکان',
-        subtitle: '${pendingPharmacies.length} چاوەڕێکراو',
-        icon: Iconsax.reserve,
-        iconColor: const Color(0xFFF59E0B),
-        iconBackgroundColor: const Color(0xFFFFFBEB),
+        subtitle: 'بەڕێوەبردنی دەرمانخانەکانی ئەپ',
+        icon: Icons.local_pharmacy_rounded,
+        iconColor: Colors.white,
+        iconBackgroundColor: Color(0xFFF59E0B),
+        showBackButton: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
