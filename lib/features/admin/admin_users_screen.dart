@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/utils/api_client.dart';
+import '../../core/theme/app_colors.dart';
 
 class AdminUsersScreen extends StatefulWidget {
   const AdminUsersScreen({super.key});
@@ -50,16 +51,41 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Header ──
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-            child: Row(
-              children: [
-                Container(
+    return Scaffold(
+      backgroundColor: AppColors.getBackground(context),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Header ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.getSurface(context),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: AppColors.getTextTitle(context),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
@@ -277,6 +303,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       ),
           ),
         ],
+      ),
       ),
     );
   }

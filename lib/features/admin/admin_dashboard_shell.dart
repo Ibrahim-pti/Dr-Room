@@ -5,7 +5,6 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'admin_dashboard_screen.dart';
 import 'admin_doctors_screen.dart';
 import 'admin_nurses_screen.dart';
-import 'admin_users_screen.dart';
 import 'admin_menu_screen.dart';
 
 class AdminDashboardShell extends StatefulWidget {
@@ -22,7 +21,6 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
     AdminDashboardScreen(),
     AdminDoctorsScreen(),
     AdminNursesScreen(),
-    AdminUsersScreen(),
     AdminMenuScreen(),
   ];
 
@@ -30,8 +28,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
     _NavItem(icon: Iconsax.chart_square, label: 'ئامارەکان'),
     _NavItem(icon: Iconsax.health, label: 'پزیشکەکان'),
     _NavItem(icon: Iconsax.profile_2user, label: 'پەرستارەکان'),
-    _NavItem(icon: Iconsax.people, label: 'بەکارهێنەران'),
-    _NavItem(icon: Iconsax.category, label: 'مێنیو'),
+    _NavItem(icon: Iconsax.setting_2, label: 'ڕێکخستن'),
   ];
 
   @override

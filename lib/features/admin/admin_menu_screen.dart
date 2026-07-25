@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/api_client.dart';
 import '../../core/theme/app_colors.dart';
 import '../../main.dart';
+import 'admin_users_screen.dart';
 
 class AdminMenuScreen extends StatefulWidget {
   const AdminMenuScreen({super.key});
@@ -269,6 +270,13 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         'sectionTitle': 'هەژمار و ڕێکخستنەکان',
         'items': [
           {
+            'title': 'بەکارهێنەران',
+            'subtitle': 'بەڕێوەبردنی بەکارهێنەران',
+            'icon': Iconsax.people,
+            'color': const Color(0xFF3B82F6),
+            'screen': const AdminUsersScreen(),
+          },
+          {
             'title': 'زیادکردنی ئەدمین',
             'subtitle': 'دروستکردنی ئەدمینی نوێ',
             'icon': Iconsax.user_add,
@@ -314,7 +322,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Icon(
-                      Iconsax.category,
+                      Iconsax.setting_2,
                       color: AppColors.primary,
                       size: 24,
                     ),
@@ -324,7 +332,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'مێنیو',
+                        'ڕێکخستن',
                         style: TextStyle(
                           fontFamily: 'Rabar',
                           color: AppColors.getTextTitle(context),
@@ -333,7 +341,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                         ),
                       ),
                       Text(
-                        'هەڵبژاردەی زیاتر',
+                        'ڕێکخستنەکانی هەژمار',
                         style: TextStyle(
                           fontFamily: 'Rabar',
                           color: AppColors.getTextSubtitle(context),
