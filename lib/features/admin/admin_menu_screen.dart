@@ -325,25 +325,6 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
   Widget build(BuildContext context) {
     final sections = [
       {
-        'sectionTitle': 'بەڕێوەبردنی ناوەڕۆک',
-        'items': [
-          {
-            'title': 'چاوپێکەوتنەکان',
-            'subtitle': 'بەڕێوەبردنی چاوپێکەوتنەکان',
-            'icon': Iconsax.calendar_tick,
-            'color': const Color(0xFF8B5CF6),
-            'screen': const AdminAppointmentsScreen(),
-          },
-          {
-            'title': 'ڕیکلامەکان',
-            'subtitle': 'بانەرەکانی ئەپ',
-            'icon': Iconsax.picture_frame,
-            'color': const Color(0xFF3B82F6),
-            'screen': const AdminBannersScreen(),
-          },
-        ],
-      },
-      {
         'sectionTitle': 'هەژمار و ڕێکخستنەکان',
         'items': [
           {
@@ -366,13 +347,6 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
             'icon': Iconsax.logout,
             'color': AppColors.error,
             'action': _logout,
-          },
-          {
-            'title': 'سڕینەوەی هەژمار',
-            'subtitle': 'سڕینەوەی هەژماری ئێستا',
-            'icon': Iconsax.trash,
-            'color': AppColors.error,
-            'action': _deleteAccount,
           },
         ],
       },
