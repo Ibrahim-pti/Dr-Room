@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class MedicalHistoryScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -24,20 +23,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   final TextEditingController _chronicController = TextEditingController();
   final TextEditingController _medicationsController = TextEditingController();
 
-  final List<String> _commonConditions = [
-    'Diabetes',
-    'Asthma',
-    'Hypertension',
-    'Allergies',
-    'Thyroid',
-    'Migraine',
-    'Arthritis',
-    'Heart Disease',
-  ];
-  final Set<String> _selectedConditions = {};
-
   static const Color primaryColor = Color(0xFF3B82F6);
-  static const Color lightBlueSoft = Color(0xFFEFF6FF);
   static const Color darkSlate = Color(0xFF1E293B);
   static const Color secondarySlate = Color(0xFF64748B);
   static const Color bgSurface = Color(0xFFF8FAFC);
@@ -62,24 +48,20 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
 
     await prefs.setBool('guest_has_allergies', _hasAllergies!);
     if (_hasAllergies == true) {
-      await prefs.setString('guest_allergies_details', _allergiesController.text.trim());
+      await prefs.setString(
+          'guest_allergies_details', _allergiesController.text.trim());
     }
 
     await prefs.setBool('guest_has_chronic', _hasChronicDiseases!);
     if (_hasChronicDiseases == true) {
-      String chronicText = _chronicController.text.trim();
-      if (_selectedConditions.isNotEmpty) {
-        chronicText = [
-          ..._selectedConditions,
-          if (chronicText.isNotEmpty) chronicText,
-        ].join(', ');
-      }
-      await prefs.setString('guest_chronic_details', chronicText);
+      await prefs.setString(
+          'guest_chronic_details', _chronicController.text.trim());
     }
 
     await prefs.setBool('guest_takes_meds', _takesMedications!);
     if (_takesMedications == true) {
-      await prefs.setString('guest_meds_details', _medicationsController.text.trim());
+      await prefs.setString(
+          'guest_meds_details', _medicationsController.text.trim());
     }
 
     await prefs.setBool('guest_smokes', _smokes!);
@@ -106,22 +88,9 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
         ),
         backgroundColor: Colors.redAccent,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
-  }
-
-  void _toggleConditionTag(String condition) {
-    setState(() {
-      if (_selectedConditions.contains(condition)) {
-        _selectedConditions.remove(condition);
-      } else {
-        _selectedConditions.add(condition);
-        _hasChronicDiseases = true;
-      }
-    });
   }
 
   @override
@@ -149,6 +118,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                   children: [
                     const SizedBox(height: 12),
 
+                    // Title
                     Center(
                       child: Text(
                         'medical_history_title'.tr(),
@@ -176,48 +146,55 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                       ).animate().fadeIn(delay: 100.ms),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
-                    _buildMedicalConditionTags().animate().fadeIn(delay: 150.ms),
-
-                    const SizedBox(height: 24),
-
-                    _buildQuestionCard(
+                    // Question cards
+                    _buildQuestionRow(
                       question: 'allergies_question'.tr(),
+                      icon: Icons.warning_amber_rounded,
+                      iconColor: const Color(0xFFF59E0B),
+                      iconBg: const Color(0xFFFFFBEB),
                       value: _hasAllergies,
-                      icon: Iconsax.danger_copy,
                       onChanged: (val) => setState(() => _hasAllergies = val),
                       controller: _allergiesController,
                       hintText: 'allergies_hint'.tr(),
-                      delay: 200,
+                      delay: 150,
                     ),
 
-                    _buildQuestionCard(
+                    _buildQuestionRow(
                       question: 'chronic_diseases_question'.tr(),
+                      icon: Icons.favorite_rounded,
+                      iconColor: const Color(0xFFEF4444),
+                      iconBg: const Color(0xFFFEF2F2),
                       value: _hasChronicDiseases,
-                      icon: Iconsax.activity_copy,
-                      onChanged: (val) => setState(() => _hasChronicDiseases = val),
+                      onChanged: (val) =>
+                          setState(() => _hasChronicDiseases = val),
                       controller: _chronicController,
                       hintText: 'chronic_diseases_hint'.tr(),
-                      delay: 300,
+                      delay: 250,
                     ),
 
-                    _buildQuestionCard(
+                    _buildQuestionRow(
                       question: 'medications_question'.tr(),
+                      icon: Icons.medication_rounded,
+                      iconColor: const Color(0xFF8B5CF6),
+                      iconBg: const Color(0xFFF5F3FF),
                       value: _takesMedications,
-                      icon: Iconsax.hospital_copy,
-                      onChanged: (val) => setState(() => _takesMedications = val),
+                      onChanged: (val) =>
+                          setState(() => _takesMedications = val),
                       controller: _medicationsController,
                       hintText: 'medications_hint'.tr(),
-                      delay: 400,
+                      delay: 350,
                     ),
 
-                    _buildQuestionCard(
+                    _buildQuestionRow(
                       question: 'smoking_question'.tr(),
+                      icon: Icons.smoke_free_rounded,
+                      iconColor: const Color(0xFF10B981),
+                      iconBg: const Color(0xFFECFDF5),
                       value: _smokes,
-                      icon: Iconsax.warning_2_copy,
                       onChanged: (val) => setState(() => _smokes = val),
-                      delay: 500,
+                      delay: 450,
                     ),
 
                     const SizedBox(height: 16),
@@ -226,19 +203,9 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
               ),
             ),
 
-            // Bottom Sticky Action Button
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
+            // Bottom Button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -305,7 +272,8 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                 value: progress,
                 minHeight: 8,
                 backgroundColor: const Color(0xFFE2E8F0),
-                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
           ),
@@ -326,252 +294,170 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     );
   }
 
-  Widget _buildMedicalConditionTags() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Iconsax.health_copy, size: 18, color: primaryColor),
-              const SizedBox(width: 8),
-              Text(
-                'Quick Select Conditions',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: darkSlate,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _commonConditions.map((condition) {
-              final isSelected = _selectedConditions.contains(condition);
-              return GestureDetector(
-                onTap: () => _toggleConditionTag(condition),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isSelected ? lightBlueSoft : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
-                      width: isSelected ? 1.5 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (isSelected)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 4),
-                          child: Icon(
-                            Icons.check_rounded,
-                            size: 14,
-                            color: primaryColor,
-                          ),
-                        ),
-                      Text(
-                        condition,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                          color: isSelected ? primaryColor : darkSlate,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuestionCard({
+  Widget _buildQuestionRow({
     required String question,
-    required bool? value,
     required IconData icon,
+    required Color iconColor,
+    required Color iconBg,
+    required bool? value,
     required ValueChanged<bool> onChanged,
     TextEditingController? controller,
     String? hintText,
     required int delay,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: value != null
-              ? primaryColor.withValues(alpha: 0.3)
-              : const Color(0xFFE2E8F0),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: lightBlueSoft,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, size: 20, color: primaryColor),
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: value != null
+                  ? primaryColor.withValues(alpha: 0.25)
+                  : const Color(0xFFE2E8F0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.025),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  question,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: darkSlate,
-                    height: 1.3,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Question row
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: iconBg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: iconColor, size: 20),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      question,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: darkSlate,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Yes / No toggle
+              Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    _buildToggle(
+                      label: 'yes'.tr(),
+                      isSelected: value == true,
+                      onTap: () => onChanged(true),
+                      selectedColor: primaryColor,
+                    ),
+                    _buildToggle(
+                      label: 'no'.tr(),
+                      isSelected: value == false,
+                      onTap: () => onChanged(false),
+                      selectedColor: const Color(0xFF64748B),
+                    ),
+                  ],
                 ),
               ),
+
+              // Detail field when Yes
+              if (value == true && controller != null && hintText != null) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  style: GoogleFonts.poppins(
+                    color: darkSlate,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xFFF8FAFC),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide:
+                          const BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                          color: primaryColor, width: 1.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    hintText: hintText,
+                    hintStyle: GoogleFonts.poppins(
+                      color: const Color(0xFF94A3B8),
+                      fontSize: 13,
+                    ),
+                  ),
+                ).animate().fadeIn(duration: 220.ms).slideY(begin: -0.1),
+              ],
             ],
           ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: _buildChoicePill(
-                  title: 'yes'.tr(),
-                  optionValue: true,
-                  currentValue: value,
-                  onTap: () => onChanged(true),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildChoicePill(
-                  title: 'no'.tr(),
-                  optionValue: false,
-                  currentValue: value,
-                  onTap: () => onChanged(false),
-                ),
-              ),
-            ],
-          ),
-          if (value == true && controller != null && hintText != null) ...[
-            const SizedBox(height: 14),
-            TextField(
-              controller: controller,
-              style: GoogleFonts.poppins(
-                color: darkSlate,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: const Color(0xFFF8FAFC),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: primaryColor, width: 1.5),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                hintText: hintText,
-                hintStyle: GoogleFonts.poppins(
-                  color: const Color(0xFF94A3B8),
-                  fontSize: 13,
-                ),
-              ),
-            ).animate().fadeIn(duration: 250.ms).slideY(begin: -0.1),
-          ],
-        ],
-      ),
-    ).animate().fadeIn(delay: delay.ms);
+        ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.06, end: 0),
+      ],
+    );
   }
 
-  Widget _buildChoicePill({
-    required String title,
-    required bool optionValue,
-    required bool? currentValue,
+  Widget _buildToggle({
+    required String label,
+    required bool isSelected,
     required VoidCallback onTap,
+    required Color selectedColor,
   }) {
-    final isSelected = currentValue == optionValue;
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? primaryColor : const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
-            width: 1.5,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: isSelected ? selectedColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: selectedColor.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    )
+                  ]
+                : null,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.25),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              optionValue ? Icons.check_circle_rounded : Icons.cancel_rounded,
-              size: 18,
-              color: isSelected ? Colors.white : secondarySlate,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
+          child: Center(
+            child: Text(
+              label,
               style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: isSelected ? Colors.white : darkSlate,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : secondarySlate,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

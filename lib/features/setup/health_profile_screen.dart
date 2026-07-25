@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
@@ -200,19 +199,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                ),
              ),
 
-            // Sticky Bottom Button
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
+            // Bottom Button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
