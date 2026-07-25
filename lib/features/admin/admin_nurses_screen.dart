@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/utils/api_client.dart';
+import 'admin_app_bar.dart';
 
 class AdminNursesScreen extends StatefulWidget {
   const AdminNursesScreen({super.key});
@@ -79,57 +80,18 @@ class _AdminNursesScreenState extends State<AdminNursesScreen>
     final approvedNurses =
         _nurses.where((n) => n['status'] == 'approved').toList();
 
-    return SafeArea(
-      child: Column(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9),
+      appBar: AdminAppBar(
+        title: 'پەرستارەکان',
+        subtitle: '${pendingNurses.length} چاوەڕێکراو',
+        icon: Iconsax.profile_2user,
+        iconColor: const Color(0xFFEC4899),
+        iconBackgroundColor: const Color(0xFFFDF2F8),
+      ),
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ──
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFDF2F8),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(
-                    Iconsax.profile_2user,
-                    color: Color(0xFFEC4899),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'پەرستارەکان',
-                        style: TextStyle(
-                          fontFamily: 'Rabar',
-                          color: const Color(0xFF1E293B),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '${pendingNurses.length} چاوەڕێکراو',
-                        style: TextStyle(
-                          fontFamily: 'Rabar',
-                          color: const Color(0xFF64748B),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ).animate().fadeIn().slideY(begin: -0.1, end: 0),
-          ),
-
           // ── Tabs ──
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),

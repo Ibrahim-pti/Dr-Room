@@ -3,10 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
-import 'admin_banners_screen.dart';
-import 'admin_articles_screen.dart';
 import 'admin_notifications_screen.dart';
-import 'admin_appointments_screen.dart';
+import 'admin_app_bar.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -44,88 +42,72 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _fetchStats,
-          color: const Color(0xFF3B82F6),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Header ──
-                _buildHeader(),
-                const SizedBox(height: 24),
-
-                if (_isLoading)
-                  _buildLoadingShimmer()
-                else ...[
-                  // ── Stats Grid ──
-                  _buildStatsGrid(),
-                  const SizedBox(height: 28),
-
-                  // ── App Management ──
-                  _buildAppManagement(),
-                  const SizedBox(height: 28),
-
-                  // ── Recent Appointments ──
-                  _buildRecentAppointments(),
+      appBar: AdminAppBar(
+        title: 'پەنێڵی ئەدمین',
+        subtitle: 'بەڕێوەبردنی سیستم',
+        icon: Icons.dashboard_rounded,
+        iconColor: Colors.white,
+        iconBackgroundColor: const Color(0xFF3B82F6),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: AdminNotificationsScreen(),
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
-              ],
+              ),
+              child: const Icon(
+                Iconsax.notification,
+                color: Color(0xFF1E293B),
+                size: 24,
+              ),
             ),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _fetchStats,
+        color: const Color(0xFF3B82F6),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_isLoading)
+                _buildLoadingShimmer()
+              else ...[
+                // ── Stats Grid ──
+                _buildStatsGrid(),
+                const SizedBox(height: 28),
+
+                // ── Recent Appointments ──
+                _buildRecentAppointments(),
+              ],
+            ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        // Admin icon
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-            ),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(
-            Icons.dashboard_rounded,
-            color: Colors.white,
-            size: 26,
-          ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'پەنێڵی ئەدمین',
-                style: TextStyle(
-                  fontFamily: 'Rabar',
-                  color: const Color(0xFF1E293B),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                'بەڕێوەبردنی سیستم',
-                style: TextStyle(
-                  fontFamily: 'Rabar',
-                  color: const Color(0xFF64748B),
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
   }
 
   Widget _buildStatsGrid() {
@@ -177,118 +159,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAppManagement() {
-    final items = [
-      {
-        'title': 'چاوپێکەوتنەکان',
-        'icon': Iconsax.calendar_tick,
-        'color': const Color(0xFF8B5CF6),
-        'screen': const AdminAppointmentsScreen(),
-      },
-      {
-        'title': 'ڕیکلامەکان',
-        'icon': Iconsax.picture_frame,
-        'color': const Color(0xFF3B82F6),
-        'screen': const AdminBannersScreen(),
-      },
-      {
-        'title': ' وتارەکان',
-        'icon': Iconsax.book_1,
-        'color': const Color(0xFF10B981),
-        'screen': const AdminArticlesScreen(),
-      },
-      {
-        'title': 'ئاگادارکەرەوەکان',
-        'icon': Iconsax.notification,
-        'color': const Color(0xFFF59E0B),
-        'screen': const AdminNotificationsScreen(),
-      },
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'بەڕێوەبردنی ئەپ',
-          style: TextStyle(
-            fontFamily: 'Rabar',
-            color: const Color(0xFF1E293B),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ).animate(delay: 300.ms).fadeIn(),
-        const SizedBox(height: 14),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 14,
-            mainAxisSpacing: 14,
-            childAspectRatio: 1.1,
-          ),
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            final item = items[index];
-            final color = item['color'] as Color;
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: item['screen'] as Widget,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(item['icon'] as IconData, color: color, size: 28),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      item['title'] as String,
-                      style: TextStyle(
-                        fontFamily: 'Rabar',
-                        color: const Color(0xFF1E293B),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ).animate(delay: Duration(milliseconds: 300 + (index * 100))).fadeIn().slideY(begin: 0.1, end: 0),
-            );
-          },
         ),
       ],
     );

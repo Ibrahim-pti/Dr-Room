@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../../core/utils/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_colors.dart';
+import 'admin_app_bar.dart';
 
 class AdminArticlesScreen extends StatefulWidget {
   const AdminArticlesScreen({super.key});
@@ -65,7 +66,9 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
             return Container(
               decoration: BoxDecoration(
                 color: AppColors.getSurface(context),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
+                ),
               ),
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom + 24,
@@ -99,9 +102,18 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildDarkInput(controller: titleController, hint: 'ناونیشانی وتار', context: context),
+                    _buildDarkInput(
+                      controller: titleController,
+                      hint: 'ناونیشانی وتار',
+                      context: context,
+                    ),
                     const SizedBox(height: 12),
-                    _buildDarkInput(controller: contentController, hint: 'ناوەڕۆکی وتار', maxLines: 5, context: context),
+                    _buildDarkInput(
+                      controller: contentController,
+                      hint: 'ناوەڕۆکی وتار',
+                      maxLines: 5,
+                      context: context,
+                    ),
                     const SizedBox(height: 16),
                     GestureDetector(
                       onTap: () async {
@@ -131,12 +143,19 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                         child: selectedImage != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: Image.file(selectedImage!, fit: BoxFit.cover),
+                                child: Image.file(
+                                  selectedImage!,
+                                  fit: BoxFit.cover,
+                                ),
                               )
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Iconsax.add_circle, color: Color(0xFF10B981), size: 30),
+                                  const Icon(
+                                    Iconsax.add_circle,
+                                    color: Color(0xFF10B981),
+                                    size: 30,
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'وێنەی بەرگ زیاد بکە (ئارەزوومەندانە)',
@@ -155,7 +174,9 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          if (titleController.text.isEmpty || contentController.text.isEmpty) return;
+                          if (titleController.text.isEmpty ||
+                              contentController.text.isEmpty)
+                            return;
                           final prefs = await SharedPreferences.getInstance();
                           final token = prefs.getString('auth_token');
                           var request = http.MultipartRequest(
@@ -168,7 +189,10 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                           request.fields['content'] = contentController.text;
                           if (selectedImage != null) {
                             request.files.add(
-                              await http.MultipartFile.fromPath('image', selectedImage!.path),
+                              await http.MultipartFile.fromPath(
+                                'image',
+                                selectedImage!.path,
+                              ),
                             );
                           }
                           var res = await request.send();
@@ -181,7 +205,9 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                           backgroundColor: const Color(0xFF10B981),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           elevation: 0,
                         ),
                         child: const Padding(
@@ -190,8 +216,8 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                             'بڵاوکردنەوەی وتار',
                             style: TextStyle(
                               color: Colors.white,
-                              fontFamily: 'Rabar', 
-                              fontSize: 16, 
+                              fontFamily: 'Rabar',
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               height: 1.2,
                             ),
@@ -236,7 +262,10 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
             fontFamily: 'Rabar',
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
@@ -246,250 +275,217 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.getBackground(context),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      appBar: AdminAppBar(
+        title: 'وتارەکان',
+        subtitle: '${_articles.length} published',
+        icon: Iconsax.book_1,
+        iconColor: const Color(0xFF10B981),
+        iconBackgroundColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+        actions: [
+          GestureDetector(
+            onTap: _showAddArticleModal,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 12),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.getSurface(context),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: AppColors.getTextTitle(context),
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: const Icon(Iconsax.book_1, color: Color(0xFF10B981), size: 22),
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'وتارەکان',
-                        style: TextStyle(
-                          color: AppColors.getTextTitle(context),
-                          fontFamily: 'Rabar',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '${_articles.length} published',
-                        style: TextStyle(
-                          color: AppColors.getTextSubtitle(context),
-                          fontFamily: 'Rabar',
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: _showAddArticleModal,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.add, color: Color(0xFF10B981), size: 18),
-                          const SizedBox(width: 4),
-                          Text(
-                            'نوێ',
-                            style: TextStyle(
-                              color: const Color(0xFF10B981),
-                              fontFamily: 'Rabar',
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                  const Icon(Icons.add, color: Color(0xFF10B981), size: 18),
+                  const SizedBox(width: 4),
+                  Text(
+                    'نوێ',
+                    style: TextStyle(
+                      color: const Color(0xFF10B981),
+                      fontFamily: 'Rabar',
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
-              ).animate().fadeIn().slideY(begin: -0.1, end: 0),
+              ),
             ),
-
-            // Content
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF10B981)))
-                  : _articles.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                decoration: BoxDecoration(
-                                  color: AppColors.getTextSubtitle(context).withValues(alpha: 0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Iconsax.book,
-                                  color: AppColors.getTextSubtitle(context),
-                                  size: 48,
-                                ),
+          ),
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Content
+          Expanded(
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF10B981)),
+                  )
+                : _articles.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: AppColors.getTextSubtitle(
+                              context,
+                            ).withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Iconsax.book,
+                            color: AppColors.getTextSubtitle(context),
+                            size: 48,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'هیچ وتارێک نییە',
+                          style: TextStyle(
+                            color: AppColors.getTextTitle(context),
+                            fontFamily: 'Rabar',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'تائێستا هیچ بابەتێک بڵاونەکراوەتەوە',
+                          style: TextStyle(
+                            color: AppColors.getTextSubtitle(context),
+                            fontFamily: 'Rabar',
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _fetchArticles,
+                    color: const Color(0xFF10B981),
+                    backgroundColor: AppColors.getSurface(context),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
+                      itemCount: _articles.length,
+                      itemBuilder: (context, index) {
+                        final article = _articles[index];
+                        return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.getSurface(context),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'هیچ وتارێک نییە',
-                                style: TextStyle(
-                                  color: AppColors.getTextTitle(context),
-                                  fontFamily: 'Rabar',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'تائێستا هیچ بابەتێک بڵاونەکراوەتەوە',
-                                style: TextStyle(
-                                  color: AppColors.getTextSubtitle(context),
-                                  fontFamily: 'Rabar',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ).animate().fadeIn().slideY(begin: 0.2, end: 0),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _fetchArticles,
-                          color: const Color(0xFF10B981),
-                          backgroundColor: AppColors.getSurface(context),
-                          child: ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 110),
-                            itemCount: _articles.length,
-                            itemBuilder: (context, index) {
-                              final article = _articles[index];
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                decoration: BoxDecoration(
-                                  color: AppColors.getSurface(context),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.03),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (article['image_path'] != null)
-                                      ClipRRect(
-                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                                        child: Image.network(
-                                          'http://127.0.0.1:8000/storage/${article['image_path']}',
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (article['image_path'] != null)
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(20),
+                                      ),
+                                      child: Image.network(
+                                        'http://127.0.0.1:8000/storage/${article['image_path']}',
+                                        height: 130,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (c, e, s) => Container(
                                           height: 130,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (c, e, s) => Container(
-                                            height: 130,
-                                            color: AppColors.getBackground(context),
-                                            child: Center(
-                                              child: Icon(
-                                                Icons.image_not_supported,
-                                                color: AppColors.getBorder(context),
-                                                size: 32,
+                                          color: AppColors.getBackground(
+                                            context,
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.image_not_supported,
+                                              color: AppColors.getBorder(
+                                                context,
                                               ),
+                                              size: 32,
                                             ),
                                           ),
                                         ),
                                       ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  article['title'] ?? 'بێ ناونیشان',
-                                                  style: TextStyle(
-                                                    color: AppColors.getTextTitle(context),
-                                                    fontFamily: 'Rabar',
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Text(
-                                                  article['content'] ?? '',
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                    color: AppColors.getTextSubtitle(context),
-                                                    fontFamily: 'Rabar',
-                                                    fontSize: 12,
-                                                    height: 1.4,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          GestureDetector(
-                                            onTap: () => _deleteArticle(article['id']),
-                                            child: Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.error.withValues(alpha: 0.1),
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: const Icon(
-                                                Iconsax.trash,
-                                                color: AppColors.error,
-                                                size: 18,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                                     ),
-                                  ],
-                                ),
-                              ).animate(delay: Duration(milliseconds: index * 70)).fadeIn().slideY(begin: 0.08, end: 0);
-                            },
-                          ),
-                        ),
-            ),
-          ],
-        ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                article['title'] ??
+                                                    'بێ ناونیشان',
+                                                style: TextStyle(
+                                                  color: AppColors.getTextTitle(
+                                                    context,
+                                                  ),
+                                                  fontFamily: 'Rabar',
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                article['content'] ?? '',
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color:
+                                                      AppColors.getTextSubtitle(
+                                                        context,
+                                                      ),
+                                                  fontFamily: 'Rabar',
+                                                  fontSize: 12,
+                                                  height: 1.4,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        GestureDetector(
+                                          onTap: () =>
+                                              _deleteArticle(article['id']),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.error.withValues(
+                                                alpha: 0.1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Iconsax.trash,
+                                              color: AppColors.error,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            .animate(delay: Duration(milliseconds: index * 70))
+                            .fadeIn()
+                            .slideY(begin: 0.08, end: 0);
+                      },
+                    ),
+                  ),
+          ),
+        ],
       ),
     );
   }
