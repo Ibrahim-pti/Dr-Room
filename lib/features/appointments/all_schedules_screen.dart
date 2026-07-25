@@ -115,7 +115,7 @@ class _AllSchedulesScreenState extends State<AllSchedulesScreen> {
                         final date = '${dateTime.year}-${dateTime.month}-${dateTime.day}';
                         final time = '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
                         final image = (s['doctor'] != null && s['doctor']['image_path'] != null)
-                            ? 'http://127.0.0.1:8000/storage/${s['doctor']['image_path']}'
+                            ? '${ApiClient.storageUrl}/${s['doctor']['image_path']}'
                             : 'assets/images/doctor1.png';
                         final doctorId = s['doctor_id'];
 

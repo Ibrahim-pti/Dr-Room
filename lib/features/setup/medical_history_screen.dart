@@ -38,8 +38,10 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     }
 
     if ((_hasAllergies == true && _allergiesController.text.trim().isEmpty) ||
-        (_hasChronicDiseases == true && _chronicController.text.trim().isEmpty) ||
-        (_takesMedications == true && _medicationsController.text.trim().isEmpty)) {
+        (_hasChronicDiseases == true &&
+            _chronicController.text.trim().isEmpty) ||
+        (_takesMedications == true &&
+            _medicationsController.text.trim().isEmpty)) {
       _showError();
       return;
     }
@@ -49,19 +51,25 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     await prefs.setBool('guest_has_allergies', _hasAllergies!);
     if (_hasAllergies == true) {
       await prefs.setString(
-          'guest_allergies_details', _allergiesController.text.trim());
+        'guest_allergies_details',
+        _allergiesController.text.trim(),
+      );
     }
 
     await prefs.setBool('guest_has_chronic', _hasChronicDiseases!);
     if (_hasChronicDiseases == true) {
       await prefs.setString(
-          'guest_chronic_details', _chronicController.text.trim());
+        'guest_chronic_details',
+        _chronicController.text.trim(),
+      );
     }
 
     await prefs.setBool('guest_takes_meds', _takesMedications!);
     if (_takesMedications == true) {
       await prefs.setString(
-          'guest_meds_details', _medicationsController.text.trim());
+        'guest_meds_details',
+        _medicationsController.text.trim(),
+      );
     }
 
     await prefs.setBool('guest_smokes', _smokes!);
@@ -69,14 +77,22 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     if (mounted) {
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
-    widget.onFinished();
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        widget.onFinished();
+      }
+    });
   }
 
   void _skipSetup() {
     if (mounted) {
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
-    widget.onFinished();
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        widget.onFinished();
+      }
+    });
   }
 
   void _showError() {
@@ -272,8 +288,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                 value: progress,
                 minHeight: 8,
                 backgroundColor: const Color(0xFFE2E8F0),
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(primaryColor),
+                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
           ),
@@ -398,16 +413,19 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                     fillColor: const Color(0xFFF8FAFC),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide:
-                          const BorderSide(color: Color(0xFFE2E8F0)),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(
-                          color: primaryColor, width: 1.5),
+                        color: primaryColor,
+                        width: 1.5,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     hintText: hintText,
                     hintStyle: GoogleFonts.poppins(
                       color: const Color(0xFF94A3B8),
@@ -444,7 +462,7 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
                       color: selectedColor.withValues(alpha: 0.3),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                   ]
                 : null,
           ),

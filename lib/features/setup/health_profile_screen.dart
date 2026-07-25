@@ -193,11 +193,11 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                     // Blood Type Chips Section
                     _buildBloodTypeChips().animate().fadeIn(delay: 350.ms),
 
-                     const SizedBox(height: 16),
-                   ],
-                 ),
-               ),
-             ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
 
             // Bottom Button
             Padding(
@@ -402,8 +402,12 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
                       '$age',
                       style: GoogleFonts.poppins(
                         fontSize: isSelected ? 28 : 18,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected ? primaryColor : const Color(0xFF94A3B8),
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? primaryColor
+                            : const Color(0xFF94A3B8),
                       ),
                     ),
                   );
@@ -486,4 +490,3 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     );
   }
 }
-

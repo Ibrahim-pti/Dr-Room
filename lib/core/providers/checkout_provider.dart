@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dr_room/core/utils/api_client.dart';
+import 'dart:convert';
+import 'cart_provider.dart';
 
 class CheckoutProvider extends ChangeNotifier {
   String _selectedPaymentMethod = 'Cash on Delivery';
@@ -12,17 +15,37 @@ class CheckoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> processPayment() async {
+  Future<bool> processPayment(CartProvider cart) async {
     _isProcessing = true;
     notifyListeners();
 
-    // Simulate network latency for payment processing
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final payload = {
+        'service_type': cart.serviceType ?? 'General',
+        'subtotal': cart.subtotal,
+        'extra_fee': cart.extraFee,
+        'total_price': cart.total,
+        'payment_method': _selectedPaymentMethod,
+        'patient_details': cart.patientDetails ?? {},
+        'items': cart.items.map((e) => e.toJson()).toList(),
+      };
 
-    _isProcessing = false;
-    notifyListeners();
-    
-    // Return true assuming payment is successful
-    return true;
+      final response = await ApiClient.post('/orders', body: payload);
+      
+      _isProcessing = false;
+      notifyListeners();
+
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        debugPrint('Checkout Failed: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Checkout Error: $e');
+      _isProcessing = false;
+      notifyListeners();
+      return false;
+    }
   }
 }

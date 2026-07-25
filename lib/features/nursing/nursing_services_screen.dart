@@ -5,6 +5,8 @@ import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../checkout/checkout_details_screen.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/cart_provider.dart';
 
 class NursingServicesScreen extends StatefulWidget {
   const NursingServicesScreen({super.key});
@@ -228,6 +230,18 @@ class _NursingServicesScreenState extends State<NursingServicesScreen> {
                     child: ElevatedButton(
                       onPressed: selectedCount > 0
                           ? () {
+                              final cart = context.read<CartProvider>();
+                              cart.clearCart();
+                              cart.setServiceType('Nursing Services', extraFee: 0.0);
+                              
+                              for (var s in _services.where((s) => s['selected'] == true)) {
+                                cart.addItem(CartItem(
+                                  id: s['titleKey'],
+                                  name: s['titleKey'].toString().tr(),
+                                  price: 25.00, // Default price for nursing services
+                                ));
+                              }
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

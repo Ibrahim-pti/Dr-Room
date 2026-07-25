@@ -360,7 +360,7 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: Image.network(
-                                  'http://127.0.0.1:8000/storage/${article['image_path']}',
+                                  '${ApiClient.storageUrl}/${article['image_path']}',
                                   fit: BoxFit.cover,
                                 ),
                               )
@@ -628,7 +628,7 @@ class _AdminArticlesScreenState extends State<AdminArticlesScreen> {
                                         top: Radius.circular(20),
                                       ),
                                       child: Image.network(
-                                        'http://127.0.0.1:8000/storage/${article['image_path']}',
+                                        '${ApiClient.storageUrl}/${article['image_path']}',
                                         height: 130,
                                         width: double.infinity,
                                         fit: BoxFit.cover,

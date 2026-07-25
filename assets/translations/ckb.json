@@ -366,5 +366,8 @@
   "smoking_question": "ئایا جگەرە دەکێشیت؟",
   "yes": "بەڵێ",
   "no": "نەخێر",
-  "finish_setup": "تەواوکردن"
+  "finish_setup": "تەواوکردن",
+  "nurse_gender_preference": "ڕەگەزی پەرستار (ئارەزووکراو)",
+  "patient_name": "ناوی نەخۆش",
+  "patient_gender": "ڕەگەزی نەخۆش"
 }

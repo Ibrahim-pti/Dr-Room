@@ -2,9 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class ApiClient {
-  // Use your computer's IP address or localhost for simulator, 10.0.2.2 for Android emulator
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static String get serverIp {
+    if (kIsWeb) return '127.0.0.1';
+    if (Platform.isAndroid) return '10.0.2.2';
+    return '127.0.0.1';
+  }
+
+  static String get baseUrl => 'http://$serverIp:8000/api';
+  static String get storageUrl => 'http://$serverIp:8000/storage';
 
   static Future<Map<String, String>> _getHeaders() async {
     final prefs = await SharedPreferences.getInstance();

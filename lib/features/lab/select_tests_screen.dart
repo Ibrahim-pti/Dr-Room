@@ -3,6 +3,8 @@ import '../../core/theme/app_colors.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../checkout/checkout_details_screen.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/cart_provider.dart';
 
 class SelectTestsScreen extends StatefulWidget {
   const SelectTestsScreen({super.key});
@@ -166,6 +168,18 @@ class _SelectTestsScreenState extends State<SelectTestsScreen> {
                     child: ElevatedButton(
                       onPressed: selectedCount > 0
                           ? () {
+                              final cart = context.read<CartProvider>();
+                              cart.clearCart();
+                              cart.setServiceType('Lab Tests', extraFee: 10.00);
+                              
+                              for (var t in _tests.where((t) => t['selected'])) {
+                                cart.addItem(CartItem(
+                                  id: t['name'],
+                                  name: t['name'],
+                                  price: double.parse(t['price'].replaceAll('\$', '')),
+                                ));
+                              }
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

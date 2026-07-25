@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\AppointmentBookingController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Admin\BannerController;
 use App\Http\Controllers\Api\Admin\ArticleController;
 use App\Http\Controllers\Api\Admin\NotificationController;
@@ -39,6 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointments', [AppointmentBookingController::class, 'index']);
     Route::post('/appointments', [AppointmentBookingController::class, 'store']);
     Route::delete('/appointments/{id}', [AppointmentBookingController::class, 'destroy']);
+
+    // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
 
     // ─── Doctor: Dashboard API ─────────────────────────────────────────────
     Route::middleware([\App\Http\Middleware\IsDoctor::class])->prefix('doctor')->group(function () {

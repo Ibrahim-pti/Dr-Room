@@ -367,5 +367,8 @@
   "smoking_question": "Do you smoke?",
   "yes": "Yes",
   "no": "No",
-  "finish_setup": "Finish"
+  "finish_setup": "Finish",
+  "nurse_gender_preference": "Nurse Gender Preference",
+  "patient_name": "Patient Name",
+  "patient_gender": "Patient Gender"
 }

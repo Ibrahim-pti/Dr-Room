@@ -25,6 +25,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
   String? _selectedGender;
+  String? _selectedNurseGender;
   bool _hasSubmitted = false;
 
   bool _isLoadingLocation = false;
@@ -79,22 +80,36 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         ),
       );
 
-      final geo.Geocoding geocoder = geo.Geocoding();
-      List<geo.Placemark> placemarks = await geocoder.placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        geo.Placemark place = placemarks[0];
+      if (mounted) {
         setState(() {
-          _locationDetails =
-              '${place.street}, ${place.subAdministrativeArea ?? place.locality}, ${place.country}';
           _currentLatLng = LatLng(position.latitude, position.longitude);
         });
-
-        // Move map to the current location if map is ready
         _mapController.move(_currentLatLng!, 15.0);
+      }
+
+      try {
+        final geo.Geocoding geocoder = geo.Geocoding();
+        List<geo.Placemark> placemarks = await geocoder.placemarkFromCoordinates(
+          position.latitude,
+          position.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          geo.Placemark place = placemarks[0];
+          if (mounted) {
+            setState(() {
+              _locationDetails =
+                  '${place.street}, ${place.subAdministrativeArea ?? place.locality}, ${place.country}';
+            });
+          }
+        }
+      } catch (e) {
+        // Geocoding often fails on iOS simulators
+        if (mounted) {
+          setState(() {
+            _locationDetails = 'Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -137,6 +152,11 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
       }
     } catch (e) {
       // Handle error gracefully if reverse geocoding fails
+      if (mounted) {
+        setState(() {
+          _locationDetails = 'Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})';
+        });
+      }
     }
   }
 
@@ -145,7 +165,9 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
       _hasSubmitted = true;
     });
 
-    if (_formKey.currentState!.validate() && _selectedGender != null) {
+    if (_formKey.currentState!.validate() &&
+        _selectedGender != null &&
+        _selectedNurseGender != null) {
       if (_currentLatLng == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -268,13 +290,27 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                           child: Column(
                             children: [
                               _buildTextField(
-                                label: 'full_name'.tr(),
+                                label: 'patient_name'.tr(),
                                 controller: _nameController,
                                 icon: Iconsax.user_copy,
                                 hint: 'e.g. John Doe',
                               ),
                               const SizedBox(height: 20),
-                              _buildGenderSelector(),
+                              _buildGenderSelector(
+                                title: 'patient_gender'.tr(),
+                                selectedValue: _selectedGender,
+                                onChanged: (val) {
+                                  setState(() => _selectedGender = val);
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              _buildGenderSelector(
+                                title: 'nurse_gender_preference'.tr(),
+                                selectedValue: _selectedNurseGender,
+                                onChanged: (val) {
+                                  setState(() => _selectedNurseGender = val);
+                                },
+                              ),
                               const SizedBox(height: 20),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,13 +668,17 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
     );
   }
 
-  Widget _buildGenderSelector() {
-    bool showError = _hasSubmitted && _selectedGender == null;
+  Widget _buildGenderSelector({
+    required String title,
+    required String? selectedValue,
+    required void Function(String) onChanged,
+  }) {
+    bool showError = _hasSubmitted && selectedValue == null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'gender'.tr(),
+          title,
           style: GoogleFonts.poppins(
             color: AppColors.getTextTitle(context),
             fontSize: 14,
@@ -652,12 +692,8 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
               child: _buildGenderOption(
                 label: 'male'.tr(),
                 icon: Iconsax.man_copy,
-                isSelected: _selectedGender == 'male',
-                onTap: () {
-                  setState(() {
-                    _selectedGender = 'male';
-                  });
-                },
+                isSelected: selectedValue == 'male',
+                onTap: () => onChanged('male'),
               ),
             ),
             const SizedBox(width: 12),
@@ -665,12 +701,8 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
               child: _buildGenderOption(
                 label: 'female'.tr(),
                 icon: Iconsax.woman_copy,
-                isSelected: _selectedGender == 'female',
-                onTap: () {
-                  setState(() {
-                    _selectedGender = 'female';
-                  });
-                },
+                isSelected: selectedValue == 'female',
+                onTap: () => onChanged('female'),
               ),
             ),
           ],

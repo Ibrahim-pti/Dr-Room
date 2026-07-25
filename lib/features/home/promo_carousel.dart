@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
-
+import '../../core/utils/api_client.dart';
 class PromoCarousel extends StatefulWidget {
   final List<dynamic> banners;
   const PromoCarousel({super.key, this.banners = const []});
@@ -106,7 +106,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
                       ),
                     ],
                     image: DecorationImage(
-                      image: NetworkImage('http://127.0.0.1:8000/storage/${promo['image_path']}'),
+                      image: NetworkImage('${ApiClient.storageUrl}/${promo['image_path']}'),
                       fit: BoxFit.cover,
                     ),
                   ),

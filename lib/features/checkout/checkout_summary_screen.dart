@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'order_success_screen.dart';
 import '../../core/providers/order_provider.dart';
 import '../../core/providers/checkout_provider.dart';
+import '../../core/providers/cart_provider.dart';
 
 class CheckoutSummaryScreen extends StatefulWidget {
   const CheckoutSummaryScreen({super.key});
@@ -58,29 +59,38 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   const SizedBox(height: 16),
 
                   // ── Summary Card ──
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.getBorder(context)),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildSummaryRow('Selected Service', 'Lab Tests', false),
-                        const SizedBox(height: 16),
-                        _buildSummaryRow('Tests Included', 'CBC, Vitamin D', false),
-                        const SizedBox(height: 16),
-                        _buildSummaryRow('Subtotal', '\$55.00', false),
-                        const SizedBox(height: 16),
-                        _buildSummaryRow('Home Visit Fee', '\$10.00', false),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Divider(color: Color(0xFFF1F5F9), thickness: 1.5),
+                  Consumer<CartProvider>(
+                    builder: (context, cartProvider, child) {
+                      final itemsString = cartProvider.items.map((e) => e.name).join(', ');
+                      return Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: AppColors.getSurface(context),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: AppColors.getBorder(context)),
                         ),
-                        _buildSummaryRow('Total', '\$65.00', true),
-                      ],
-                    ),
+                        child: Column(
+                          children: [
+                            _buildSummaryRow('Selected Service', cartProvider.serviceType ?? 'Unknown', false),
+                            if (itemsString.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              _buildSummaryRow('Items Included', itemsString, false),
+                            ],
+                            const SizedBox(height: 16),
+                            _buildSummaryRow('Subtotal', '\$${cartProvider.subtotal.toStringAsFixed(2)}', false),
+                            if (cartProvider.extraFee > 0) ...[
+                              const SizedBox(height: 16),
+                              _buildSummaryRow('Extra Fees', '\$${cartProvider.extraFee.toStringAsFixed(2)}', false),
+                            ],
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Divider(color: Color(0xFFF1F5F9), thickness: 1.5),
+                            ),
+                            _buildSummaryRow('Total', '\$${cartProvider.total.toStringAsFixed(2)}', true),
+                          ],
+                        ),
+                      );
+                    },
                   ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1, end: 0),
 
                   const SizedBox(height: 40),
@@ -133,23 +143,36 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                   builder: (context, checkoutProvider, child) {
                     return ElevatedButton(
                       onPressed: checkoutProvider.isProcessing ? null : () async {
+                        final cartProvider = context.read<CartProvider>();
+                        if (cartProvider.items.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Your cart is empty.')),
+                          );
+                          return;
+                        }
+
                         // Process Payment
-                        final success = await checkoutProvider.processPayment();
+                        final success = await checkoutProvider.processPayment(cartProvider);
                         
                         if (success && context.mounted) {
+                          final serviceName = cartProvider.serviceType ?? 'Order';
+                          final itemsStr = cartProvider.items.map((e) => e.name).join(', ');
+
                           // Add to OrderProvider
                           await context.read<OrderProvider>().addOrder(OrderModel(
                             id: DateTime.now().millisecondsSinceEpoch.toString(),
-                            title: 'Complete Blood Count (CBC)', // Example title based on \$65 total
+                            title: '\$serviceName: \$itemsStr', 
                             status: 'Pending',
                             statusColor: const Color(0xFFF59E0B),
                             icon: Iconsax.health,
                             iconColor: const Color(0xFF3B82F6),
-                            price: 65.00,
+                            price: cartProvider.total,
                             date: DateTime.now(),
                           ));
                           
                           if (context.mounted) {
+                            // Clear cart on success
+                            cartProvider.clearCart();
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
@@ -177,13 +200,17 @@ class _CheckoutSummaryScreenState extends State<CheckoutSummaryScreen> {
                                 strokeWidth: 2.5,
                               ),
                             )
-                          : Text(
-                              'Confirm Order - \$65.00',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
+                          : Consumer<CartProvider>(
+                              builder: (context, cart, child) {
+                                return Text(
+                                  'Confirm Order - \$${cart.total.toStringAsFixed(2)}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                );
+                              },
                             ),
                     );
                   },

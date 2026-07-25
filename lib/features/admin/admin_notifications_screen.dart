@@ -437,7 +437,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                                       ClipRRect(
                                         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                                         child: Image.network(
-                                          'http://127.0.0.1:8000/storage/${notif['image_path']}',
+                                          '${ApiClient.storageUrl}/${notif['image_path']}',
                                           height: 130,
                                           width: double.infinity,
                                           fit: BoxFit.cover,

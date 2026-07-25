@@ -9,6 +9,7 @@ import 'core/providers/checkout_provider.dart';
 import 'core/providers/favorite_provider.dart';
 import 'core/utils/ckb_localizations.dart';
 import 'core/providers/health_provider.dart';
+import 'core/providers/cart_provider.dart';
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
@@ -50,6 +51,7 @@ class DrRoomApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
         ChangeNotifierProvider(create: (_) => HealthProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: ThemeProvider().themeModeNotifier,
@@ -143,7 +145,7 @@ class AppFlowState extends State<AppFlow> {
       case _FlowState.onboarding:
         return OnboardingScreen(
           key: const ValueKey('onboarding'),
-          onFinished: () => _goTo(_FlowState.login),
+          onFinished: () => _goTo(_FlowState.home),
         );
 
       case _FlowState.login:

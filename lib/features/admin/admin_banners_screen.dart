@@ -420,7 +420,7 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
                                       ClipRRect(
                                         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
                                         child: Image.network(
-                                          'http://127.0.0.1:8000/storage/${banner['image_path']}',
+                                          '${ApiClient.storageUrl}/${banner['image_path']}',
                                           height: 160,
                                           width: double.infinity,
                                           fit: BoxFit.cover,

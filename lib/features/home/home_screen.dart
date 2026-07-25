@@ -644,7 +644,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   final specialty = doc['specialty'] ?? 'Specialist';
                   final rating = doc['rating']?.toString() ?? '5.0';
                   final image = (doc['image_path'] != null)
-                      ? 'http://127.0.0.1:8000/storage/${doc['image_path']}'
+                      ? '${ApiClient.storageUrl}/${doc['image_path']}'
                       : 'assets/images/doctor1.png';
                   final doctorId = doc['id'];
 
