@@ -145,4 +145,14 @@ class AuthController extends Controller
             'user' => $request->user()
         ]);
     }
+
+    public function destroy(Request $request)
+    {
+        $user = $request->user();
+        if ($user) {
+            $user->delete();
+            return response()->json(['message' => 'هەژمارەکەت بە سەرکەوتوویی سڕایەوە']);
+        }
+        return response()->json(['message' => 'بەکارهێنەر نەدۆزرایەوە'], 404);
+    }
 }

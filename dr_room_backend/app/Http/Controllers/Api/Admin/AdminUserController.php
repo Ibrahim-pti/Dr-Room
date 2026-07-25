@@ -32,4 +32,27 @@ class AdminUserController extends Controller
 
         return response()->json(['message' => 'User unblocked successfully', 'user' => $user]);
     }
+
+    public function storeAdmin(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $admin = User::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => 'admin',
+            'status' => 'approved',
+            'is_admin' => true,
+        ]);
+
+        return response()->json([
+            'message' => 'ئەدمین بە سەرکەوتوویی زیادکرا',
+            'admin' => $admin
+        ], 201);
+    }
 }

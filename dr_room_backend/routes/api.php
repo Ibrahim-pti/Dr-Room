@@ -27,6 +27,7 @@ Route::get('/doctors', [AppController::class, 'doctors']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::delete('/user', [AuthController::class, 'destroy']);
 
     // ─── Patient: Appointment Booking ──────────────────────────────────────
     Route::get('/appointments', [AppointmentBookingController::class, 'index']);
@@ -67,5 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [\App\Http\Controllers\Api\Admin\AdminUserController::class, 'index']);
         Route::patch('/users/{id}/block', [\App\Http\Controllers\Api\Admin\AdminUserController::class, 'block']);
         Route::patch('/users/{id}/unblock', [\App\Http\Controllers\Api\Admin\AdminUserController::class, 'unblock']);
+        Route::post('/add-admin', [\App\Http\Controllers\Api\Admin\AdminUserController::class, 'storeAdmin']);
     });
 });
