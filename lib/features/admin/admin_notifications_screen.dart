@@ -54,6 +54,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
     File? selectedImage;
     final titleController = TextEditingController();
     final messageController = TextEditingController();
+    bool isSubmitting = false;
 
     await showModalBottomSheet(
       context: context,
@@ -154,53 +155,72 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () async {
-                          if (titleController.text.isEmpty || messageController.text.isEmpty) return;
-                          
-                          final prefs = await SharedPreferences.getInstance();
-                          final token = prefs.getString('auth_token');
-                          var request = http.MultipartRequest(
-                            'POST',
-                            Uri.parse('${ApiClient.baseUrl}/admin/notifications'),
-                          );
-                          request.headers['Authorization'] = 'Bearer $token';
-                          request.headers['Accept'] = 'application/json';
-                          request.fields['title'] = titleController.text;
-                          request.fields['message'] = messageController.text;
-                          request.fields['type'] = 'general';
-                          
-                          if (selectedImage != null) {
-                            request.files.add(
-                              await http.MultipartFile.fromPath('image', selectedImage!.path),
-                            );
-                          }
-                          
-                          var res = await request.send();
-                          if (res.statusCode == 201) {
-                            if (!ctx.mounted) return;
-                            Navigator.pop(ctx);
-                            _fetchNotifications();
-                          }
-                        },
+                        onPressed: isSubmitting
+                            ? null
+                            : () async {
+                                if (titleController.text.isEmpty || messageController.text.isEmpty) return;
+                                
+                                setModalState(() => isSubmitting = true);
+                                
+                                final prefs = await SharedPreferences.getInstance();
+                                final token = prefs.getString('auth_token');
+                                var request = http.MultipartRequest(
+                                  'POST',
+                                  Uri.parse('${ApiClient.baseUrl}/admin/notifications'),
+                                );
+                                request.headers['Authorization'] = 'Bearer $token';
+                                request.headers['Accept'] = 'application/json';
+                                request.fields['title'] = titleController.text;
+                                request.fields['message'] = messageController.text;
+                                request.fields['type'] = 'general';
+                                
+                                if (selectedImage != null) {
+                                  request.files.add(
+                                    await http.MultipartFile.fromPath('image', selectedImage!.path),
+                                  );
+                                }
+                                
+                                var res = await request.send();
+                                
+                                if (ctx.mounted) {
+                                  setModalState(() => isSubmitting = false);
+                                }
+                                
+                                if (res.statusCode == 201) {
+                                  if (!ctx.mounted) return;
+                                  Navigator.pop(ctx);
+                                  _fetchNotifications();
+                                }
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFF59E0B),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           elevation: 0,
+                          disabledBackgroundColor: const Color(0xFFF59E0B).withValues(alpha: 0.6),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            'ناردن',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Rabar', 
-                              fontSize: 16, 
-                              fontWeight: FontWeight.bold,
-                              height: 1.2,
-                            ),
-                          ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: isSubmitting
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'ناردن',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Rabar', 
+                                    fontSize: 16, 
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.2,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
