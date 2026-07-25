@@ -1,5 +1,7 @@
+import 'package:dr_room/main.dart';
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -52,6 +54,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   ];
 
   Future<void> _bookAppointment() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    if (token == null || token.isEmpty) {
+      if (!mounted) return;
+      _showLoginPrompt();
+      return;
+    }
+
     setState(() {
       _isBooking = true;
     });
@@ -66,15 +77,19 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       var hour = int.parse(timeStr.split(':')[0]);
       if (isPM && hour != 12) hour += 12;
       if (!isPM && hour == 12) hour = 0;
-      
-      final minute = timeStr.split(':')[1].substring(0, 2);
-      final formattedDate = '2026-11-$date ${hour.toString().padLeft(2, '0')}:$minute:00';
 
-      final response = await ApiClient.post('/appointments', body: {
-        'doctor_id': widget.doctorId,
-        'appointment_date': formattedDate,
-        'type': 'in_person',
-      });
+      final minute = timeStr.split(':')[1].substring(0, 2);
+      final formattedDate =
+          '2026-11-$date ${hour.toString().padLeft(2, '0')}:$minute:00';
+
+      final response = await ApiClient.post(
+        '/appointments',
+        body: {
+          'doctor_id': widget.doctorId,
+          'appointment_date': formattedDate,
+          'type': 'in_person',
+        },
+      );
 
       if (response.statusCode == 201) {
         if (!mounted) return;
@@ -109,6 +124,64 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         });
       }
     }
+  }
+
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          'پێویستە چوونەژوورەوە بکەیت',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppColors.getTextTitle(context),
+          ),
+        ),
+        content: Text(
+          'بۆ وەرگرتنی کات لای دکتۆر پێویستە سەرەتا خۆت تۆمار بکەیت یان چوونەژوورەوە بکەیت.',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: AppColors.getTextSubtitle(context),
+            height: 1.5,
+          ),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'دواتر',
+              style: GoogleFonts.poppins(
+                color: AppColors.getTextSubtitle(context),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AppFlow(startAtLogin: true),
+                ),
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'چوونەژوورەوە',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -146,11 +219,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               ),
               child: Consumer<FavoriteProvider>(
                 builder: (context, favoriteProvider, child) {
-                  final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
+                  final isFavorite = favoriteProvider.isFavorite(
+                    widget.doctorId,
+                  );
                   return IconButton(
                     icon: Icon(
                       isFavorite ? Icons.favorite : Iconsax.heart,
-                      color: isFavorite ? const Color(0xFFEF4444) : AppColors.getTextTitle(context),
+                      color: isFavorite
+                          ? const Color(0xFFEF4444)
+                          : AppColors.getTextTitle(context),
                     ),
                     onPressed: () {
                       favoriteProvider.toggleFavorite({
@@ -162,9 +239,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            isFavorite ? 'Removed from favorites' : 'Added to favorites',
+                            isFavorite
+                                ? 'Removed from favorites'
+                                : 'Added to favorites',
                           ),
-                          backgroundColor: isFavorite ? Colors.red : const Color(0xFF10B981),
+                          backgroundColor: isFavorite
+                              ? Colors.red
+                              : const Color(0xFF10B981),
                           duration: const Duration(seconds: 2),
                         ),
                       );
@@ -258,7 +339,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                 '8 yr+',
                                 Iconsax.briefcase,
                               ),
-                              _buildStatItem('rating'.tr(), '4.9', Iconsax.star),
+                              _buildStatItem(
+                                'rating'.tr(),
+                                '4.9',
+                                Iconsax.star,
+                              ),
                             ],
                           ),
                         ],
@@ -307,7 +392,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Iconsax.star_1, color: Color(0xFFF59E0B), size: 20),
+                          const Icon(
+                            Iconsax.star_1,
+                            color: Color(0xFFF59E0B),
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             '4.9 (124 reviews)',

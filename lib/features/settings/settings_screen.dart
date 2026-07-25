@@ -23,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   String _userName = '';
   String _userPhone = '';
+  bool _isGuest = false;
 
   @override
   void initState() {
@@ -34,9 +35,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {
-        final un = prefs.getString('user_name') ?? '';
-        _userName = un.isNotEmpty ? un : 'guest_user'.tr();
-        _userPhone = prefs.getString('user_phone') ?? '';
+        final token = prefs.getString('auth_token');
+        _isGuest = token == null || token.isEmpty;
+
+        if (!_isGuest) {
+          final un = prefs.getString('user_name') ?? '';
+          _userName = un.isNotEmpty ? un : 'guest_user'.tr();
+          _userPhone = prefs.getString('user_phone') ?? '';
+        }
       });
     }
   }
@@ -44,6 +50,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    if (_isGuest) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.account_circle_rounded,
+                  size: 100,
+                  color: isDark
+                      ? const Color(0xFF64748B)
+                      : const Color(0xFF94A3B8),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'تکایە خۆت تۆمار بکە',
+                  style: GoogleFonts.poppins(
+                    color: AppColors.getTextTitle(context),
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'بۆ بینینی زانیارییەکانی پڕۆفایلەکەت و سوودمەندبوون لە خزمەتگوزارییەکان، پێویستە چوونەژوورەوە بکەیت.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.getTextSubtitle(context),
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const AppFlow(startAtLogin: true),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B82F6),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'چوونەژوورەوە',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -253,7 +333,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const HealthDashboardScreen(),
+                                builder: (context) =>
+                                    const HealthDashboardScreen(),
                               ),
                             );
                           },
@@ -349,7 +430,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (context.mounted) {
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => const AppFlow()),
+                              MaterialPageRoute(
+                                builder: (context) => const AppFlow(),
+                              ),
                               (route) => false,
                             );
                           }
@@ -590,11 +673,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildLanguageOption(bottomSheetContext, 'English', '🇬🇧', const Locale('en')),
+              _buildLanguageOption(
+                bottomSheetContext,
+                'English',
+                '🇬🇧',
+                const Locale('en'),
+              ),
               const SizedBox(height: 12),
-              _buildLanguageOption(bottomSheetContext, 'کوردی', 'kurdish', const Locale('ckb')),
+              _buildLanguageOption(
+                bottomSheetContext,
+                'کوردی',
+                'kurdish',
+                const Locale('ckb'),
+              ),
               const SizedBox(height: 12),
-              _buildLanguageOption(bottomSheetContext, 'العربية', '🇮🇶', const Locale('ar')),
+              _buildLanguageOption(
+                bottomSheetContext,
+                'العربية',
+                '🇮🇶',
+                const Locale('ar'),
+              ),
             ],
           ),
         );

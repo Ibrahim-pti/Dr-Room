@@ -77,7 +77,8 @@ class DrRoomApp extends StatelessWidget {
 
 /// Manages the app flow: Splash → Onboarding → Login ↔ Register → Home
 class AppFlow extends StatefulWidget {
-  const AppFlow({super.key});
+  final bool startAtLogin;
+  const AppFlow({super.key, this.startAtLogin = false});
 
   @override
   State<AppFlow> createState() => AppFlowState();
@@ -86,6 +87,14 @@ class AppFlow extends StatefulWidget {
 class AppFlowState extends State<AppFlow> {
   _FlowState _state = _FlowState.splash;
   String _phoneNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.startAtLogin) {
+      _state = _FlowState.login;
+    }
+  }
 
   void _goTo(_FlowState state) {
     setState(() => _state = state);
@@ -98,10 +107,7 @@ class AppFlowState extends State<AppFlow> {
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
       transitionBuilder: (child, animation) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
       child: _buildScreen(),
     );
@@ -120,7 +126,7 @@ class AppFlowState extends State<AppFlow> {
                 _goTo(_FlowState.home);
               }
             } else {
-              _goTo(_FlowState.onboarding);
+              _goTo(_FlowState.home);
             }
           },
         );
@@ -140,7 +146,7 @@ class AppFlowState extends State<AppFlow> {
           },
           onSignUp: () => _goTo(_FlowState.register),
         );
-        
+
       case _FlowState.register:
         return RegisterScreen(
           key: const ValueKey('register'),
@@ -166,14 +172,10 @@ class AppFlowState extends State<AppFlow> {
         );
 
       case _FlowState.home:
-        return const MainShell(
-          key: ValueKey('home'),
-        );
-        
+        return const MainShell(key: ValueKey('home'));
+
       case _FlowState.admin:
-        return const AdminDashboardShell(
-          key: ValueKey('admin'),
-        );
+        return const AdminDashboardShell(key: ValueKey('admin'));
     }
   }
 }

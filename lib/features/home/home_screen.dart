@@ -71,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _fetchHomeData,
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
         child: Padding(
           // Extra bottom padding for the floating navigation bar
           padding: const EdgeInsetsDirectional.only(bottom: 120),
