@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'medical_history_screen.dart';
 
 class HealthProfileScreen extends StatefulWidget {
@@ -19,9 +19,14 @@ class HealthProfileScreen extends StatefulWidget {
 class _HealthProfileScreenState extends State<HealthProfileScreen> {
   String? _selectedGender;
   String? _selectedBloodType;
+  int _selectedAge = 22;
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
-  final TextEditingController _heightController = TextEditingController();
+
+  static const Color primaryColor = Color(0xFF3B82F6);
+  static const Color lightBlueSoft = Color(0xFFEFF6FF);
+  static const Color darkSlate = Color(0xFF1E293B);
+  static const Color secondarySlate = Color(0xFF64748B);
+  static const Color bgSurface = Color(0xFFF8FAFC);
 
   final List<String> _bloodTypes = [
     'A+',
@@ -34,12 +39,16 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     'O-',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _ageController.text = _selectedAge.toString();
+  }
+
   Future<void> _completeSetup() async {
     if (_selectedGender == null ||
         _selectedBloodType == null ||
-        _ageController.text.isEmpty ||
-        _weightController.text.isEmpty ||
-        _heightController.text.isEmpty) {
+        _ageController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -48,6 +57,9 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
           ),
           backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
       return;
@@ -56,17 +68,15 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_completed_setup', true);
 
-    // Save local health data
-    if (_selectedGender != null)
+    if (_selectedGender != null) {
       await prefs.setString('guest_gender', _selectedGender!);
-    if (_selectedBloodType != null)
+    }
+    if (_selectedBloodType != null) {
       await prefs.setString('guest_blood_type', _selectedBloodType!);
-    if (_ageController.text.isNotEmpty)
+    }
+    if (_ageController.text.isNotEmpty) {
       await prefs.setString('guest_age', _ageController.text);
-    if (_weightController.text.isNotEmpty)
-      await prefs.setString('guest_weight', _weightController.text);
-    if (_heightController.text.isNotEmpty)
-      await prefs.setString('guest_height', _heightController.text);
+    }
 
     if (mounted) {
       Navigator.push(
@@ -78,211 +88,214 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     }
   }
 
+  void _skipSetup() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MedicalHistoryScreen(onFinished: widget.onFinished),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _ageController.dispose();
-    _weightController.dispose();
-    _heightController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: Color(0xFF1E293B),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Medical Header Icon
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
+      backgroundColor: bgSurface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Header Bar with Progress Indicator & Skip
+            _buildTopHeader(progress: 0.66),
+
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+
+                    // Page Title
+                    Center(
+                      child: Text(
+                        'health_profile_title'.tr(),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: darkSlate,
+                          height: 1.3,
+                        ),
+                      ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Center(
+                      child: Text(
+                        'health_profile_subtitle'.tr(),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: secondarySlate,
+                          height: 1.4,
+                        ),
+                      ).animate().fadeIn(delay: 100.ms),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Gender Selection Section
+                    Text(
+                      'gender'.tr(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: darkSlate,
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Iconsax.health_copy,
-                    size: 48,
-                    color: Color(0xFF3B82F6),
-                  ),
-                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
-              ),
-              const SizedBox(height: 24),
-
-              Center(
-                child: Text(
-                  'health_profile_title'.tr(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1E293B),
-                  ),
-                ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
-              ),
-
-              const SizedBox(height: 8),
-
-              Center(
-                child: Text(
-                  'health_profile_subtitle'.tr(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: const Color(0xFF64748B),
-                    height: 1.5,
-                  ),
-                ).animate().fadeIn(delay: 100.ms),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Gender Selection
-              Text(
-                'gender'.tr(),
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1E293B),
-                ),
-              ).animate().fadeIn(delay: 200.ms),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildGenderCard(
-                      'male'.tr(),
-                      Icons.male_rounded,
-                      'Male',
-                      delay: 250,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildGenderCard(
-                      'female'.tr(),
-                      Icons.female_rounded,
-                      'Female',
-                      delay: 300,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Age & Blood Type
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildInputField(
-                      label: 'age'.tr(),
-                      controller: _ageController,
-                      icon: Iconsax.calendar_1_copy,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      delay: 400,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildBloodTypeDropdown(delay: 500)),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              // Weight & Height
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildInputField(
-                      label: 'weight_kg'.tr(),
-                      controller: _weightController,
-                      icon: Iconsax.weight_copy,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d*'),
+                    ).animate().fadeIn(delay: 150.ms),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildGenderCard(
+                            'male'.tr(),
+                            Icons.male_rounded,
+                            'Male',
+                            delay: 200,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: _buildGenderCard(
+                            'female'.tr(),
+                            Icons.female_rounded,
+                            'Female',
+                            delay: 250,
+                          ),
                         ),
                       ],
-                      delay: 600,
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildInputField(
-                      label: 'height_cm'.tr(),
-                      controller: _heightController,
-                      icon: Iconsax.ruler_copy,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d*'),
-                        ),
-                      ],
-                      delay: 700,
-                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Age Picker (Wheel style like mockup)
+                    _buildAgeWheelPicker().animate().fadeIn(delay: 300.ms),
+
+                    const SizedBox(height: 28),
+
+                    // Blood Type Chips Section
+                    _buildBloodTypeChips().animate().fadeIn(delay: 350.ms),
+
+                     const SizedBox(height: 16),
+                   ],
+                 ),
+               ),
+             ),
+
+            // Sticky Bottom Button
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 48),
-
-              // Save Button
-              SizedBox(
+              child: SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
                   onPressed: _completeSetup,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                     elevation: 4,
-                    shadowColor: const Color(0xFF3B82F6).withValues(alpha: 0.4),
-                  ),
-                  child: Text(
-                    'save_and_continue'.tr(),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    shadowColor: primaryColor.withValues(alpha: 0.35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'continue_btn'.tr(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 20),
+                    ],
                   ),
                 ),
-              ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.2),
-
-              const SizedBox(height: 40),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTopHeader({required double progress}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF1F5F9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18,
+                color: darkSlate,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: const Color(0xFFE2E8F0),
+                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          TextButton(
+            onPressed: _skipSetup,
+            style: TextButton.styleFrom(
+              foregroundColor: secondarySlate,
+              textStyle: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: Text('skip'.tr()),
+          ),
+        ],
       ),
     );
   }
@@ -298,43 +311,38 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
       onTap: () => setState(() => _selectedGender = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+          color: isSelected ? lightBlueSoft : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xFF3B82F6)
-                : const Color(0xFFE2E8F0),
-            width: 2,
+            color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
+            width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? primaryColor.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
             Icon(
               icon,
-              size: 40,
-              color: isSelected
-                  ? const Color(0xFF3B82F6)
-                  : const Color(0xFF94A3B8),
+              size: 36,
+              color: isSelected ? primaryColor : secondarySlate,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               title,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? const Color(0xFF3B82F6)
-                    : const Color(0xFF64748B),
+                fontSize: 15,
+                color: isSelected ? primaryColor : darkSlate,
               ),
             ),
           ],
@@ -343,134 +351,150 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildInputField({
-    required String label,
-    required TextEditingController controller,
-    required IconData icon,
-    required TextInputType keyboardType,
-    List<TextInputFormatter>? inputFormatters,
-    required int delay,
-  }) {
+  Widget _buildAgeWheelPicker() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          'age'.tr(),
           style: GoogleFonts.poppins(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1E293B),
+            color: darkSlate,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Container(
+          height: 160,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: TextField(
-            controller: controller,
-            keyboardType: keyboardType,
-            inputFormatters: inputFormatters,
-            style: GoogleFonts.poppins(color: const Color(0xFF1E293B)),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xFFF1F5F9),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                height: 52,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: lightBlueSoft,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: primaryColor.withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                ),
               ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5),
+              CupertinoPicker(
+                itemExtent: 46,
+                scrollController: FixedExtentScrollController(
+                  initialItem: (_selectedAge - 1).clamp(0, 119),
+                ),
+                onSelectedItemChanged: (index) {
+                  setState(() {
+                    _selectedAge = index + 1;
+                    _ageController.text = _selectedAge.toString();
+                  });
+                },
+                selectionOverlay: const SizedBox(),
+                children: List.generate(120, (index) {
+                  final age = index + 1;
+                  final isSelected = age == _selectedAge;
+                  return Center(
+                    child: Text(
+                      '$age',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSelected ? 28 : 18,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected ? primaryColor : const Color(0xFF94A3B8),
+                      ),
+                    ),
+                  );
+                }),
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              prefixIcon: Icon(
-                icon,
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.7),
-                size: 22,
-              ),
-            ),
+            ],
           ),
         ),
       ],
-    ).animate().fadeIn(delay: delay.ms);
+    );
   }
 
-  Widget _buildBloodTypeDropdown({required int delay}) {
+  Widget _buildBloodTypeChips() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'blood_type'.tr(),
           style: GoogleFonts.poppins(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1E293B),
+            color: darkSlate,
           ),
         ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _selectedBloodType,
-              hint: Row(
-                children: [
-                  const Icon(
-                    Icons.water_drop_rounded,
-                    color: Colors.redAccent,
-                    size: 20,
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: _bloodTypes.map((type) {
+            final isSelected = _selectedBloodType == type;
+            return GestureDetector(
+              onTap: () => setState(() => _selectedBloodType = type),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? primaryColor : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
+                    width: 1.5,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'select'.tr(),
-                    style: GoogleFonts.poppins(color: const Color(0xFF94A3B8)),
-                  ),
-                ],
-              ),
-              isExpanded: true,
-              icon: const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Color(0xFF94A3B8),
-              ),
-              items: _bloodTypes.map((String type) {
-                return DropdownMenuItem<String>(
-                  value: type,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.water_drop_rounded,
-                        color: Colors.redAccent,
-                        size: 20,
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: primaryColor.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.water_drop_rounded,
+                      size: 16,
+                      color: isSelected ? Colors.white : Colors.redAccent,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      type,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.white : darkSlate,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        type,
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF1E293B),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedBloodType = newValue;
-                });
-              },
-            ),
-          ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
-    ).animate().fadeIn(delay: delay.ms);
+    );
   }
 }
+

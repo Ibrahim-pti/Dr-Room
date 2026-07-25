@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -5,202 +6,272 @@ import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'health_profile_screen.dart';
 
-class LanguageSelectionScreen extends StatelessWidget {
+class LanguageSelectionScreen extends StatefulWidget {
   final VoidCallback onFinished;
 
   const LanguageSelectionScreen({super.key, required this.onFinished});
 
   @override
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
+}
+
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
+  String _selectedLocale = 'en';
+
+  static const Color primaryColor = Color(0xFF3B82F6);
+  static const Color lightBlueSoft = Color(0xFFEFF6FF);
+  static const Color darkSlate = Color(0xFF1E293B);
+  static const Color secondarySlate = Color(0xFF64748B);
+  static const Color bgSurface = Color(0xFFF8FAFC);
+
+  void _proceedToHealthProfile() {
+    context.setLocale(Locale(_selectedLocale));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HealthProfileScreen(onFinished: widget.onFinished),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // Background Gradient
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFFE6EDF5), Color(0xFFFFFFFF)],
-              ),
-            ),
-          ),
+    return Directionality(
+      textDirection: ui.TextDirection.ltr,
+      child: Scaffold(
+        backgroundColor: bgSurface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Header Bar with 33% Progress Indicator
+            _buildTopHeader(progress: 0.33),
 
-          // Decorative Elements
-          Positioned(
-            top: -50,
-            right: -50,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -100,
-            left: -50,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.05),
-              ),
-            ),
-          ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
 
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 60),
-
-                  // Icon
-                  Center(
-                    child:
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF3B82F6,
-                                ).withValues(alpha: 0.15),
-                                blurRadius: 24,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
+                    // Language Icon Header
+                    Container(
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        color: lightBlueSoft,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryColor.withValues(alpha: 0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 6),
                           ),
-                          child: const Icon(
-                            Icons.language_rounded,
-                            size: 48,
-                            color: Color(0xFF3B82F6),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.language_rounded,
+                        size: 48,
+                        color: primaryColor,
+                      ),
+                    ).animate().scale(
+                      duration: 500.ms,
+                      curve: Curves.easeOutBack,
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Title
+                    Text(
+                          'select_language'.tr(),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: darkSlate,
                           ),
-                        ).animate().scale(
-                          duration: 500.ms,
-                          curve: Curves.easeOutBack,
+                        )
+                        .animate()
+                        .fadeIn(delay: 200.ms)
+                        .slideY(begin: 0.2, end: 0),
+
+                    const SizedBox(height: 40),
+
+                    // Language Cards
+                    _buildLangCard(
+                      title: 'کوردی',
+                      subtitleKey: 'lang_kurdish',
+                      localeCode: 'ckb',
+                      flag: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: SvgPicture.asset(
+                          'assets/images/kurdistan_flag.svg',
+                          width: 32,
+                          height: 22,
+                          fit: BoxFit.cover,
                         ),
-                  ),
-
-                  const SizedBox(height: 40),
-
-                  // Title
-                  Text(
-                    'Choose Language',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1E293B),
+                      ),
+                      delay: 300,
                     ),
-                  ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-
-                  const SizedBox(height: 60),
-
-                  // Language Options
-                  _buildLangCard(
-                    context,
-                    title: 'کوردی',
-                    localeCode: 'ckb',
-                    flag: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: SvgPicture.asset('assets/images/kurdistan_flag.svg', width: 32, height: 22, fit: BoxFit.cover),
+                    const SizedBox(height: 16),
+                    _buildLangCard(
+                      title: 'English',
+                      subtitleKey: 'lang_english',
+                      localeCode: 'en',
+                      flag: const Text('🇬🇧', style: TextStyle(fontSize: 26)),
+                      delay: 400,
                     ),
-                    delay: 400,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLangCard(
-                    context,
-                    title: 'English',
-                    localeCode: 'en',
-                    flag: const Text('🇬🇧', style: TextStyle(fontSize: 28)),
-                    delay: 500,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildLangCard(
-                    context,
-                    title: 'العربية',
-                    localeCode: 'ar',
-                    flag: const Text('🇸🇦', style: TextStyle(fontSize: 28)),
-                    delay: 600,
-                  ),
+                    const SizedBox(height: 16),
+                    _buildLangCard(
+                      title: 'العربية',
+                      subtitleKey: 'lang_arabic',
+                      localeCode: 'ar',
+                      flag: const Text('🇸🇦', style: TextStyle(fontSize: 26)),
+                      delay: 500,
+                    ),
 
-                  const SizedBox(height: 60),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Continue Button (Pill Shape)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
+                  ),
                 ],
               ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _proceedToHealthProfile,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: primaryColor.withValues(alpha: 0.35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'continue_btn'.tr(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 20),
+                    ],
+                  ),
+                ),
+              ),
             ),
+          ],
+        ),
+      ),
+    ),
+    );
+  }
+
+  Widget _buildTopHeader({required double progress}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Row(
+        children: [
+          const SizedBox(width: 40),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: const Color(0xFFE2E8F0),
+                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          TextButton(
+            onPressed: _proceedToHealthProfile,
+            style: TextButton.styleFrom(
+              foregroundColor: secondarySlate,
+              textStyle: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: Text('skip'.tr()),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildLangCard(
-    BuildContext context, {
+  Widget _buildLangCard({
     required String title,
+    required String subtitleKey,
     required String localeCode,
     required Widget flag,
     required int delay,
   }) {
+    final isSelected = _selectedLocale == localeCode;
     return GestureDetector(
-      onTap: () async {
-        await context.setLocale(Locale(localeCode));
-        if (!context.mounted) return;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => HealthProfileScreen(onFinished: onFinished),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      onTap: () => setState(() => _selectedLocale = localeCode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? lightBlueSoft : Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
+            width: isSelected ? 2 : 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B82F6).withValues(alpha: 0.08),
-              blurRadius: 16,
+              color: isSelected
+                  ? primaryColor.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.02),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         ),
         child: Row(
           children: [
-            SizedBox(
-              width: 32,
-              child: Center(child: flag),
-            ),
+            SizedBox(width: 32, child: Center(child: flag)),
             const SizedBox(width: 16),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1E293B),
-                    ),
-                  ),
-                ],
+              child: Text(
+                subtitleKey.tr(),
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? primaryColor : darkSlate,
+                ),
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Color(0xFF94A3B8),
-              size: 20,
+            Icon(
+              isSelected
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: isSelected ? primaryColor : const Color(0xFFCBD5E1),
+              size: 24,
             ),
           ],
         ),

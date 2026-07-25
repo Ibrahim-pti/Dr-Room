@@ -24,6 +24,24 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   final TextEditingController _chronicController = TextEditingController();
   final TextEditingController _medicationsController = TextEditingController();
 
+  final List<String> _commonConditions = [
+    'Diabetes',
+    'Asthma',
+    'Hypertension',
+    'Allergies',
+    'Thyroid',
+    'Migraine',
+    'Arthritis',
+    'Heart Disease',
+  ];
+  final Set<String> _selectedConditions = {};
+
+  static const Color primaryColor = Color(0xFF3B82F6);
+  static const Color lightBlueSoft = Color(0xFFEFF6FF);
+  static const Color darkSlate = Color(0xFF1E293B);
+  static const Color secondarySlate = Color(0xFF64748B);
+  static const Color bgSurface = Color(0xFFF8FAFC);
+
   Future<void> _completeSetup() async {
     if (_hasAllergies == null ||
         _hasChronicDiseases == null ||
@@ -49,7 +67,14 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
 
     await prefs.setBool('guest_has_chronic', _hasChronicDiseases!);
     if (_hasChronicDiseases == true) {
-      await prefs.setString('guest_chronic_details', _chronicController.text.trim());
+      String chronicText = _chronicController.text.trim();
+      if (_selectedConditions.isNotEmpty) {
+        chronicText = [
+          ..._selectedConditions,
+          if (chronicText.isNotEmpty) chronicText,
+        ].join(', ');
+      }
+      await prefs.setString('guest_chronic_details', chronicText);
     }
 
     await prefs.setBool('guest_takes_meds', _takesMedications!);
@@ -65,6 +90,13 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     widget.onFinished();
   }
 
+  void _skipSetup() {
+    if (mounted) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    }
+    widget.onFinished();
+  }
+
   void _showError() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -74,8 +106,22 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
         ),
         backgroundColor: Colors.redAccent,
         behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
+  }
+
+  void _toggleConditionTag(String condition) {
+    setState(() {
+      if (_selectedConditions.contains(condition)) {
+        _selectedConditions.remove(condition);
+      } else {
+        _selectedConditions.add(condition);
+        _hasChronicDiseases = true;
+      }
+    });
   }
 
   @override
@@ -89,289 +135,445 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B)),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Icon
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+      backgroundColor: bgSurface,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildTopHeader(progress: 1.0),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+
+                    Center(
+                      child: Text(
+                        'medical_history_title'.tr(),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: darkSlate,
+                          height: 1.3,
+                        ),
+                      ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Center(
+                      child: Text(
+                        'medical_history_subtitle'.tr(),
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: secondarySlate,
+                          height: 1.4,
+                        ),
+                      ).animate().fadeIn(delay: 100.ms),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    _buildMedicalConditionTags().animate().fadeIn(delay: 150.ms),
+
+                    const SizedBox(height: 24),
+
+                    _buildQuestionCard(
+                      question: 'allergies_question'.tr(),
+                      value: _hasAllergies,
+                      icon: Iconsax.danger_copy,
+                      onChanged: (val) => setState(() => _hasAllergies = val),
+                      controller: _allergiesController,
+                      hintText: 'allergies_hint'.tr(),
+                      delay: 200,
+                    ),
+
+                    _buildQuestionCard(
+                      question: 'chronic_diseases_question'.tr(),
+                      value: _hasChronicDiseases,
+                      icon: Iconsax.activity_copy,
+                      onChanged: (val) => setState(() => _hasChronicDiseases = val),
+                      controller: _chronicController,
+                      hintText: 'chronic_diseases_hint'.tr(),
+                      delay: 300,
+                    ),
+
+                    _buildQuestionCard(
+                      question: 'medications_question'.tr(),
+                      value: _takesMedications,
+                      icon: Iconsax.hospital_copy,
+                      onChanged: (val) => setState(() => _takesMedications = val),
+                      controller: _medicationsController,
+                      hintText: 'medications_hint'.tr(),
+                      delay: 400,
+                    ),
+
+                    _buildQuestionCard(
+                      question: 'smoking_question'.tr(),
+                      value: _smokes,
+                      icon: Iconsax.warning_2_copy,
+                      onChanged: (val) => setState(() => _smokes = val),
+                      delay: 500,
+                    ),
+
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+
+            // Bottom Sticky Action Button
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
                   ),
-                  child: const Icon(
-                    Iconsax.clipboard_text_copy,
-                    size: 48,
-                    color: Color(0xFF3B82F6),
-                  ),
-                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+                ],
               ),
-              const SizedBox(height: 24),
-
-              Center(
-                child: Text(
-                  'medical_history_title'.tr(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1E293B),
-                  ),
-                ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1),
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  'medical_history_subtitle'.tr(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: const Color(0xFF64748B),
-                    height: 1.5,
-                  ),
-                ).animate().fadeIn(delay: 100.ms),
-              ),
-              const SizedBox(height: 32),
-
-              _buildQuestionSection(
-                question: 'allergies_question'.tr(),
-                value: _hasAllergies,
-                onChanged: (val) => setState(() => _hasAllergies = val),
-                controller: _allergiesController,
-                hintText: 'allergies_hint'.tr(),
-                inputIcon: Iconsax.danger_copy,
-                delay: 200,
-              ),
-
-              _buildQuestionSection(
-                question: 'chronic_diseases_question'.tr(),
-                value: _hasChronicDiseases,
-                onChanged: (val) => setState(() => _hasChronicDiseases = val),
-                controller: _chronicController,
-                hintText: 'chronic_diseases_hint'.tr(),
-                inputIcon: Iconsax.activity_copy,
-                delay: 300,
-              ),
-
-              _buildQuestionSection(
-                question: 'medications_question'.tr(),
-                value: _takesMedications,
-                onChanged: (val) => setState(() => _takesMedications = val),
-                controller: _medicationsController,
-                hintText: 'medications_hint'.tr(),
-                inputIcon: Iconsax.hospital_copy,
-                delay: 400,
-              ),
-
-              _buildQuestionSection(
-                question: 'smoking_question'.tr(),
-                value: _smokes,
-                onChanged: (val) => setState(() => _smokes = val),
-                delay: 500,
-              ),
-
-              const SizedBox(height: 32),
-
-              // Finish Button
-              SizedBox(
+              child: SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
                   onPressed: _completeSetup,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
+                    backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                     elevation: 4,
-                    shadowColor: const Color(0xFF3B82F6).withValues(alpha: 0.4),
-                  ),
-                  child: Text(
-                    'finish_setup'.tr(),
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                    shadowColor: primaryColor.withValues(alpha: 0.35),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'finish_setup'.tr(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_rounded, size: 20),
+                    ],
                   ),
                 ),
-              ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
-
-              const SizedBox(height: 40),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildQuestionSection({
+  Widget _buildTopHeader({required double progress}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF1F5F9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18,
+                color: darkSlate,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: const Color(0xFFE2E8F0),
+                valueColor: const AlwaysStoppedAnimation<Color>(primaryColor),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          TextButton(
+            onPressed: _skipSetup,
+            style: TextButton.styleFrom(
+              foregroundColor: secondarySlate,
+              textStyle: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            child: Text('skip'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicalConditionTags() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Iconsax.health_copy, size: 18, color: primaryColor),
+              const SizedBox(width: 8),
+              Text(
+                'Quick Select Conditions',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: darkSlate,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _commonConditions.map((condition) {
+              final isSelected = _selectedConditions.contains(condition);
+              return GestureDetector(
+                onTap: () => _toggleConditionTag(condition),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? lightBlueSoft : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 4),
+                          child: Icon(
+                            Icons.check_rounded,
+                            size: 14,
+                            color: primaryColor,
+                          ),
+                        ),
+                      Text(
+                        condition,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? primaryColor : darkSlate,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionCard({
     required String question,
     required bool? value,
+    required IconData icon,
     required ValueChanged<bool> onChanged,
     TextEditingController? controller,
     String? hintText,
-    IconData? inputIcon,
     required int delay,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          question,
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1E293B),
-          ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: value != null
+              ? primaryColor.withValues(alpha: 0.3)
+              : const Color(0xFFE2E8F0),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildChoiceCard(
-                title: 'yes'.tr(),
-                icon: Icons.check_circle_rounded,
-                optionValue: true,
-                currentValue: value,
-                onChanged: onChanged,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildChoiceCard(
-                title: 'no'.tr(),
-                icon: Icons.cancel_rounded,
-                optionValue: false,
-                currentValue: value,
-                onChanged: onChanged,
-              ),
-            ),
-          ],
-        ),
-        if (value == true && controller != null && hintText != null && inputIcon != null) ...[
-          const SizedBox(height: 16),
-          _buildInputField(
-            hint: hintText,
-            controller: controller,
-            icon: inputIcon,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
-        const SizedBox(height: 32),
-      ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: lightBlueSoft,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 20, color: primaryColor),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  question,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: darkSlate,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildChoicePill(
+                  title: 'yes'.tr(),
+                  optionValue: true,
+                  currentValue: value,
+                  onTap: () => onChanged(true),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildChoicePill(
+                  title: 'no'.tr(),
+                  optionValue: false,
+                  currentValue: value,
+                  onTap: () => onChanged(false),
+                ),
+              ),
+            ],
+          ),
+          if (value == true && controller != null && hintText != null) ...[
+            const SizedBox(height: 14),
+            TextField(
+              controller: controller,
+              style: GoogleFonts.poppins(
+                color: darkSlate,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: const Color(0xFFF8FAFC),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: primaryColor, width: 1.5),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                hintText: hintText,
+                hintStyle: GoogleFonts.poppins(
+                  color: const Color(0xFF94A3B8),
+                  fontSize: 13,
+                ),
+              ),
+            ).animate().fadeIn(duration: 250.ms).slideY(begin: -0.1),
+          ],
+        ],
+      ),
     ).animate().fadeIn(delay: delay.ms);
   }
 
-  Widget _buildChoiceCard({
+  Widget _buildChoicePill({
     required String title,
-    required IconData icon,
     required bool optionValue,
     required bool? currentValue,
-    required ValueChanged<bool> onChanged,
+    required VoidCallback onTap,
   }) {
     final isSelected = currentValue == optionValue;
     return GestureDetector(
-      onTap: () => onChanged(optionValue),
+      onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? primaryColor : const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFFE2E8F0),
-            width: isSelected ? 2 : 1,
+            color: isSelected ? primaryColor : const Color(0xFFE2E8F0),
+            width: 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    color: primaryColor.withValues(alpha: 0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ]
               : null,
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              icon,
-              size: 40,
-              color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8),
+              optionValue ? Icons.check_circle_rounded : Icons.cancel_rounded,
+              size: 18,
+              color: isSelected ? Colors.white : secondarySlate,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(width: 8),
             Text(
               title,
               style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFF64748B),
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: isSelected ? Colors.white : darkSlate,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildInputField({
-    required String hint,
-    required TextEditingController controller,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: TextField(
-        controller: controller,
-        style: GoogleFonts.poppins(color: const Color(0xFF1E293B)),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: const Color(0xFFF1F5F9),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-          hintText: hint,
-          hintStyle: GoogleFonts.poppins(
-            color: const Color(0xFF94A3B8),
-            fontSize: 14,
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: const Color(0xFF3B82F6).withValues(alpha: 0.7),
-            size: 22,
-          ),
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(begin: -0.1);
   }
 }
