@@ -352,5 +352,17 @@
   "weight_kg": "الوزن (كجم)",
   "height_cm": "الطول (سم)",
   "save_and_continue": "حفظ ومتابعة",
-  "fill_all_fields": "يرجى ملء جميع الحقول"
+  "fill_all_fields": "يرجى ملء جميع الحقول",
+  "medical_history_title": "التاريخ الطبي",
+  "medical_history_subtitle": "تساعد هذه التفاصيل الطبيب في وصف العلاج المناسب.",
+  "allergies_question": "هل تعاني من أي حساسية للأدوية أو الطعام؟",
+  "allergies_hint": "اذكر أنواع الحساسية...",
+  "chronic_diseases_question": "هل تعاني من أي أمراض مزمنة؟ (مثل السكري)",
+  "chronic_diseases_hint": "اذكر الأمراض...",
+  "medications_question": "هل تتناول أي أدوية بانتظام؟",
+  "medications_hint": "اذكر الأدوية...",
+  "smoking_question": "هل تدخن؟",
+  "yes": "نعم",
+  "no": "لا",
+  "finish_setup": "إنهاء"
 }

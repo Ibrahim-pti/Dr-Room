@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'medical_history_screen.dart';
 
 class HealthProfileScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -67,7 +68,14 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     if (_heightController.text.isNotEmpty)
       await prefs.setString('guest_height', _heightController.text);
 
-    widget.onFinished();
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MedicalHistoryScreen(onFinished: widget.onFinished),
+        ),
+      );
+    }
   }
 
   @override
@@ -357,9 +365,7 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: TextField(
             controller: controller,
@@ -367,7 +373,16 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
             inputFormatters: inputFormatters,
             style: GoogleFonts.poppins(color: const Color(0xFF1E293B)),
             decoration: InputDecoration(
-              border: InputBorder.none,
+              filled: true,
+              fillColor: const Color(0xFFF1F5F9),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5),
+              ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 14,
@@ -400,9 +415,8 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color(0xFFF1F5F9),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(

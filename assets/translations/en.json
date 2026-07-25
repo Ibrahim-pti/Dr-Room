@@ -352,5 +352,17 @@
   "weight_kg": "Weight (kg)",
   "height_cm": "Height (cm)",
   "save_and_continue": "Save & Continue",
-  "fill_all_fields": "Please fill in all fields"
+  "fill_all_fields": "Please fill in all fields",
+  "medical_history_title": "Medical History",
+  "medical_history_subtitle": "These details help the doctor prescribe the right treatment.",
+  "allergies_question": "Do you have any food or drug allergies?",
+  "allergies_hint": "List your allergies...",
+  "chronic_diseases_question": "Do you have any chronic diseases? (e.g. Diabetes)",
+  "chronic_diseases_hint": "List your diseases...",
+  "medications_question": "Are you currently taking any regular medications?",
+  "medications_hint": "List your medications...",
+  "smoking_question": "Do you smoke?",
+  "yes": "Yes",
+  "no": "No",
+  "finish_setup": "Finish"
 }
