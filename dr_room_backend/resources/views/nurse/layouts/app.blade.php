@@ -415,7 +415,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <form method="POST" action="{{ route('nurse.logout') }}">
+                <form method="POST" action="{{ route('staff.logout') }}">
                     @csrf
                     <button type="submit" class="logout-btn">
                         <svg class="nav-icon" style="color: #EF4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">

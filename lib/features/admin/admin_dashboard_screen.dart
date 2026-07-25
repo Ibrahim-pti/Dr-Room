@@ -10,6 +10,7 @@ import 'admin_labs_screen.dart';
 import 'admin_pharmacies_screen.dart';
 import 'admin_xrays_screen.dart';
 import 'admin_banners_screen.dart';
+import 'admin_orders_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -166,6 +167,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         'icon': Iconsax.scan,
         'color': const Color(0xFF10B981),
         'screen': const AdminXRaysScreen(),
+      },
+      {
+        'title': 'داواکارییەکان',
+        'subtitle': 'بینین و ناردنی ئۆردەرەکان',
+        'icon': Iconsax.document,
+        'color': const Color(0xFF3B82F6),
+        'screen': const AdminOrdersScreen(),
       },
     ];
 

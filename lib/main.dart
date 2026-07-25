@@ -10,6 +10,7 @@ import 'core/providers/favorite_provider.dart';
 import 'core/utils/ckb_localizations.dart';
 import 'core/providers/health_provider.dart';
 import 'core/providers/cart_provider.dart';
+import 'core/providers/admin_order_provider.dart';
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
@@ -52,6 +53,7 @@ class DrRoomApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
         ChangeNotifierProvider(create: (_) => HealthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => AdminOrderProvider()),
       ],
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: ThemeProvider().themeModeNotifier,

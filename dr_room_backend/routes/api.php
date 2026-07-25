@@ -31,6 +31,9 @@ Route::get('/articles', [AppController::class, 'articles']);
 Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
 
+// ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
+// Handled inside auth group
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -62,6 +65,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('articles', ArticleController::class);
         Route::apiResource('notifications', NotificationController::class);
         Route::get('/appointments', [AppointmentController::class, 'index']);
+
+        // Orders
+        Route::get('/orders', [\App\Http\Controllers\Api\Admin\AdminOrderController::class, 'index']);
+        Route::patch('/orders/{id}/assign-nurse', [\App\Http\Controllers\Api\Admin\AdminOrderController::class, 'assignNurse']);
+        Route::patch('/orders/{id}/status', [\App\Http\Controllers\Api\Admin\AdminOrderController::class, 'updateStatus']);
 
         // Doctors
         Route::get('/doctors', [\App\Http\Controllers\Api\Admin\AdminDoctorController::class, 'index']);
