@@ -5,8 +5,8 @@
     <!-- Welcome Section -->
     <div class="welcome-section">
         <div>
-            <h1 class="welcome-title">Dashboard</h1>
-            <p class="welcome-subtitle">Welcome back, Dr. {{ explode(' ', $user->name)[0] }}</p>
+            <h1 class="welcome-title">داشبۆرد</h1>
+            <p class="welcome-subtitle">بەخێربێیتەوە، دکتۆر {{ explode(' ', $user->name)[0] }}</p>
         </div>
     </div>
 
@@ -22,12 +22,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Today's Appointments</div>
+            <div class="stat-label">چاوپێکەوتنەکانی ئەمڕۆ</div>
             <div class="stat-change positive">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                12% from yesterday
+                ١٥٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -41,12 +41,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Completed</div>
+            <div class="stat-label">تەواوکراو</div>
             <div class="stat-change positive">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                8% from yesterday
+                ٨٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -60,12 +60,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Pending</div>
+            <div class="stat-label">ڕاوێژی ئۆنلاین</div>
             <div class="stat-change negative">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="transform: rotate(180deg);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                4% from yesterday
+                ٢٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -79,7 +79,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Rating</div>
+            <div class="stat-label">هەڵسەنگاندن</div>
             <div class="stat-stars">
                 @for($i = 0; $i < 5; $i++)
                     <svg width="14" height="14" fill="{{ $i < round($doctor->rating ?? 4.8) ? '#EAB308' : '#E2E8F0' }}" viewBox="0 0 24 24">
@@ -95,79 +95,76 @@
         <!-- Today's Appointments List -->
         <div class="card appointments-card">
             <div class="card-header">
-                <h3 class="card-title">Today's Appointments</h3>
-                <a href="{{ route('doctor.appointments.index') }}" class="view-all-link">View All</a>
+                <h3 class="card-title">خشتەی کارکردنی ئەمڕۆ</h3>
+                <a href="{{ route('doctor.appointments.index') }}" class="view-all-link">بینینی هەمووی</a>
             </div>
             <div class="appointments-list">
                 @if(isset($upcomingAppointments) && $upcomingAppointments->count() > 0)
                     @foreach($upcomingAppointments->take(4) as $appointment)
                         <div class="appointment-item">
-                            <div class="appointment-time">{{ $appointment->appointment_date->format('h:i A') }}</div>
+                            <div class="appointment-time">{{ $appointment->appointment_date->format('h:i') }} {{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
                             <div class="appointment-info">
                                 <div class="appointment-avatar">
                                     @if($appointment->patient->profile_image)
                                         <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" alt="">
                                     @else
-                                        {{ substr($appointment->patient->name, 0, 1) }}
+                                        {{ mb_substr($appointment->patient->name, 0, 1) }}
                                     @endif
                                 </div>
                                 <div>
                                     <div class="appointment-name">{{ $appointment->patient->name }}</div>
-                                    <div class="appointment-type">{{ $appointment->type == 'online' ? 'Online Consultation' : 'Follow-up' }}</div>
+                                    <div class="appointment-type">{{ $appointment->type == 'online' ? 'ڕاوێژی ئۆنلاین' : 'سەردانی نۆڕینگە' }}</div>
                                 </div>
                             </div>
                             <span class="status-badge {{ $appointment->status == 'completed' ? 'completed' : ($appointment->status == 'pending' ? 'pending' : 'upcoming') }}">
-                                {{ ucfirst($appointment->status) }}
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                                </svg>
+                                {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'pending' ? 'چاوەڕێکراو' : 'بەڕێوەیە') }}
                             </span>
                         </div>
                     @endforeach
                 @else
                     <div class="appointment-item">
-                        <div class="appointment-time">09:00 AM</div>
+                        <div class="appointment-time">09:00 ب.ن</div>
                         <div class="appointment-info">
-                            <div class="appointment-avatar">A</div>
+                            <div class="appointment-avatar">ع</div>
                             <div>
-                                <div class="appointment-name">Ali Ahmed</div>
-                                <div class="appointment-type">Online Consultation</div>
+                                <div class="appointment-name">عەلی ئەحمەد</div>
+                                <div class="appointment-type">ڕاوێژی ئۆنلاین</div>
                             </div>
                         </div>
-                        <span class="status-badge completed">Completed <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                        <span class="status-badge completed">تەواوکراو</span>
                     </div>
                     <div class="appointment-item">
-                        <div class="appointment-time">10:30 AM</div>
+                        <div class="appointment-time">10:30 ب.ن</div>
                         <div class="appointment-info">
-                            <div class="appointment-avatar" style="background: #FCE7F3; color: #EC4899;">S</div>
+                            <div class="appointment-avatar" style="background: #FCE7F3; color: #EC4899;">س</div>
                             <div>
-                                <div class="appointment-name">Sara Karim</div>
-                                <div class="appointment-type">Follow-up</div>
+                                <div class="appointment-name">سارا کەریم</div>
+                                <div class="appointment-type">بەدواداچوون</div>
                             </div>
                         </div>
-                        <span class="status-badge upcoming">Upcoming <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                        <span class="status-badge upcoming">بەڕێوەیە</span>
                     </div>
                     <div class="appointment-item">
-                        <div class="appointment-time">11:30 AM</div>
+                        <div class="appointment-time">11:30 ب.ن</div>
                         <div class="appointment-info">
-                            <div class="appointment-avatar" style="background: #DBEAFE; color: #3B82F6;">H</div>
+                            <div class="appointment-avatar" style="background: #DBEAFE; color: #3B82F6;">ح</div>
                             <div>
-                                <div class="appointment-name">Hassan Qadir</div>
-                                <div class="appointment-type">Online Consultation</div>
+                                <div class="appointment-name">حەسەن قادر</div>
+                                <div class="appointment-type">ڕاوێژی ئۆنلاین</div>
                             </div>
                         </div>
-                        <span class="status-badge upcoming">Upcoming <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                        <span class="status-badge upcoming">بەڕێوەیە</span>
                     </div>
                     <div class="appointment-item">
-                        <div class="appointment-time">01:00 PM</div>
+                        <div class="appointment-time">01:00 د.ن</div>
                         <div class="appointment-info">
-                            <div class="appointment-avatar" style="background: #FEF3C7; color: #D97706;">Z</div>
+                            <div class="appointment-avatar" style="background: #FEF3C7; color: #D97706;">ز</div>
                             <div>
-                                <div class="appointment-name">Zana Othman</div>
-                                <div class="appointment-type">Follow-up</div>
+                                <div class="appointment-name">زانا عوسمان</div>
+                                <div class="appointment-type">بەدواداچوون</div>
                             </div>
                         </div>
-                        <span class="status-badge pending">Pending <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+                        <span class="status-badge pending">چاوەڕێکراو</span>
                     </div>
                 @endif
             </div>
@@ -176,11 +173,11 @@
         <!-- Appointments Overview Chart -->
         <div class="card chart-card">
             <div class="card-header">
-                <h3 class="card-title">Appointments Overview</h3>
+                <h3 class="card-title">پوختەی داهات</h3>
                 <select class="chart-select">
-                    <option>This Week</option>
-                    <option>Last Week</option>
-                    <option>This Month</option>
+                    <option>ئەم هەفتەیە</option>
+                    <option>هەفتەی ڕابردوو</option>
+                    <option>ئەم مانگە</option>
                 </select>
             </div>
             <div class="chart-container">
@@ -191,8 +188,8 @@
         <!-- Recent Patients -->
         <div class="card patients-card">
             <div class="card-header">
-                <h3 class="card-title">Recent Patients</h3>
-                <a href="{{ route('doctor.patients.index') }}" class="view-all-link">View All</a>
+                <h3 class="card-title">دوایین نەخۆشەکان</h3>
+                <a href="{{ route('doctor.patients.index') }}" class="view-all-link">بینینی هەمووی</a>
             </div>
             <div class="patients-list">
                 @if(isset($recentPatients) && count($recentPatients) > 0)
@@ -202,48 +199,48 @@
                                 @if($patient->profile_image)
                                     <img src="{{ asset('storage/' . $patient->profile_image) }}" alt="">
                                 @else
-                                    {{ substr($patient->name, 0, 1) }}
+                                    {{ mb_substr($patient->name, 0, 1) }}
                                 @endif
                             </div>
                             <div class="patient-info">
                                 <div class="patient-name">{{ $patient->name }}</div>
-                                <div class="patient-detail">{{ $patient->gender ?? 'Male' }}, {{ $patient->age ?? '30' }}</div>
+                                <div class="patient-detail">{{ $patient->gender ?? 'نێر' }}, {{ $patient->age ?? '30' }} ساڵ</div>
                             </div>
-                            <div class="patient-date">Today</div>
+                            <div class="patient-date">ئەمڕۆ</div>
                         </div>
                     @endforeach
                 @else
                     <div class="patient-item">
-                        <div class="patient-avatar">A</div>
+                        <div class="patient-avatar">ع</div>
                         <div class="patient-info">
-                            <div class="patient-name">Ali Ahmed</div>
-                            <div class="patient-detail">Male, 38</div>
+                            <div class="patient-name">عەلی ئەحمەد</div>
+                            <div class="patient-detail">نێر، 38 ساڵ</div>
                         </div>
-                        <div class="patient-date">Today</div>
+                        <div class="patient-date">ئەمڕۆ</div>
                     </div>
                     <div class="patient-item">
-                        <div class="patient-avatar" style="background: #FCE7F3; color: #EC4899;">S</div>
+                        <div class="patient-avatar" style="background: #FCE7F3; color: #EC4899;">س</div>
                         <div class="patient-info">
-                            <div class="patient-name">Sara Karim</div>
-                            <div class="patient-detail">Female, 35</div>
+                            <div class="patient-name">سارا کەریم</div>
+                            <div class="patient-detail">مێ، 35 ساڵ</div>
                         </div>
-                        <div class="patient-date">Today</div>
+                        <div class="patient-date">ئەمڕۆ</div>
                     </div>
                     <div class="patient-item">
-                        <div class="patient-avatar" style="background: #DBEAFE; color: #3B82F6;">H</div>
+                        <div class="patient-avatar" style="background: #DBEAFE; color: #3B82F6;">ح</div>
                         <div class="patient-info">
-                            <div class="patient-name">Hassan Qadir</div>
-                            <div class="patient-detail">Male, 42</div>
+                            <div class="patient-name">حەسەن قادر</div>
+                            <div class="patient-detail">نێر، 42 ساڵ</div>
                         </div>
-                        <div class="patient-date">Yesterday</div>
+                        <div class="patient-date">دوێنێ</div>
                     </div>
                     <div class="patient-item">
-                        <div class="patient-avatar" style="background: #FEF3C7; color: #D97706;">Z</div>
+                        <div class="patient-avatar" style="background: #FEF3C7; color: #D97706;">ز</div>
                         <div class="patient-info">
-                            <div class="patient-name">Zana Othman</div>
-                            <div class="patient-detail">Female, 29</div>
+                            <div class="patient-name">زانا عوسمان</div>
+                            <div class="patient-detail">مێ، 29 ساڵ</div>
                         </div>
-                        <div class="patient-date">Yesterday</div>
+                        <div class="patient-date">دوێنێ</div>
                     </div>
                 @endif
             </div>
@@ -596,9 +593,9 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: ['دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە', 'یەکشەممە'],
                     datasets: [{
-                        label: 'Appointments',
+                        label: 'چاوپێکەوتنەکان',
                         data: [15, 22, 18, 25, 30, 35, 28],
                         borderColor: '#3B82F6',
                         backgroundColor: 'rgba(59, 130, 246, 0.08)',

@@ -188,11 +188,12 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
         itemCount: list.length,
         itemBuilder: (context, index) {
-          final doc = list[index];
-          final user = doc['user'] ?? {};
+          final user = list[index];
           final name = user['name'] ?? 'نەزانراو';
           final email = user['email'] ?? '';
-          final specialty = doc['bio'] ?? 'گشتی';
+          final phone = user['phone'] ?? '';
+          final lab = user['lab'] ?? {};
+          final type = lab['lab_type'] ?? 'گشتی';
 
           return Container(
             margin: const EdgeInsets.only(bottom: 14),
@@ -231,7 +232,7 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            specialty,
+                            type,
                             style: TextStyle(
                               fontFamily: 'Rabar',
                               color: const Color(0xFF8B5CF6),
@@ -262,6 +263,30 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
                               ],
                             ),
                           ],
+                          if (phone.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.phone_outlined,
+                                  color: Color(0xFF94A3B8),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    phone,
+                                    style: TextStyle(
+                                      fontFamily: 'Rabar',
+                                      color: const Color(0xFF94A3B8),
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -276,7 +301,7 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
                           label: 'پەسەندکردن',
                           icon: Iconsax.tick_circle,
                           color: const Color(0xFF10B981),
-                          onTap: () => _approveLab(doc['id']),
+                          onTap: () => _approveLab(user['id']),
                         ),
                       ),
                     if (!isPending)
@@ -285,7 +310,7 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
                           label: 'ڕەتکردنەوە',
                           icon: Iconsax.close_circle,
                           color: const Color(0xFFF59E0B),
-                          onTap: () => _rejectLab(doc['id']),
+                          onTap: () => _rejectLab(user['id']),
                         ),
                       ),
                     const SizedBox(width: 10),
@@ -294,7 +319,7 @@ class _AdminLabsScreenState extends State<AdminLabsScreen>
                         label: 'سڕینەوە',
                         icon: Iconsax.trash,
                         color: const Color(0xFFEF4444),
-                        onTap: () => _deleteLab(doc['id']),
+                        onTap: () => _deleteLab(user['id']),
                       ),
                     ),
                   ],

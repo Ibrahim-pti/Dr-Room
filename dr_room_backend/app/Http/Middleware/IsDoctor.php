@@ -15,7 +15,11 @@ class IsDoctor
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Access denied. Doctor account required.'], 403);
             }
-            return redirect('/doctor/login');
+            return redirect('/staff/login');
+        }
+
+        if (auth()->user()->status === 'pending') {
+            return redirect()->route('staff.waiting');
         }
 
         return $next($request);

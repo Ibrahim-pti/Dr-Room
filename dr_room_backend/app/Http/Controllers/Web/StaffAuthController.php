@@ -31,10 +31,7 @@ class StaffAuthController extends Controller
             $user = Auth::user();
             
             if ($user->status === 'pending') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'هەژمارەکەت چاوەڕێی پەسەندکردنی ئەدمینە.',
-                ]);
+                return redirect()->route('staff.waiting');
             }
             
             if ($user->status === 'blocked') {
@@ -87,8 +84,8 @@ class StaffAuthController extends Controller
             'status' => 'pending',
         ]);
 
-        // We do not log them in automatically because they are pending.
-        return redirect()->route('staff.login')->with('success', 'هەژمارەکەت دروستکرا. تکایە چاوەڕێ بکە تاوەکو ئەدمین پەسەندی دەکات.');
+        Auth::login($user);
+        return redirect()->route('staff.waiting');
     }
 
     public function logout(Request $request)
@@ -109,5 +106,29 @@ class StaffAuthController extends Controller
             return redirect('/lab/dashboard');
         }
         return redirect()->route('staff.login');
+    }
+
+    public function waiting()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('staff.login');
+        }
+
+        if ($user->status === 'approved') {
+            return $this->redirectBasedOnRole($user->role);
+        }
+
+        return view('auth.waiting');
+    }
+
+    public function status()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['status' => 'unauthenticated'], 401);
+        }
+        
+        return response()->json(['status' => $user->status]);
     }
 }

@@ -187,10 +187,11 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
         itemCount: list.length,
         itemBuilder: (context, index) {
-          final doc = list[index];
-          final user = doc['user'] ?? {};
+          final user = list[index];
           final name = user['name'] ?? 'نەزانراو';
           final email = user['email'] ?? '';
+          final phone = user['phone'] ?? '';
+          final doc = user['doctor'] ?? {};
           final specialty = doc['specialty'] ?? 'گشتی';
 
           return Container(
@@ -261,6 +262,30 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
                               ],
                             ),
                           ],
+                          if (phone.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.phone_outlined,
+                                  color: Color(0xFF94A3B8),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    phone,
+                                    style: TextStyle(
+                                      fontFamily: 'Rabar',
+                                      color: const Color(0xFF94A3B8),
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -275,7 +300,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
                           label: 'پەسەندکردن',
                           icon: Iconsax.tick_circle,
                           color: const Color(0xFF10B981),
-                          onTap: () => _approveDoctor(doc['id']),
+                          onTap: () => _approveDoctor(user['id']),
                         ),
                       ),
                     if (!isPending)
@@ -284,7 +309,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
                           label: 'ڕەتکردنەوە',
                           icon: Iconsax.close_circle,
                           color: const Color(0xFFF59E0B),
-                          onTap: () => _rejectDoctor(doc['id']),
+                          onTap: () => _rejectDoctor(user['id']),
                         ),
                       ),
                     const SizedBox(width: 10),
@@ -293,7 +318,7 @@ class _AdminDoctorsScreenState extends State<AdminDoctorsScreen>
                         label: 'سڕینەوە',
                         icon: Iconsax.trash,
                         color: const Color(0xFFEF4444),
-                        onTap: () => _deleteDoctor(doc['id']),
+                        onTap: () => _deleteDoctor(user['id']),
                       ),
                     ),
                   ],

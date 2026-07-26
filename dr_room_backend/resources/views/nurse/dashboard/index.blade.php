@@ -5,8 +5,8 @@
     <!-- Welcome Section -->
     <div class="welcome-section">
         <div>
-            <h1 class="welcome-title">Dashboard</h1>
-            <p class="welcome-subtitle">Welcome back, Nurse {{ explode(' ', $user->name)[0] }}</p>
+            <h1 class="welcome-title">داشبۆرد</h1>
+            <p class="welcome-subtitle">بەخێربێیتەوە، پەرستار {{ explode(' ', $user->name)[0] }}</p>
         </div>
     </div>
 
@@ -22,12 +22,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Today's Requests</div>
+            <div class="stat-label">داواکارییەکانی ئەمڕۆ</div>
             <div class="stat-change positive">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                15% from yesterday
+                ١٥٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -41,12 +41,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Completed</div>
+            <div class="stat-label">تەواوکراوەکان</div>
             <div class="stat-change positive">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                10% from yesterday
+                ١٠٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -60,12 +60,12 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">In Progress</div>
+            <div class="stat-label">لە جێبەجێکردندایە</div>
             <div class="stat-change negative">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="transform: rotate(180deg);">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                 </svg>
-                2% from yesterday
+                ٢٪ بەراورد بە دوێنێ
             </div>
         </div>
 
@@ -79,7 +79,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="stat-label">Rating</div>
+            <div class="stat-label">هەڵسەنگاندن</div>
             <div class="stat-stars">
                 @for($i = 0; $i < 5; $i++)
                     <svg width="14" height="14" fill="{{ $i < round($nurse->rating ?? 4.9) ? '#EAB308' : '#E2E8F0' }}" viewBox="0 0 24 24">
@@ -95,76 +95,76 @@
         <!-- Today's Schedule -->
         <div class="card schedule-card">
             <div class="card-header">
-                <h3 class="card-title">Today's Schedule</h3>
-                <a href="{{ route('nurse.appointments.index') }}" class="view-all-link">View All</a>
+                <h3 class="card-title">خشتەی کارکردنی ئەمڕۆ</h3>
+                <a href="{{ route('nurse.appointments.index') }}" class="view-all-link">بینینی هەمووی</a>
             </div>
             <div class="schedule-list">
                 @if(isset($upcomingAppointments) && $upcomingAppointments->count() > 0)
                     @foreach($upcomingAppointments->take(4) as $appointment)
                         <div class="schedule-item">
-                            <div class="schedule-time">{{ $appointment->appointment_date->format('h:i A') }}</div>
+                            <div class="schedule-time">{{ $appointment->appointment_date->format('h:i') }} {{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
                             <div class="schedule-info">
                                 <div class="schedule-avatar">
                                     @if($appointment->patient->profile_image)
                                         <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" alt="">
                                     @else
-                                        {{ substr($appointment->patient->name, 0, 1) }}
+                                        {{ mb_substr($appointment->patient->name, 0, 1) }}
                                     @endif
                                 </div>
                                 <div>
-                                    <div class="schedule-name">{{ $appointment->type == 'online' ? 'Online Care' : 'Home Visit' }}</div>
+                                    <div class="schedule-name">{{ $appointment->type == 'online' ? 'چاودێری ئۆنلاین' : 'سەردانی ماڵەوە' }}</div>
                                     <div class="schedule-patient">{{ $appointment->patient->name }}</div>
                                 </div>
                             </div>
                             <span class="status-badge {{ $appointment->status == 'completed' ? 'completed' : ($appointment->status == 'in_progress' ? 'in-progress' : 'upcoming') }}">
-                                {{ ucfirst(str_replace('_', ' ', $appointment->status)) }}
+                                {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'in_progress' ? 'لە جێبەجێکردندایە' : 'بەڕێوەیە') }}
                             </span>
                         </div>
                     @endforeach
                 @else
                     <div class="schedule-item">
-                        <div class="schedule-time">08:30 AM</div>
+                        <div class="schedule-time">08:30 ب.ن</div>
                         <div class="schedule-info">
-                            <div class="schedule-avatar">A</div>
+                            <div class="schedule-avatar">ع</div>
                             <div>
-                                <div class="schedule-name">Blood Test</div>
-                                <div class="schedule-patient">Ali Ahmed</div>
+                                <div class="schedule-name">پشکنینی خوێن</div>
+                                <div class="schedule-patient">عەلی ئەحمەد</div>
                             </div>
                         </div>
-                        <span class="status-badge completed">Completed</span>
+                        <span class="status-badge completed">تەواوکراو</span>
                     </div>
                     <div class="schedule-item">
-                        <div class="schedule-time">10:00 AM</div>
+                        <div class="schedule-time">10:00 ب.ن</div>
                         <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #FCE7F3; color: #EC4899;">S</div>
+                            <div class="schedule-avatar" style="background: #FCE7F3; color: #EC4899;">س</div>
                             <div>
-                                <div class="schedule-name">Injection (IV)</div>
-                                <div class="schedule-patient">Sara Karim</div>
+                                <div class="schedule-name">دەرزی (IV)</div>
+                                <div class="schedule-patient">سارا کەریم</div>
                             </div>
                         </div>
-                        <span class="status-badge in-progress">In Progress</span>
+                        <span class="status-badge in-progress">لە جێبەجێکردندایە</span>
                     </div>
                     <div class="schedule-item">
-                        <div class="schedule-time">12:00 PM</div>
+                        <div class="schedule-time">12:00 د.ن</div>
                         <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #DBEAFE; color: #3B82F6;">H</div>
+                            <div class="schedule-avatar" style="background: #DBEAFE; color: #3B82F6;">ح</div>
                             <div>
-                                <div class="schedule-name">Dressing</div>
-                                <div class="schedule-patient">Hassan Qadir</div>
+                                <div class="schedule-name">برینپێچی</div>
+                                <div class="schedule-patient">حەسەن قادر</div>
                             </div>
                         </div>
-                        <span class="status-badge upcoming">Upcoming</span>
+                        <span class="status-badge upcoming">بەڕێوەیە</span>
                     </div>
                     <div class="schedule-item">
-                        <div class="schedule-time">02:30 PM</div>
+                        <div class="schedule-time">02:30 د.ن</div>
                         <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #FEF3C7; color: #D97706;">Z</div>
+                            <div class="schedule-avatar" style="background: #FEF3C7; color: #D97706;">ز</div>
                             <div>
-                                <div class="schedule-name">Elderly Care</div>
-                                <div class="schedule-patient">Zana Othman</div>
+                                <div class="schedule-name">چاودێری بەتەمەن</div>
+                                <div class="schedule-patient">زانا عوسمان</div>
                             </div>
                         </div>
-                        <span class="status-badge upcoming">Upcoming</span>
+                        <span class="status-badge upcoming">بەڕێوەیە</span>
                     </div>
                 @endif
             </div>
@@ -173,21 +173,21 @@
         <!-- Earnings Overview -->
         <div class="card earnings-card">
             <div class="card-header">
-                <h3 class="card-title">Earnings Overview</h3>
+                <h3 class="card-title">پوختەی داهات</h3>
                 <select class="chart-select">
-                    <option>This Week</option>
-                    <option>Last Week</option>
-                    <option>This Month</option>
+                    <option>ئەم هەفتەیە</option>
+                    <option>هەفتەی ڕابردوو</option>
+                    <option>ئەم مانگە</option>
                 </select>
             </div>
             <div class="earnings-total">
-                <div class="earnings-label">Total Earnings</div>
-                <div class="earnings-amount">320,000 <span class="earnings-currency">IQD</span></div>
+                <div class="earnings-label">کۆی گشتی داهات</div>
+                <div class="earnings-amount">320,000 <span class="earnings-currency">دینار</span></div>
                 <div class="stat-change positive" style="margin-top: 4px;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
                     </svg>
-                    12% from last week
+                    ١٢٪ بەراورد بە هەفتەی ڕابردوو
                 </div>
             </div>
             <div class="chart-container">
@@ -198,7 +198,7 @@
         <!-- Request Status -->
         <div class="card status-card">
             <div class="card-header">
-                <h3 class="card-title">Request Status</h3>
+                <h3 class="card-title">دۆخی داواکارییەکان</h3>
             </div>
             <div class="donut-container">
                 <canvas id="requestStatusChart"></canvas>
@@ -206,17 +206,17 @@
             <div class="status-legend">
                 <div class="legend-item">
                     <span class="legend-dot" style="background: #3B82F6;"></span>
-                    <span class="legend-label">Completed</span>
+                    <span class="legend-label">تەواوکراو</span>
                     <span class="legend-value">8 (57%)</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-dot" style="background: #F97316;"></span>
-                    <span class="legend-label">In Progress</span>
+                    <span class="legend-label">لە جێبەجێکردندایە</span>
                     <span class="legend-value">3 (25%)</span>
                 </div>
                 <div class="legend-item">
                     <span class="legend-dot" style="background: #EAB308;"></span>
-                    <span class="legend-label">Pending</span>
+                    <span class="legend-label">چاوەڕێکراو</span>
                     <span class="legend-value">1 (8%)</span>
                 </div>
             </div>
@@ -544,9 +544,9 @@
             new Chart(earningsCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: ['دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە', 'یەکشەممە'],
                     datasets: [{
-                        label: 'Earnings',
+                        label: 'داهات',
                         data: [280000, 350000, 320000, 400000, 380000, 420000, 300000],
                         backgroundColor: [
                             '#3B82F6', '#6366F1', '#3B82F6', '#6366F1', '#3B82F6', '#6366F1', '#3B82F6'
@@ -588,7 +588,7 @@
             new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Completed', 'In Progress', 'Pending'],
+                    labels: ['تەواوکراو', 'لە جێبەجێکردندایە', 'چاوەڕێکراو'],
                     datasets: [{
                         data: [8, 3, 1],
                         backgroundColor: ['#3B82F6', '#F97316', '#EAB308'],

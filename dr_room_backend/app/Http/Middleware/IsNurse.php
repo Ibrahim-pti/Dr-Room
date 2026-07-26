@@ -19,7 +19,11 @@ class IsNurse
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Access denied. Nurse account required.'], 403);
             }
-            return redirect('/nurse/login');
+            return redirect('/staff/login');
+        }
+
+        if (auth()->user()->status === 'pending') {
+            return redirect()->route('staff.waiting');
         }
 
         return $next($request);

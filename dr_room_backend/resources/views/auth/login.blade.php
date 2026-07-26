@@ -187,6 +187,12 @@
                 <h1>Staff Login</h1>
                 <p class="subtitle">Welcome back! Please login to your account.</p>
 
+                @if (session('success'))
+                    <div class="err-box" style="background: #F0FDF4; border-color: #DCFCE7; color: #166534;">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="err-box">
                         @foreach ($errors->all() as $error)

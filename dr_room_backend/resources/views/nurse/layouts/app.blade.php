@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,13 +21,13 @@
         .sidebar {
             width: 260px;
             background: #fff;
-            border-right: 1px solid #E2E8F0;
+            border-inline-end: 1px solid #E2E8F0;
             display: flex;
             flex-direction: column;
             height: 100vh;
             position: fixed;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             z-index: 50;
             transition: transform 0.3s ease;
         }
@@ -80,7 +80,7 @@
             border: none;
             background: none;
             width: 100%;
-            text-align: left;
+            text-align: start;
         }
 
         .nav-item:hover {
@@ -127,7 +127,7 @@
             border: none;
             background: none;
             width: 100%;
-            text-align: left;
+            text-align: start;
         }
 
         .logout-btn:hover {
@@ -135,7 +135,7 @@
         }
 
         .main-content {
-            margin-left: 260px;
+            margin-inline-start: 260px;
             min-height: 100vh;
         }
 
@@ -247,7 +247,7 @@
         }
 
         .header-profile-info {
-            text-align: right;
+            text-align: start;
         }
 
         .header-profile-name {
@@ -294,8 +294,8 @@
             display: none;
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
+            inset-inline-start: 0;
+            inset-inline-end: 0;
             bottom: 0;
             background: rgba(0,0,0,0.4);
             z-index: 45;
@@ -303,7 +303,7 @@
 
         @media (max-width: 1024px) {
             .sidebar {
-                transform: translateX(-100%);
+                transform: translateX(100%); /* For RTL, slide from right */
             }
             .sidebar.open {
                 transform: translateX(0);
@@ -312,7 +312,7 @@
                 display: block;
             }
             .main-content {
-                margin-left: 0;
+                margin-inline-start: 0;
             }
             .mobile-menu-btn {
                 display: flex;
@@ -354,65 +354,44 @@
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                     </svg>
-                    Dashboard
+                    داشبۆرد
                 </a>
 
                 <a href="{{ route('nurse.appointments.index') }}" class="nav-item {{ request()->routeIs('nurse.appointments.*') ? 'active' : '' }}">
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
-                    My Requests
+                    داواکارییەکانم
                 </a>
 
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Schedule
-                </a>
+
 
                 <a href="{{ route('nurse.patients.index') }}" class="nav-item {{ request()->routeIs('nurse.patients.*') ? 'active' : '' }}">
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    Patients
+                    نەخۆشەکان
                 </a>
 
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                    </svg>
-                    Visit History
-                </a>
+
 
                 <a href="{{ route('nurse.earnings.index') }}" class="nav-item {{ request()->routeIs('nurse.earnings.*') ? 'active' : '' }}">
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Earnings
+                    داهات
                 </a>
 
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Availability
-                </a>
+
 
                 <a href="{{ route('nurse.profile.index') }}" class="nav-item {{ request()->routeIs('nurse.profile.*') ? 'active' : '' }}">
                     <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                    Profile
+                    پرۆفایل
                 </a>
 
-                <a href="#" class="nav-item">
-                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    Settings
-                </a>
+
             </nav>
 
             <div class="sidebar-footer">
@@ -422,7 +401,7 @@
                         <svg class="nav-icon" style="color: #EF4444;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>
-                        Logout
+                        چوونەدەرەوە
                     </button>
                 </form>
             </div>
@@ -462,14 +441,14 @@
 
                     <div class="header-profile">
                         <div class="header-profile-info">
-                            <div class="header-profile-name">Nurse {{ explode(' ', Auth::user()->name)[0] }}</div>
-                            <div class="header-profile-role">{{ Auth::user()->nurse->specialty ?? 'Staff Nurse' }}</div>
+                            <div class="header-profile-name">پەرستار {{ explode(' ', Auth::user()->name)[0] }}</div>
+                            <div class="header-profile-role">{{ Auth::user()->nurse->specialty ?? 'پەرستاری گشتی' }}</div>
                         </div>
                         <div class="header-profile-avatar">
                             @if(Auth::user()->nurse && Auth::user()->nurse->profile_image)
                                 <img src="{{ asset('storage/' . Auth::user()->nurse->profile_image) }}" alt="Profile">
                             @else
-                                {{ substr(Auth::user()->name, 0, 1) }}
+                                {{ mb_substr(Auth::user()->name, 0, 1) }}
                             @endif
                         </div>
                         <svg class="profile-dropdown-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

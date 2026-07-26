@@ -188,11 +188,12 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
         padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
         itemCount: list.length,
         itemBuilder: (context, index) {
-          final doc = list[index];
-          final user = doc['user'] ?? {};
+          final user = list[index];
           final name = user['name'] ?? 'نەزانراو';
           final email = user['email'] ?? '';
-          final specialty = doc['bio'] ?? 'گشتی';
+          final phone = user['phone'] ?? '';
+          final xray = user['xray'] ?? {};
+          final location = xray['location'] ?? 'گشتی';
 
           return Container(
             margin: const EdgeInsets.only(bottom: 14),
@@ -231,10 +232,10 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            specialty,
+                            location,
                             style: TextStyle(
                               fontFamily: 'Rabar',
-                              color: const Color(0xFF10B981),
+                              color: const Color(0xFF6366F1),
                               fontSize: 13,
                             ),
                           ),
@@ -262,6 +263,30 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
                               ],
                             ),
                           ],
+                          if (phone.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.phone_outlined,
+                                  color: Color(0xFF94A3B8),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    phone,
+                                    style: TextStyle(
+                                      fontFamily: 'Rabar',
+                                      color: const Color(0xFF94A3B8),
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -276,7 +301,7 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
                           label: 'پەسەندکردن',
                           icon: Iconsax.tick_circle,
                           color: const Color(0xFF10B981),
-                          onTap: () => _approveXRay(doc['id']),
+                          onTap: () => _approveXRay(user['id']),
                         ),
                       ),
                     if (!isPending)
@@ -285,7 +310,7 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
                           label: 'ڕەتکردنەوە',
                           icon: Iconsax.close_circle,
                           color: const Color(0xFFF59E0B),
-                          onTap: () => _rejectXRay(doc['id']),
+                          onTap: () => _rejectXRay(user['id']),
                         ),
                       ),
                     const SizedBox(width: 10),
@@ -294,7 +319,7 @@ class _AdminXRaysScreenState extends State<AdminXRaysScreen>
                         label: 'سڕینەوە',
                         icon: Iconsax.trash,
                         color: const Color(0xFFEF4444),
-                        onTap: () => _deleteXRay(doc['id']),
+                        onTap: () => _deleteXRay(user['id']),
                       ),
                     ),
                   ],

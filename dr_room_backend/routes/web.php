@@ -32,6 +32,9 @@ Route::prefix('staff')->group(function () {
     Route::post('/register', [StaffAuthController::class, 'register']);
     
     Route::post('/logout', [StaffAuthController::class, 'logout'])->name('staff.logout')->middleware('auth');
+    
+    Route::get('/waiting', [StaffAuthController::class, 'waiting'])->name('staff.waiting')->middleware('auth');
+    Route::get('/status', [StaffAuthController::class, 'status'])->name('staff.status')->middleware('auth');
 });
 
 // Doctor Dashboard Routes

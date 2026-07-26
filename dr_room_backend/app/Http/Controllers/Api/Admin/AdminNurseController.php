@@ -27,6 +27,18 @@ class AdminNurseController extends Controller
             ]);
         }
 
+        \App\Models\AppNotification::create([
+            'user_id' => $user->id,
+            'title' => 'هەژمارەکەت پەسەندکرا',
+            'title_en' => 'Account Approved',
+            'title_ar' => 'تمت الموافقة على حسابك',
+            'message' => 'پیرۆزە! هەژمارەکەت لەلایەن ئەدمینەوە پەسەندکرا. ئێستا دەتوانیت بچیتە ناو سیستەمەکە.',
+            'message_en' => 'Congratulations! Your account has been approved by the admin.',
+            'message_ar' => 'مبروك! تمت الموافقة على حسابك من قبل المسؤول.',
+            'type' => 'system',
+            'is_read' => false
+        ]);
+
         return response()->json(['message' => 'Nurse approved successfully', 'user' => $user->load('nurse')]);
     }
 
