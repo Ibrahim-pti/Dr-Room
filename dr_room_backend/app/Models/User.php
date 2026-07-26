@@ -46,6 +46,11 @@ class User extends Authenticatable
         return $this->role === 'nurse';
     }
 
+    public function getIsLabAttribute(): bool
+    {
+        return $this->role === 'lab';
+    }
+
     public function getIsBlockedAttribute(): bool
     {
         return $this->status === 'blocked';

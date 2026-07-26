@@ -75,6 +75,18 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
     Route::put('/profile', [NurseProfileController::class, 'update'])->name('nurse.profile.update');
 });
 
+// Lab Dashboard Routes
+Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Web\LabDashboardController::class, 'index'])->name('lab.dashboard');
+    
+    // Patients
+    Route::get('/patients', [\App\Http\Controllers\Web\LabPatientController::class, 'index'])->name('lab.patients.index');
+    
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'index'])->name('lab.profile.index');
+    Route::put('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'update'])->name('lab.profile.update');
+});
+
 Route::get('/{locale?}', function ($locale = 'ckb') {
     if (!in_array($locale, ['en', 'ar', 'ckb'])) {
         abort(404);

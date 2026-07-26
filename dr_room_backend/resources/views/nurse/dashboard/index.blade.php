@@ -1,607 +1,177 @@
 @extends('nurse.layouts.app')
 
 @section('content')
-<div class="dashboard-container">
-    <!-- Welcome Section -->
-    <div class="welcome-section">
+<div class="space-y-6 lg:space-y-8 pb-10">
+    
+    <!-- Welcome Header -->
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100">
         <div>
-            <h1 class="welcome-title">داشبۆرد</h1>
-            <p class="welcome-subtitle">بەخێربێیتەوە، پەرستار {{ explode(' ', $user->name)[0] }}</p>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">داشبۆرد</h1>
+            <p class="text-slate-500 font-medium">بەخێربێیتەوە بۆ سیستەم، <span class="text-teal-600">پەرستار {{ explode(' ', $user->name)[0] }}</span></p>
+        </div>
+        <div class="text-sm font-medium text-slate-400 flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            {{ now()->format('Y-m-d') }}
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <!-- Today's Requests -->
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-number">{{ $todayAppointments ?? 12 }}</div>
-                <div class="stat-icon" style="background: #EFF6FF; color: #3B82F6;">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <!-- Today Appointments -->
+        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:bg-teal-600 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <div class="stat-label">داواکارییەکانی ئەمڕۆ</div>
-            <div class="stat-change positive">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                </svg>
-                ١٥٪ بەراورد بە دوێنێ
+            <div>
+                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $todayAppointments ?? 12 }}</h3>
+                <p class="text-slate-500 text-sm font-medium">داواکارییەکانی ئەمڕۆ</p>
             </div>
         </div>
 
         <!-- Completed -->
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-number">{{ $completedAppointments ?? 8 }}</div>
-                <div class="stat-icon" style="background: #F0FDF4; color: #22C55E;">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <div class="stat-label">تەواوکراوەکان</div>
-            <div class="stat-change positive">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                </svg>
-                ١٠٪ بەراورد بە دوێنێ
+            <div>
+                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $completedAppointments ?? 8 }}</h3>
+                <p class="text-slate-500 text-sm font-medium">پشکنینی تەواوکراو</p>
             </div>
         </div>
 
-        <!-- In Progress -->
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-number">{{ $inProgressAppointments ?? 3 }}</div>
-                <div class="stat-icon" style="background: #FFF7ED; color: #F97316;">
-                    <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+        <!-- Pending -->
+        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <div class="stat-label">لە جێبەجێکردندایە</div>
-            <div class="stat-change negative">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="transform: rotate(180deg);">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                </svg>
-                ٢٪ بەراورد بە دوێنێ
-            </div>
-        </div>
-
-        <!-- Rating -->
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-number">{{ number_format($nurse->rating ?? 4.9, 1) }}</div>
-                <div class="stat-icon" style="background: #FFFBEB; color: #EAB308;">
-                    <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-label">هەڵسەنگاندن</div>
-            <div class="stat-stars">
-                @for($i = 0; $i < 5; $i++)
-                    <svg width="14" height="14" fill="{{ $i < round($nurse->rating ?? 4.9) ? '#EAB308' : '#E2E8F0' }}" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                @endfor
+            <div>
+                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $pendingAppointments ?? 4 }}</h3>
+                <p class="text-slate-500 text-sm font-medium">لە چاوەڕوانیدا</p>
             </div>
         </div>
     </div>
 
-    <!-- Main Content Grid -->
-    <div class="dashboard-grid">
-        <!-- Today's Schedule -->
-        <div class="card schedule-card">
-            <div class="card-header">
-                <h3 class="card-title">خشتەی کارکردنی ئەمڕۆ</h3>
-                <a href="{{ route('nurse.appointments.index') }}" class="view-all-link">بینینی هەمووی</a>
+    <!-- Main Content Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        
+        <!-- Upcoming Appointments -->
+        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-800">داواکارییەکانی ئەمڕۆ</h3>
+                <a href="{{ route('nurse.appointments.index') }}" class="text-sm font-bold text-teal-600 hover:text-teal-700 bg-teal-50 px-4 py-2 rounded-xl transition-colors">هەمووی ببینە</a>
             </div>
-            <div class="schedule-list">
+            <div class="p-2 sm:p-4 flex-1">
                 @if(isset($upcomingAppointments) && $upcomingAppointments->count() > 0)
-                    @foreach($upcomingAppointments->take(4) as $appointment)
-                        <div class="schedule-item">
-                            <div class="schedule-time">{{ $appointment->appointment_date->format('h:i') }} {{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
-                            <div class="schedule-info">
-                                <div class="schedule-avatar">
+                    <div class="space-y-2">
+                        @foreach($upcomingAppointments->take(5) as $appointment)
+                            <div class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-transparent hover:border-slate-100">
+                                <div class="w-16 text-center">
+                                    <div class="text-lg font-black text-slate-800">{{ $appointment->appointment_date->format('h:i') }}</div>
+                                    <div class="text-xs font-bold text-slate-400">{{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-teal-100 to-emerald-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
                                     @if($appointment->patient->profile_image)
-                                        <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" alt="">
+                                        <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" class="w-full h-full object-cover">
                                     @else
-                                        {{ mb_substr($appointment->patient->name, 0, 1) }}
+                                        <span class="text-teal-600 font-bold">{{ mb_substr($appointment->patient->name, 0, 1) }}</span>
                                     @endif
                                 </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-base font-bold text-slate-800 truncate">{{ $appointment->patient->name }}</h4>
+                                    <p class="text-sm font-medium text-slate-500 truncate">{{ $appointment->service->name ?? 'پشکنینی گشتی' }}</p>
+                                </div>
                                 <div>
-                                    <div class="schedule-name">{{ $appointment->type == 'online' ? 'چاودێری ئۆنلاین' : 'سەردانی ماڵەوە' }}</div>
-                                    <div class="schedule-patient">{{ $appointment->patient->name }}</div>
+                                    <span class="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap {{ $appointment->status == 'completed' ? 'bg-emerald-100 text-emerald-700' : ($appointment->status == 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-teal-100 text-teal-700') }}">
+                                        {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'pending' ? 'چاوەڕێکراو' : 'بەڕێوەیە') }}
+                                    </span>
                                 </div>
                             </div>
-                            <span class="status-badge {{ $appointment->status == 'completed' ? 'completed' : ($appointment->status == 'in_progress' ? 'in-progress' : 'upcoming') }}">
-                                {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'in_progress' ? 'لە جێبەجێکردندایە' : 'بەڕێوەیە') }}
-                            </span>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 @else
-                    <div class="schedule-item">
-                        <div class="schedule-time">08:30 ب.ن</div>
-                        <div class="schedule-info">
-                            <div class="schedule-avatar">ع</div>
-                            <div>
-                                <div class="schedule-name">پشکنینی خوێن</div>
-                                <div class="schedule-patient">عەلی ئەحمەد</div>
+                    <!-- Placeholder -->
+                    <div class="space-y-2">
+                        @php
+                            $dummies = [
+                                ['time' => '09:00', 'ampm' => 'ب.ن', 'name' => 'عەلی ئەحمەد', 'type' => 'پشکنینی خوێن', 'status' => 'completed', 'status_text' => 'تەواوکراو', 'color' => 'emerald'],
+                                ['time' => '10:30', 'ampm' => 'ب.ن', 'name' => 'سارا کەریم', 'type' => 'پێدانی دەرمان', 'status' => 'upcoming', 'status_text' => 'بەڕێوەیە', 'color' => 'teal'],
+                                ['time' => '11:30', 'ampm' => 'ب.ن', 'name' => 'حەسەن قادر', 'type' => 'پشکنینی شەکرە', 'status' => 'upcoming', 'status_text' => 'بەڕێوەیە', 'color' => 'teal'],
+                                ['time' => '01:00', 'ampm' => 'د.ن', 'name' => 'زانا عوسمان', 'type' => 'گۆڕینی برین', 'status' => 'pending', 'status_text' => 'چاوەڕێکراو', 'color' => 'amber'],
+                            ];
+                        @endphp
+                        @foreach($dummies as $dummy)
+                            <div class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-transparent hover:border-slate-100">
+                                <div class="w-12 sm:w-16 text-center">
+                                    <div class="text-base sm:text-lg font-black text-slate-800">{{ $dummy['time'] }}</div>
+                                    <div class="text-[10px] sm:text-xs font-bold text-slate-400">{{ $dummy['ampm'] }}</div>
+                                </div>
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500 font-bold text-sm sm:text-base">
+                                    {{ mb_substr($dummy['name'], 0, 1) }}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-800 truncate">{{ $dummy['name'] }}</h4>
+                                    <p class="text-xs sm:text-sm font-medium text-slate-500 truncate">{{ $dummy['type'] }}</p>
+                                </div>
+                                <div>
+                                    <span class="inline-flex items-center justify-center px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-{{ $dummy['color'] }}-100 text-{{ $dummy['color'] }}-700 whitespace-nowrap">
+                                        {{ $dummy['status_text'] }}
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <span class="status-badge completed">تەواوکراو</span>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="schedule-time">10:00 ب.ن</div>
-                        <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #FCE7F3; color: #EC4899;">س</div>
-                            <div>
-                                <div class="schedule-name">دەرزی (IV)</div>
-                                <div class="schedule-patient">سارا کەریم</div>
-                            </div>
-                        </div>
-                        <span class="status-badge in-progress">لە جێبەجێکردندایە</span>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="schedule-time">12:00 د.ن</div>
-                        <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #DBEAFE; color: #3B82F6;">ح</div>
-                            <div>
-                                <div class="schedule-name">برینپێچی</div>
-                                <div class="schedule-patient">حەسەن قادر</div>
-                            </div>
-                        </div>
-                        <span class="status-badge upcoming">بەڕێوەیە</span>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="schedule-time">02:30 د.ن</div>
-                        <div class="schedule-info">
-                            <div class="schedule-avatar" style="background: #FEF3C7; color: #D97706;">ز</div>
-                            <div>
-                                <div class="schedule-name">چاودێری بەتەمەن</div>
-                                <div class="schedule-patient">زانا عوسمان</div>
-                            </div>
-                        </div>
-                        <span class="status-badge upcoming">بەڕێوەیە</span>
+                        @endforeach
                     </div>
                 @endif
             </div>
         </div>
 
-        <!-- Earnings Overview -->
-        <div class="card earnings-card">
-            <div class="card-header">
-                <h3 class="card-title">پوختەی داهات</h3>
-                <select class="chart-select">
-                    <option>ئەم هەفتەیە</option>
-                    <option>هەفتەی ڕابردوو</option>
-                    <option>ئەم مانگە</option>
-                </select>
-            </div>
-            <div class="earnings-total">
-                <div class="earnings-label">کۆی گشتی داهات</div>
-                <div class="earnings-amount">320,000 <span class="earnings-currency">دینار</span></div>
-                <div class="stat-change positive" style="margin-top: 4px;">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
-                    </svg>
-                    ١٢٪ بەراورد بە هەفتەی ڕابردوو
+        <!-- Right Side: Chart -->
+        <div class="flex flex-col gap-6 lg:gap-8">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-slate-800">پوختەی کارکردن</h3>
+                    <select class="bg-slate-50 border-none text-sm font-bold text-slate-600 py-2 px-3 rounded-xl cursor-pointer outline-none focus:ring-2 focus:ring-teal-500/20">
+                        <option>ئەم هەفتەیە</option>
+                        <option>ئەم مانگە</option>
+                    </select>
                 </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="earningsChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Request Status -->
-        <div class="card status-card">
-            <div class="card-header">
-                <h3 class="card-title">دۆخی داواکارییەکان</h3>
-            </div>
-            <div class="donut-container">
-                <canvas id="requestStatusChart"></canvas>
-            </div>
-            <div class="status-legend">
-                <div class="legend-item">
-                    <span class="legend-dot" style="background: #3B82F6;"></span>
-                    <span class="legend-label">تەواوکراو</span>
-                    <span class="legend-value">8 (57%)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot" style="background: #F97316;"></span>
-                    <span class="legend-label">لە جێبەجێکردندایە</span>
-                    <span class="legend-value">3 (25%)</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot" style="background: #EAB308;"></span>
-                    <span class="legend-label">چاوەڕێکراو</span>
-                    <span class="legend-value">1 (8%)</span>
+                <div class="relative flex-1 w-full min-h-[250px]">
+                    <canvas id="appointmentsChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .dashboard-container {
-        animation: fadeIn 0.5s ease-out;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(15px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .welcome-section {
-        margin-bottom: 28px;
-    }
-
-    .welcome-title {
-        font-size: 26px;
-        font-weight: 800;
-        color: #1e293b;
-        margin-bottom: 4px;
-    }
-
-    .welcome-subtitle {
-        font-size: 14px;
-        color: #94A3B8;
-        font-weight: 500;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-        margin-bottom: 28px;
-    }
-
-    .stat-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 22px;
-        border: 1px solid #E2E8F0;
-        transition: all 0.3s;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-    }
-
-    .stat-card-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 8px;
-    }
-
-    .stat-number {
-        font-size: 32px;
-        font-weight: 800;
-        color: #1e293b;
-        line-height: 1;
-    }
-
-    .stat-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .stat-label {
-        font-size: 13px;
-        color: #94A3B8;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-
-    .stat-change {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .stat-change.positive { color: #22C55E; }
-    .stat-change.negative { color: #EF4444; }
-
-    .stat-stars {
-        display: flex;
-        gap: 2px;
-    }
-
-    /* Dashboard Grid */
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr 1.2fr 0.8fr;
-        gap: 20px;
-    }
-
-    .card {
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid #E2E8F0;
-        overflow: hidden;
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 22px 16px;
-    }
-
-    .card-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1e293b;
-    }
-
-    .view-all-link {
-        font-size: 13px;
-        font-weight: 600;
-        color: #3B82F6;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .view-all-link:hover { color: #2563EB; }
-
-    .chart-select {
-        padding: 6px 12px;
-        border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        color: #64748B;
-        background: #fff;
-        cursor: pointer;
-        outline: none;
-    }
-
-    /* Schedule List */
-    .schedule-list {
-        padding: 0 22px 22px;
-    }
-
-    .schedule-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 0;
-        border-bottom: 1px solid #F1F5F9;
-    }
-
-    .schedule-item:last-child { border-bottom: none; }
-
-    .schedule-time {
-        font-size: 12px;
-        font-weight: 600;
-        color: #64748B;
-        min-width: 70px;
-    }
-
-    .schedule-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex: 1;
-    }
-
-    .schedule-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: #E0E7FF;
-        color: #6366F1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 14px;
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-
-    .schedule-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .schedule-name {
-        font-size: 13px;
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .schedule-patient {
-        font-size: 11px;
-        color: #94A3B8;
-        font-weight: 500;
-    }
-
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 5px 12px;
-        border-radius: 20px;
-        white-space: nowrap;
-    }
-
-    .status-badge.completed { background: #F0FDF4; color: #22C55E; }
-    .status-badge.upcoming { background: #EFF6FF; color: #3B82F6; }
-    .status-badge.in-progress { background: #FFF7ED; color: #F97316; }
-    .status-badge.pending { background: #FFFBEB; color: #EAB308; }
-
-    /* Earnings */
-    .earnings-total {
-        padding: 0 22px 16px;
-    }
-
-    .earnings-label {
-        font-size: 12px;
-        color: #94A3B8;
-        font-weight: 500;
-    }
-
-    .earnings-amount {
-        font-size: 28px;
-        font-weight: 800;
-        color: #1e293b;
-    }
-
-    .earnings-currency {
-        font-size: 16px;
-        font-weight: 600;
-        color: #94A3B8;
-    }
-
-    .chart-container {
-        padding: 0 22px 22px;
-        height: 200px;
-    }
-
-    /* Donut Chart */
-    .donut-container {
-        padding: 10px 30px;
-        height: 180px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .status-legend {
-        padding: 0 22px 22px;
-    }
-
-    .legend-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 0;
-    }
-
-    .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .legend-label {
-        font-size: 12px;
-        font-weight: 500;
-        color: #64748B;
-        flex: 1;
-    }
-
-    .legend-value {
-        font-size: 12px;
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    /* Responsive */
-    @media (max-width: 1200px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .dashboard-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .stat-card { padding: 16px; }
-        .stat-number { font-size: 26px; }
-        .welcome-title { font-size: 22px; }
-    }
-</style>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Earnings Bar Chart
-        const earningsCtx = document.getElementById('earningsChart');
-        if (earningsCtx) {
-            new Chart(earningsCtx, {
+        const ctx = document.getElementById('appointmentsChart');
+        if (ctx) {
+            new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە', 'یەکشەممە'],
+                    labels: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ه'],
                     datasets: [{
-                        label: 'داهات',
-                        data: [280000, 350000, 320000, 400000, 380000, 420000, 300000],
-                        backgroundColor: [
-                            '#3B82F6', '#6366F1', '#3B82F6', '#6366F1', '#3B82F6', '#6366F1', '#3B82F6'
-                        ],
-                        borderRadius: 8,
-                        barPercentage: 0.6,
+                        label: 'داواکارییەکان',
+                        data: [5, 8, 12, 7, 15, 10, 4],
+                        backgroundColor: '#14B8A6',
+                        borderRadius: 6,
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94A3B8', font: { size: 11, weight: 500 } }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#F1F5F9', drawBorder: false },
-                            ticks: {
-                                color: '#94A3B8',
-                                font: { size: 11, weight: 500 },
-                                callback: function(value) {
-                                    return (value / 1000) + 'K';
-                                }
-                            }
-                        }
+                        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Rabar', weight: 'bold' } } },
+                        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, border: { display: false, dash: [4, 4] }, ticks: { color: '#94A3B8', maxTicksLimit: 5, font: { weight: 'bold' } } }
                     }
-                }
-            });
-        }
-
-        // Request Status Donut Chart
-        const statusCtx = document.getElementById('requestStatusChart');
-        if (statusCtx) {
-            new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['تەواوکراو', 'لە جێبەجێکردندایە', 'چاوەڕێکراو'],
-                    datasets: [{
-                        data: [8, 3, 1],
-                        backgroundColor: ['#3B82F6', '#F97316', '#EAB308'],
-                        borderWidth: 0,
-                        cutout: '65%',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                    },
                 }
             });
         }
