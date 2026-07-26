@@ -16,6 +16,7 @@ import 'promo_carousel.dart';
 import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
 import '../locator/clinic_locator_screen.dart';
+import '../lab/lab_details_screen.dart';
 
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
@@ -456,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const AllLabsScreen(),
+                                  builder: (context) => LabDetailsScreen(lab: lab),
                                 ),
                               );
                             },
@@ -608,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
                 // ── Top Pharmacies ──
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(

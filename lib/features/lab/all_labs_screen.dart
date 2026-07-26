@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'lab_details_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/utils/api_client.dart';
@@ -285,7 +286,12 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
-            // Can navigate to lab details here
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LabDetailsScreen(lab: lab),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16),

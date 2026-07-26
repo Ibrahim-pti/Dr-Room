@@ -187,7 +187,7 @@
   "reviews": "هەڵسەنگاندنەکان",
   "patients": "نەخۆشەکان",
   "about": "دەربارە",
-  "working_hours": "کاتژمێرەکانی کارکردن",
+  "working_hours": "کاتی کارکردن",
   "location": "شوێن",
   "chat": "چات",
   "type_message": "نامەیەک بنووسە...",
@@ -379,5 +379,8 @@
   "top_pharmacies": "باشترین دەرمانخانەکان",
   "health_articles": "ڕێنمایی و وتاری تەندروستی",
   "limited_time_offers": "ئۆفەری کاتی!",
-  "click_to_see_offers": "کلیک بکە بۆ بینینی سەرجەم ئۆفەرەکان"
+  "click_to_see_offers": "کلیک بکە بۆ بینینی سەرجەم ئۆفەرەکان",
+  "about_lab": "دەربارەی تاقیگە",
+  "book_test": "داواکردنی پشکنین",
+  "verified_lab": "تاقیگەی باوەڕپێکراو"
 }
