@@ -105,7 +105,7 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
                           const Icon(Iconsax.search_normal_1, size: 48, color: Color(0xFFCBD5E1)),
                           const SizedBox(height: 16),
                           Text(
-                            'هیچ تاقیگەیەک نەدۆزرایەوە',
+                            'no_labs_found'.tr(),
                             style: GoogleFonts.poppins(
                               color: const Color(0xFF64748B),
                               fontSize: 16,
@@ -157,7 +157,7 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'تاقیگە پزیشکییەکان',
+                    'top_labs'.tr(),
                     style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: 28,
@@ -166,7 +166,7 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'باشترین تاقیگەکان لە هەموو شارەکانی کوردستان',
+                    'best_labs_desc'.tr(),
                     style: GoogleFonts.poppins(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 14,
@@ -210,9 +210,9 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
                     controller: _searchCtrl,
                     onChanged: (value) => _filterLabs(),
                     style: const TextStyle(fontFamily: 'Rabar', fontSize: 14),
-                    decoration: const InputDecoration(
-                      hintText: 'گەڕان بەدوای تاقیگە...',
-                      hintStyle: TextStyle(fontFamily: 'Rabar', color: Color(0xFF94A3B8)),
+                    decoration: InputDecoration(
+                      hintText: 'search_labs'.tr(),
+                      hintStyle: const TextStyle(fontFamily: 'Rabar', color: Color(0xFF94A3B8)),
                       border: InputBorder.none,
                     ),
                   ),
@@ -248,7 +248,7 @@ class _AllLabsScreenState extends State<AllLabsScreen> {
                       ),
                     ),
                     child: Text(
-                      city == 'All' ? 'هەمووی' : city,
+                      city == 'All' ? 'all_cities'.tr() : city,
                       style: GoogleFonts.poppins(
                         color: isSelected ? Colors.white : const Color(0xFF64748B),
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,

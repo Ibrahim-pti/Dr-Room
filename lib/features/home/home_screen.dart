@@ -339,6 +339,186 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 32),
 
+                const SizedBox(height: 32),
+
+                // ── Top Labs Header ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'top_labs'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllLabsScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 550.ms),
+
+                const SizedBox(height: 16),
+
+                // ── Top Labs Horizontal List ──
+                SizedBox(
+                  height: 140,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      final labs = [
+                        {
+                          'name': 'تاقیگەی ناوەندی هەولێر',
+                          'city': 'Erbil',
+                          'type': 'گشتی',
+                        },
+                        {
+                          'name': 'تاقیگەی سلێمانی نموونەیی',
+                          'city': 'Sulaymaniyah',
+                          'type': 'تایبەت',
+                        },
+                        {
+                          'name': 'تاقیگەی دهۆک',
+                          'city': 'Duhok',
+                          'type': 'گشتی',
+                        },
+                        {
+                          'name': 'تاقیگەی کەرکوک مێدیکا',
+                          'city': 'Kirkuk',
+                          'type': 'تایبەت',
+                        },
+                      ];
+                      final lab = labs[index];
+                      return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AllLabsScreen(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 260,
+                              margin: const EdgeInsetsDirectional.only(end: 16),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.getSurface(context),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.getBorder(context),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF0F9FF),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: const Color(0xFFE0F2FE),
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Iconsax.building_3,
+                                        color: Color(0xFF3B82F6),
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          lab['name']!,
+                                          style: const TextStyle(
+                                            fontFamily: 'Rabar',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1E293B),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Iconsax.location,
+                                              color: Color(0xFF94A3B8),
+                                              size: 12,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              lab['city']!,
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF64748B),
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.star_rounded,
+                                              color: Color(0xFF10B981),
+                                              size: 14,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '4.8',
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF059669),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(delay: (600 + (index * 100)).ms)
+                          .slideX(begin: 0.1, end: 0);
+                    },
+                  ),
+                ),
                 // ── Categories (Grid) ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -602,186 +782,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(height: 32),
 
-                const SizedBox(height: 32),
-
-                // ── Top Labs Header ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'تاقیگە پزیشکییەکان',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllLabsScreen(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 550.ms),
-
-                const SizedBox(height: 16),
-
-                // ── Top Labs Horizontal List ──
-                SizedBox(
-                  height: 140,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: 4,
-                    itemBuilder: (context, index) {
-                      final labs = [
-                        {
-                          'name': 'تاقیگەی ناوەندی هەولێر',
-                          'city': 'Erbil',
-                          'type': 'گشتی',
-                        },
-                        {
-                          'name': 'تاقیگەی سلێمانی نموونەیی',
-                          'city': 'Sulaymaniyah',
-                          'type': 'تایبەت',
-                        },
-                        {
-                          'name': 'تاقیگەی دهۆک',
-                          'city': 'Duhok',
-                          'type': 'گشتی',
-                        },
-                        {
-                          'name': 'تاقیگەی کەرکوک مێدیکا',
-                          'city': 'Kirkuk',
-                          'type': 'تایبەت',
-                        },
-                      ];
-                      final lab = labs[index];
-                      return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AllLabsScreen(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 260,
-                              margin: const EdgeInsetsDirectional.only(end: 16),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppColors.getSurface(context),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppColors.getBorder(context),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF0F9FF),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: const Color(0xFFE0F2FE),
-                                      ),
-                                    ),
-                                    child: const Center(
-                                      child: Icon(
-                                        Iconsax.building_3,
-                                        color: Color(0xFF3B82F6),
-                                        size: 28,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          lab['name']!,
-                                          style: const TextStyle(
-                                            fontFamily: 'Rabar',
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF1E293B),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Iconsax.location,
-                                              color: Color(0xFF94A3B8),
-                                              size: 12,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              lab['city']!,
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF64748B),
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.star_rounded,
-                                              color: Color(0xFF10B981),
-                                              size: 14,
-                                            ),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              '4.8',
-                                              style: GoogleFonts.poppins(
-                                                color: const Color(0xFF059669),
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                          .animate()
-                          .fadeIn(delay: (600 + (index * 100)).ms)
-                          .slideX(begin: 0.1, end: 0);
-                    },
-                  ),
-                ),
                 // ── Top Doctors Header ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
