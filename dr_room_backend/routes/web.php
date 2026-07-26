@@ -54,6 +54,45 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
     // Profile
     Route::get('/profile', [DoctorProfileController::class, 'index'])->name('doctor.profile.index');
     Route::put('/profile', [DoctorProfileController::class, 'update'])->name('doctor.profile.update');
+    
+    // New Feature Placeholders (Doctor)
+    $doctorPlaceholder = function ($title) {
+        return view('shared.placeholder', ['layout' => 'doctor.layouts.app', 'title' => $title]);
+    };
+    
+    // Patient sub-routes
+    Route::get('/patients/history', fn() => $doctorPlaceholder('مێژووی پزیشکی'))->name('doctor.patients.history');
+    Route::get('/patients/allergies', fn() => $doctorPlaceholder('هەستیارییەکان'))->name('doctor.patients.allergies');
+    Route::get('/patients/files', fn() => $doctorPlaceholder('فایلە پزیشکییەکان'))->name('doctor.patients.files');
+    
+    // Appointment sub-routes
+    Route::get('/appointments/history', fn() => $doctorPlaceholder('مێژووی چاوپێکەوتنەکان'))->name('doctor.appointments.history');
+    
+    // Consultations
+    Route::get('/consultation', fn() => $doctorPlaceholder('ڕاوێژکاری'))->name('doctor.consultation.index');
+    Route::get('/consultation/video', fn() => $doctorPlaceholder('ڕاوێژکاری ڤیدیۆیی'))->name('doctor.consultation.video');
+    Route::get('/consultation/voice', fn() => $doctorPlaceholder('ڕاوێژکاری دەنگی'))->name('doctor.consultation.voice');
+    Route::get('/consultation/chat', fn() => $doctorPlaceholder('چاتی ڕاستەوخۆ'))->name('doctor.consultation.chat');
+    
+    // Diagnosis
+    Route::get('/diagnosis', fn() => $doctorPlaceholder('دەستنیشانکردن'))->name('doctor.diagnosis.index');
+    Route::get('/diagnosis/create', fn() => $doctorPlaceholder('زیادکردنی دەستنیشانکردن'))->name('doctor.diagnosis.create');
+    Route::get('/diagnosis/plan', fn() => $doctorPlaceholder('پلانی چارەسەر'))->name('doctor.diagnosis.plan');
+    
+    // Laboratory
+    Route::get('/laboratory', fn() => $doctorPlaceholder('تاقیگە'))->name('doctor.laboratory.index');
+    Route::get('/laboratory/request', fn() => $doctorPlaceholder('داواکردنی پشکنین'))->name('doctor.laboratory.request');
+    Route::get('/laboratory/results', fn() => $doctorPlaceholder('ئەنجامەکانی پشکنین'))->name('doctor.laboratory.results');
+    
+    // Prescriptions
+    Route::get('/prescriptions', fn() => $doctorPlaceholder('ڕەچەتەکان'))->name('doctor.prescriptions.index');
+    Route::get('/prescriptions/create', fn() => $doctorPlaceholder('نووسینی ڕەچەتە'))->name('doctor.prescriptions.create');
+    Route::get('/prescriptions/history', fn() => $doctorPlaceholder('مێژووی ڕەچەتەکان'))->name('doctor.prescriptions.history');
+    
+    // Messages
+    Route::get('/messages', fn() => $doctorPlaceholder('نامەکان'))->name('doctor.messages.index');
+    Route::get('/messages/patients', fn() => $doctorPlaceholder('نامەی نەخۆشەکان'))->name('doctor.messages.patients');
+    Route::get('/messages/staff', fn() => $doctorPlaceholder('نامەی ستاف'))->name('doctor.messages.staff');
 });
 
 // Nurse Dashboard Routes
@@ -64,7 +103,7 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
     Route::get('/appointments', [NurseAppointmentController::class, 'index'])->name('nurse.appointments.index');
     Route::patch('/appointments/{appointment}/status', [NurseAppointmentController::class, 'updateStatus'])->name('nurse.appointments.update_status');
     
-    // Patients
+    // Patients (Patient Care)
     Route::get('/patients', [NursePatientController::class, 'index'])->name('nurse.patients.index');
     
     // Earnings
@@ -73,6 +112,33 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
     // Profile
     Route::get('/profile', [NurseProfileController::class, 'index'])->name('nurse.profile.index');
     Route::put('/profile', [NurseProfileController::class, 'update'])->name('nurse.profile.update');
+    
+    // New Feature Placeholders (Nurse)
+    $nursePlaceholder = function ($title) {
+        return view('shared.placeholder', ['layout' => 'nurse.layouts.app', 'title' => $title]);
+    };
+    
+    // Patient Care sub-routes
+    Route::get('/patients/symptoms', fn() => $nursePlaceholder('تۆمارکردنی نیشانەکان'))->name('nurse.patients.symptoms');
+    Route::get('/patients/monitoring', fn() => $nursePlaceholder('چاودێریکردنی نەخۆش'))->name('nurse.patients.monitoring');
+    Route::get('/patients/notes', fn() => $nursePlaceholder('تێبینی ڕۆژانە'))->name('nurse.patients.notes');
+    Route::get('/patients/medication', fn() => $nursePlaceholder('پێدانی دەرمان'))->name('nurse.patients.medication');
+    
+    // Appointments sub-routes
+    Route::get('/appointments/confirm', fn() => $nursePlaceholder('دڵنیابوونەوە لە کات'))->name('nurse.appointments.confirm');
+    Route::get('/appointments/prepare', fn() => $nursePlaceholder('ئامادەکردنی نەخۆش'))->name('nurse.appointments.prepare');
+    
+    // Communication
+    Route::get('/communication', fn() => $nursePlaceholder('پەیوەندی'))->name('nurse.communication.index');
+    Route::get('/communication/doctor', fn() => $nursePlaceholder('چات لەگەڵ دکتۆر'))->name('nurse.communication.doctor');
+    Route::get('/communication/patient', fn() => $nursePlaceholder('چات لەگەڵ نەخۆش'))->name('nurse.communication.patient');
+    
+    // Reports
+    Route::get('/reports', fn() => $nursePlaceholder('ڕاپۆرتەکان'))->name('nurse.reports.index');
+    Route::get('/reports/progress', fn() => $nursePlaceholder('بەرەوپێشچوونی نەخۆش'))->name('nurse.reports.progress');
+    
+    // Profile sub-routes
+    Route::get('/profile/schedule', fn() => $nursePlaceholder('خشتەی کارکردن'))->name('nurse.profile.schedule');
 });
 
 // Lab Dashboard Routes
@@ -85,6 +151,37 @@ Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->g
     // Profile
     Route::get('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'index'])->name('lab.profile.index');
     Route::put('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'update'])->name('lab.profile.update');
+    
+    // New Feature Placeholders (Lab)
+    $labPlaceholder = function ($title) {
+        return view('shared.placeholder', ['layout' => 'lab.layouts.app', 'title' => $title]);
+    };
+    
+    // Tests
+    Route::get('/tests', fn() => $labPlaceholder('پشکنینەکان'))->name('lab.tests.index');
+    Route::get('/tests/blood', fn() => $labPlaceholder('پشکنینی خوێن'))->name('lab.tests.blood');
+    Route::get('/tests/urine', fn() => $labPlaceholder('پشکنینی میز'))->name('lab.tests.urine');
+    Route::get('/tests/hormone', fn() => $labPlaceholder('پشکنینی هۆرمۆن'))->name('lab.tests.hormone');
+    Route::get('/tests/other', fn() => $labPlaceholder('پشکنینەکانی تر'))->name('lab.tests.other');
+    
+    // Management
+    Route::get('/management/approve', fn() => $labPlaceholder('پەسەندکردنی پشکنین'))->name('lab.management.approve');
+    Route::get('/management/complete', fn() => $labPlaceholder('تەواوکردنی پشکنین'))->name('lab.management.complete');
+    
+    // Results
+    Route::get('/results', fn() => $labPlaceholder('ئەنجامەکان'))->name('lab.results.index');
+    Route::get('/results/add', fn() => $labPlaceholder('زیادکردنی ئەنجام'))->name('lab.results.add');
+    Route::get('/results/edit', fn() => $labPlaceholder('گۆڕانکاری لە ئەنجام'))->name('lab.results.edit');
+    Route::get('/results/upload', fn() => $labPlaceholder('بەرزکردنەوەی PDF'))->name('lab.results.upload');
+    
+    // Reports
+    Route::get('/reports', fn() => $labPlaceholder('ڕاپۆرتەکان'))->name('lab.reports.index');
+    
+    // Communication
+    Route::get('/communication', fn() => $labPlaceholder('پەیوەندی'))->name('lab.communication.index');
+    
+    // Profile sub-routes
+    Route::get('/profile/staff', fn() => $labPlaceholder('ستافی تاقیگە'))->name('lab.profile.staff');
 });
 
 Route::get('/{locale?}', function ($locale = 'ckb') {
