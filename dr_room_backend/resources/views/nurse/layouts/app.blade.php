@@ -48,7 +48,7 @@
 
                 <!-- Patient Care Dropdown -->
                 <div>
-                    <button type="button" onclick="document.getElementById('menu-patient-care').classList.toggle('hidden')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                    <button type="button" onclick="toggleMenu('menu-patient-care')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                             چاودێری نەخۆش
@@ -66,7 +66,7 @@
 
                 <!-- Appointment Management Dropdown -->
                 <div>
-                    <button type="button" onclick="document.getElementById('menu-nurse-appointments').classList.toggle('hidden')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                    <button type="button" onclick="toggleMenu('menu-nurse-appointments')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             بەڕێوەبردنی چاوپێکەوتن
@@ -82,7 +82,7 @@
 
                 <!-- Communication -->
                 <div>
-                    <button type="button" onclick="document.getElementById('menu-communication').classList.toggle('hidden')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                    <button type="button" onclick="toggleMenu('menu-communication')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                             پەیوەندی
@@ -97,7 +97,7 @@
 
                 <!-- Reports -->
                 <div>
-                    <button type="button" onclick="document.getElementById('menu-reports').classList.toggle('hidden')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                    <button type="button" onclick="toggleMenu('menu-reports')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             ڕاپۆرتەکان
@@ -112,7 +112,7 @@
 
                 <!-- Profile Dropdown -->
                 <div>
-                    <button type="button" onclick="document.getElementById('menu-nurse-profile').classList.toggle('hidden')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
+                    <button type="button" onclick="toggleMenu('menu-nurse-profile')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 font-medium">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             پرۆفایل
@@ -207,6 +207,16 @@
                         setTimeout(() => overlay.classList.add('hidden'), 300);
                     }
                 }
+            }
+
+            function toggleMenu(menuId) {
+                const allMenus = document.querySelectorAll('div[id^="menu-"]');
+                allMenus.forEach(menu => {
+                    if (menu.id !== menuId && !menu.classList.contains('hidden')) {
+                        menu.classList.add('hidden');
+                    }
+                });
+                document.getElementById(menuId).classList.toggle('hidden');
             }
 
             document.addEventListener('DOMContentLoaded', function() {
