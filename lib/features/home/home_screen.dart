@@ -1,3 +1,4 @@
+import 'package:dr_room/features/nursing/nursing_services_screen.dart';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -10,7 +11,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../doctors/doctor_details_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../lab/lab_order_method_screen.dart';
-import '../nursing/nursing_services_screen.dart';
+import '../lab/all_labs_screen.dart';
 import 'promo_carousel.dart';
 import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
@@ -45,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final prefs = await SharedPreferences.getInstance();
       final un = prefs.getString('user_name') ?? '';
       final userName = un.isNotEmpty ? un : 'guest_user'.tr();
-      
+
       final response = await ApiClient.get('/home');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -71,93 +72,418 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _fetchHomeData,
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: ClampingScrollPhysics()),
-        child: Padding(
-          // Extra bottom padding for the floating navigation bar
-          padding: const EdgeInsetsDirectional.only(bottom: 120),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Top Section with Blue Background ──
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  // Blue Gradient Background
-                  Container(
-                    height: 280,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0xFF3B82F6), // Strong Blue
-                          Color(0xFF8BB5F8), // Lighter Blue
-                          Color(0xFFE2EAF8), // Fades to background
-                        ],
-                        stops: [0.0, 0.7, 1.0],
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: ClampingScrollPhysics(),
+          ),
+          child: Padding(
+            // Extra bottom padding for the floating navigation bar
+            padding: const EdgeInsetsDirectional.only(bottom: 120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Top Section with Blue Background ──
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    // Blue Gradient Background
+                    Container(
+                      height: 280,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xFF3B82F6), // Strong Blue
+                            Color(0xFF8BB5F8), // Lighter Blue
+                            Color(0xFFE2EAF8), // Fades to background
+                          ],
+                          stops: [0.0, 0.7, 1.0],
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Content over background
-                  SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 10),
-                          // ── App Bar ──
-                          Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                    // Content over background
+                    SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            // ── App Bar ──
+                            Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        // User Avatar
+                                        Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: AppColors.getSurface(
+                                                context,
+                                              ),
+                                              width: 2,
+                                            ),
+                                            image: const DecorationImage(
+                                              image: AssetImage(
+                                                'assets/images/doctor2.png',
+                                              ), // placeholder user image
+                                              fit: BoxFit.cover,
+                                              alignment: Alignment.topCenter,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // User Greeting
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${'hello'.tr()}، $_userName',
+                                              style: GoogleFonts.poppins(
+                                                color: AppColors.getSurface(
+                                                  context,
+                                                ),
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Text(
+                                              'good_morning'.tr(),
+                                              style: GoogleFonts.poppins(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.9,
+                                                ),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    // Right Icons (Menu & Notification)
+                                    Row(
+                                      children: [
+                                        // Notification Icon
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const NotificationsScreen(),
+                                              ),
+                                            );
+                                          },
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                width: 46,
+                                                height: 46,
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.getSurface(
+                                                    context,
+                                                  ),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Iconsax.notification,
+                                                  color: Color(0xFF0F172A),
+                                                  size: 22,
+                                                ),
+                                              ),
+                                              PositionedDirectional(
+                                                top: 12,
+                                                end: 12,
+                                                child: Container(
+                                                  width: 8,
+                                                  height: 8,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: Colors.redAccent,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        // Menu Icon
+                                        GestureDetector(
+                                          onTap: () {
+                                            Scaffold.of(
+                                              context,
+                                            ).openEndDrawer();
+                                          },
+                                          child: Container(
+                                            width: 46,
+                                            height: 46,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.getSurface(
+                                                context,
+                                              ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Iconsax.menu_1,
+                                              color: Color(0xFF0F172A),
+                                              size: 22,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                                .animate()
+                                .fadeIn(duration: 400.ms)
+                                .slideY(begin: -0.2, end: 0),
+
+                            const SizedBox(height: 32),
+
+                            // ── Hero Text ──
+                            Text(
+                                  'Your Health Starts With\nThe Right Doctor',
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.getSurface(context),
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
+                                  ),
+                                )
+                                .animate()
+                                .fadeIn(delay: 100.ms, duration: 400.ms)
+                                .slideX(begin: -0.1, end: 0),
+
+                            const SizedBox(height: 24),
+
+                            // ── Search Bar ──
+                            Container(
+                                  height: 60,
+                                  padding: const EdgeInsetsDirectional.only(
+                                    start: 20,
+                                    end: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.getSurface(context),
+                                    borderRadius: BorderRadius.circular(30),
+                                    border: Border.all(
+                                      color: AppColors.getBorder(context),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Iconsax.search_normal_1,
+                                        color: Color(0xFF94A3B8),
+                                        size: 22,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'search_doctors'.tr(),
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF94A3B8),
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Container(
+                                        width: 44,
+                                        height: 44,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF3B82F6),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Iconsax.microphone,
+                                          color: AppColors.getSurface(context),
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                .animate()
+                                .fadeIn(delay: 200.ms, duration: 400.ms)
+                                .slideY(begin: 0.2, end: 0),
+
+                            const SizedBox(height: 28),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // ── Banners / Promo Carousel ──
+                if (_isLoading)
+                  const SizedBox(
+                    height: 130,
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else
+                  PromoCarousel(banners: _banners)
+                      .animate()
+                      .fadeIn(duration: 600.ms, delay: 200.ms)
+                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+
+                const SizedBox(height: 32),
+
+                // ── Categories (Grid) ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'categories'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllCategoriesScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 350.ms),
+
+                const SizedBox(height: 16),
+
+                _buildCategoryGrid(
+                  context,
+                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+
+                const SizedBox(height: 32),
+
+                // ── Upcoming Schedule Header ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'upcoming_appointments'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllSchedulesScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 450.ms),
+
+                const SizedBox(height: 16),
+
+                // ── Upcoming Appointment Card ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child:
+                      GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AllSchedulesScreen(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: AppColors.getSurface(context),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: AppColors.getBorder(context),
+                                ),
+                              ),
+                              child: Column(
                                 children: [
+                                  // Doctor Info Row
                                   Row(
                                     children: [
-                                      // User Avatar
                                       Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
+                                        width: 56,
+                                        height: 56,
+                                        decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.getSurface(
-                                              context,
-                                            ),
-                                            width: 2,
-                                          ),
-                                          image: const DecorationImage(
+                                          image: DecorationImage(
                                             image: AssetImage(
-                                              'assets/images/doctor2.png',
-                                            ), // placeholder user image
+                                              'assets/images/doctor1.png',
+                                            ),
                                             fit: BoxFit.cover,
                                             alignment: Alignment.topCenter,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      // User Greeting
+                                      const SizedBox(width: 16),
                                       Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${'hello'.tr()}، $_userName',
+                                            'Dr. Ayesha Rahman',
                                             style: GoogleFonts.poppins(
-                                              color: AppColors.getSurface(
+                                              color: AppColors.getTextTitle(
                                                 context,
                                               ),
-                                              fontSize: 18,
+                                              fontSize: 16,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
+                                          const SizedBox(height: 4),
                                           Text(
-                                            'good_morning'.tr(),
+                                            'Skin Specialist',
                                             style: GoogleFonts.poppins(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.9,
+                                              color: AppColors.getTextSubtitle(
+                                                context,
                                               ),
                                               fontSize: 13,
                                               fontWeight: FontWeight.w400,
@@ -167,338 +493,404 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ],
                                   ),
-                                  // Right Icons (Menu & Notification)
+                                  const SizedBox(height: 20),
+                                  // Date & Time Row
                                   Row(
                                     children: [
-                                      // Notification Icon
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const NotificationsScreen(),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Iconsax.calendar_1,
+                                            size: 18,
+                                            color: Color(0xFF64748B),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            '13 Nov, Thursday',
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors.getTextSubtitle(
+                                                context,
+                                              ),
+                                              fontSize: 13,
                                             ),
-                                          );
-                                        },
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              width: 46,
-                                              height: 46,
-                                              decoration: BoxDecoration(
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(width: 24),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Iconsax.clock,
+                                            size: 18,
+                                            color: Color(0xFF64748B),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            '6:30 PM',
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors.getTextSubtitle(
+                                                context,
+                                              ),
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  // Actions Row
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            color: const Color(
+                                              0xFF3B82F6,
+                                            ).withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(
+                                              24,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'cancel_appointment'.tr(),
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF3B82F6),
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Container(
+                                          height: 48,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF3B82F6),
+                                            borderRadius: BorderRadius.circular(
+                                              24,
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              'reschedule'.tr(),
+                                              style: GoogleFonts.poppins(
                                                 color: AppColors.getSurface(
                                                   context,
                                                 ),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(
-                                                Iconsax.notification,
-                                                color: Color(0xFF0F172A),
-                                                size: 22,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
                                               ),
                                             ),
-                                            PositionedDirectional(
-                                              top: 12,
-                                              end: 12,
-                                              child: Container(
-                                                width: 8,
-                                                height: 8,
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.redAccent,
-                                                  shape: BoxShape.circle,
-                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(delay: 300.ms, duration: 400.ms)
+                          .slideY(begin: 0.2, end: 0),
+                ),
+
+                SizedBox(height: 32),
+
+                const SizedBox(height: 32),
+
+                // ── Top Labs Header ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'تاقیگە پزیشکییەکان',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllLabsScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 550.ms),
+
+                const SizedBox(height: 16),
+
+                // ── Top Labs Horizontal List ──
+                SizedBox(
+                  height: 140,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      final labs = [
+                        {
+                          'name': 'تاقیگەی ناوەندی هەولێر',
+                          'city': 'Erbil',
+                          'type': 'گشتی',
+                        },
+                        {
+                          'name': 'تاقیگەی سلێمانی نموونەیی',
+                          'city': 'Sulaymaniyah',
+                          'type': 'تایبەت',
+                        },
+                        {
+                          'name': 'تاقیگەی دهۆک',
+                          'city': 'Duhok',
+                          'type': 'گشتی',
+                        },
+                        {
+                          'name': 'تاقیگەی کەرکوک مێدیکا',
+                          'city': 'Kirkuk',
+                          'type': 'تایبەت',
+                        },
+                      ];
+                      final lab = labs[index];
+                      return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AllLabsScreen(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 260,
+                              margin: const EdgeInsetsDirectional.only(end: 16),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.getSurface(context),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.getBorder(context),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF0F9FF),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: const Color(0xFFE0F2FE),
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Iconsax.building_3,
+                                        color: Color(0xFF3B82F6),
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          lab['name']!,
+                                          style: const TextStyle(
+                                            fontFamily: 'Rabar',
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1E293B),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Iconsax.location,
+                                              color: Color(0xFF94A3B8),
+                                              size: 12,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              lab['city']!,
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF64748B),
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      // Menu Icon
-                                      GestureDetector(
-                                        onTap: () {
-                                          Scaffold.of(context).openEndDrawer();
-                                        },
-                                        child: Container(
-                                          width: 46,
-                                          height: 46,
-                                          decoration: BoxDecoration(
-                                            color: AppColors.getSurface(
-                                              context,
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.star_rounded,
+                                              color: Color(0xFF10B981),
+                                              size: 14,
                                             ),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(
-                                            Iconsax.menu_1,
-                                            color: Color(0xFF0F172A),
-                                            size: 22,
-                                          ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '4.8',
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF059669),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ],
-                              )
-                              .animate()
-                              .fadeIn(duration: 400.ms)
-                              .slideY(begin: -0.2, end: 0),
-
-                          const SizedBox(height: 32),
-
-                          // ── Hero Text ──
-                          Text(
-                                'Your Health Starts With\nThe Right Doctor',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getSurface(context),
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.3,
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(delay: 100.ms, duration: 400.ms)
-                              .slideX(begin: -0.1, end: 0),
-
-                          const SizedBox(height: 24),
-
-                          // ── Search Bar ──
-                          Container(
-                                height: 60,
-                                padding: const EdgeInsetsDirectional.only(
-                                  start: 20,
-                                  end: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.getSurface(context),
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                    color: AppColors.getBorder(context),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Iconsax.search_normal_1,
-                                      color: Color(0xFF94A3B8),
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'search_doctors'.tr(),
-                                      style: GoogleFonts.poppins(
-                                        color: const Color(0xFF94A3B8),
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF3B82F6),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Iconsax.microphone,
-                                        color: AppColors.getSurface(context),
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(delay: 200.ms, duration: 400.ms)
-                              .slideY(begin: 0.2, end: 0),
-
-                          const SizedBox(height: 28),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // ── Banners / Promo Carousel ──
-              if (_isLoading)
-                const SizedBox(height: 130, child: Center(child: CircularProgressIndicator()))
-              else
-                PromoCarousel(banners: _banners)
-                  .animate()
-                  .fadeIn(duration: 600.ms, delay: 200.ms)
-                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
-
-
-              const SizedBox(height: 32),
-
-              // ── Categories (Grid) ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'categories'.tr(),
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AllCategoriesScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'see_all'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF3B82F6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(delay: 350.ms),
-
-              const SizedBox(height: 16),
-
-              _buildCategoryGrid(
-                context,
-              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: 32),
-
-              // ── Upcoming Schedule Header ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'upcoming_appointments'.tr(),
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AllSchedulesScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'see_all'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF3B82F6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(delay: 450.ms),
-
-              const SizedBox(height: 16),
-
-              // ── Upcoming Appointment Card ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child:
-                    GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const AllSchedulesScreen(),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: AppColors.getSurface(context),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: AppColors.getBorder(context),
                               ),
                             ),
-                            child: Column(
-                              children: [
-                                // Doctor Info Row
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 56,
-                                      height: 56,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                            'assets/images/doctor1.png',
-                                          ),
-                                          fit: BoxFit.cover,
-                                          alignment: Alignment.topCenter,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Column(
+                          )
+                          .animate()
+                          .fadeIn(delay: (600 + (index * 100)).ms)
+                          .slideX(begin: 0.1, end: 0);
+                    },
+                  ),
+                ),
+                // ── Top Doctors Header ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'top_doctors'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllDoctorsScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 450.ms),
+
+                const SizedBox(height: 16),
+
+                // ── Doctor List Card ──
+                if (_topDoctors.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(
+                      child: Text('No doctors available right now.'),
+                    ),
+                  )
+                else
+                  ..._topDoctors.map((doc) {
+                    final name = doc['user'] != null
+                        ? doc['user']['name']
+                        : 'Doctor';
+                    final specialty = doc['specialty'] ?? 'Specialist';
+                    final rating = doc['rating']?.toString() ?? '5.0';
+                    final image = (doc['image_path'] != null)
+                        ? '${ApiClient.storageUrl}/${doc['image_path']}'
+                        : 'assets/images/doctor1.png';
+                    final doctorId = doc['id'];
+
+                    return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DoctorDetailsScreen(
+                                    doctorId: doctorId,
+                                    name: name,
+                                    specialty: specialty,
+                                    image: image,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 160,
+                              decoration: BoxDecoration(
+                                color: AppColors.getSurface(context),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: AppColors.getBorder(context),
+                                ),
+                              ),
+                              child: Stack(
+                                children: [
+                                  // Text Info on the left
+                                  Padding(
+                                    padding: const EdgeInsets.all(20),
+                                    child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Dr. Ayesha Rahman',
+                                          name.replaceFirst(' ', '\n'),
                                           style: GoogleFonts.poppins(
                                             color: AppColors.getTextTitle(
                                               context,
                                             ),
-                                            fontSize: 16,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.w600,
+                                            height: 1.2,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 8),
                                         Text(
-                                          'Skin Specialist',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.getTextSubtitle(
-                                              context,
-                                            ),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                // Date & Time Row
-                                Row(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Iconsax.calendar_1,
-                                          size: 18,
-                                          color: Color(0xFF64748B),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '13 Nov, Thursday',
+                                          specialty,
                                           style: GoogleFonts.poppins(
                                             color: AppColors.getTextSubtitle(
                                               context,
@@ -506,273 +898,90 @@ class _HomeScreenState extends State<HomeScreen> {
                                             fontSize: 13,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: 24),
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Iconsax.clock,
-                                          size: 18,
-                                          color: Color(0xFF64748B),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '6:30 PM',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.getTextSubtitle(
-                                              context,
+                                        const Spacer(),
+                                        // Rating
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.star_rounded,
+                                              color: Color(0xFFFBBF24),
+                                              size: 20,
                                             ),
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                // Actions Row
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFF3B82F6,
-                                          ).withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(
-                                            24,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'cancel_appointment'.tr(),
-                                            style: GoogleFonts.poppins(
-                                              color: const Color(0xFF3B82F6),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Container(
-                                        height: 48,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFF3B82F6),
-                                          borderRadius: BorderRadius.circular(
-                                            24,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            'reschedule'.tr(),
-                                            style: GoogleFonts.poppins(
-                                              color: AppColors.getSurface(
-                                                context,
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              rating,
+                                              style: GoogleFonts.poppins(
+                                                color: AppColors.getTextTitle(
+                                                  context,
+                                                ),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
                                             ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Doctor Image on the right
+                                  PositionedDirectional(
+                                    end: 0,
+                                    bottom: 0,
+                                    child: ClipRRect(
+                                      borderRadius:
+                                          const BorderRadiusDirectional.only(
+                                            bottomEnd: Radius.circular(24),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .animate()
-                        .fadeIn(delay: 300.ms, duration: 400.ms)
-                        .slideY(begin: 0.2, end: 0),
-              ),
-
-              SizedBox(height: 32),
-
-              // ── Top Doctors Header ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'top_doctors'.tr(),
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AllDoctorsScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'see_all'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF3B82F6),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(delay: 450.ms),
-
-              const SizedBox(height: 16),
-
-              // ── Doctor List Card ──
-              if (_topDoctors.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Center(child: Text('No doctors available right now.')),
-                )
-              else
-                ..._topDoctors.map((doc) {
-                  final name = doc['user'] != null ? doc['user']['name'] : 'Doctor';
-                  final specialty = doc['specialty'] ?? 'Specialist';
-                  final rating = doc['rating']?.toString() ?? '5.0';
-                  final image = (doc['image_path'] != null)
-                      ? '${ApiClient.storageUrl}/${doc['image_path']}'
-                      : 'assets/images/doctor1.png';
-                  final doctorId = doc['id'];
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DoctorDetailsScreen(
-                              doctorId: doctorId,
-                              name: name,
-                              specialty: specialty,
-                              image: image,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 160,
-                        decoration: BoxDecoration(
-                          color: AppColors.getSurface(context),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: AppColors.getBorder(context)),
-                        ),
-                        child: Stack(
-                          children: [
-                            // Text Info on the left
-                            Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name.replaceFirst(' ', '\n'),
-                                    style: GoogleFonts.poppins(
-                                      color: AppColors.getTextTitle(context),
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.2,
+                                      child: doc['image_path'] != null
+                                          ? Image.network(
+                                              image,
+                                              height: 150,
+                                              width: 120,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              image,
+                                              height: 150,
+                                              width: 120,
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    specialty,
-                                    style: GoogleFonts.poppins(
-                                      color: AppColors.getTextSubtitle(context),
-                                      fontSize: 13,
+
+                                  // Heart Icon
+                                  PositionedDirectional(
+                                    top: 16,
+                                    end: 16,
+                                    child: Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFF0F4FD),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.favorite,
+                                        color: Color(0xFF3B82F6),
+                                        size: 18,
+                                      ),
                                     ),
-                                  ),
-                                  const Spacer(),
-                                  // Rating
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.star_rounded,
-                                        color: Color(0xFFFBBF24),
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        rating,
-                                        style: GoogleFonts.poppins(
-                                          color: AppColors.getTextTitle(context),
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),
                             ),
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(delay: 500.ms)
+                        .slideY(begin: 0.1, end: 0);
+                  }),
 
-                            // Doctor Image on the right
-                            PositionedDirectional(
-                              end: 0,
-                              bottom: 0,
-                              child: ClipRRect(
-                                borderRadius: const BorderRadiusDirectional.only(
-                                  bottomEnd: Radius.circular(24),
-                                ),
-                                child: doc['image_path'] != null
-                                    ? Image.network(
-                                        image,
-                                        height: 150,
-                                        width: 120,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        image,
-                                        height: 150,
-                                        width: 120,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                            ),
-
-                            // Heart Icon
-                            PositionedDirectional(
-                              top: 16,
-                              end: 16,
-                              child: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFF0F4FD),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.favorite,
-                                  color: Color(0xFF3B82F6),
-                                  size: 18,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0);
-                }),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -920,7 +1129,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 20),
                     // Coming soon box
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(12),
@@ -928,7 +1140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.info_outline, color: Color(0xFF3B82F6), size: 20),
+                          const Icon(
+                            Icons.info_outline,
+                            color: Color(0xFF3B82F6),
+                            size: 20,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
