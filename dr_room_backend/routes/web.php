@@ -159,6 +159,8 @@ Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->g
     
     // Tests
     Route::get('/tests', fn() => $labPlaceholder('پشکنینەکان'))->name('lab.tests.index');
+    Route::get('/tests/create', fn() => view('lab.tests.create'))->name('lab.tests.create');
+    Route::get('/test-types/create', fn() => view('lab.test-types.create'))->name('lab.test-types.create');
     Route::get('/tests/blood', fn() => $labPlaceholder('پشکنینی خوێن'))->name('lab.tests.blood');
     Route::get('/tests/urine', fn() => $labPlaceholder('پشکنینی میز'))->name('lab.tests.urine');
     Route::get('/tests/hormone', fn() => $labPlaceholder('پشکنینی هۆرمۆن'))->name('lab.tests.hormone');

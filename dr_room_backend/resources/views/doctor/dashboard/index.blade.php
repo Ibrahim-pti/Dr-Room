@@ -1,216 +1,155 @@
 @extends('doctor.layouts.app')
 
 @section('content')
-<div class="space-y-6 lg:space-y-8 pb-10">
-    
-    <!-- Welcome Header -->
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100">
+<div class="fade-up" style="display:flex;flex-direction:column;gap:24px;padding-bottom:40px;">
+
+    <!-- Welcome -->
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;background:#fff;padding:24px 28px;border-radius:16px;border:1px solid #e2e8f0;">
         <div>
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">داشبۆرد</h1>
-            <p class="text-slate-500 font-medium">بەخێربێیتەوە بۆ سیستەم، <span class="text-blue-600">دکتۆر {{ explode(' ', $user->name)[0] }}</span></p>
+            <h1 style="font-size:1.6rem;font-weight:800;color:#0f172a;margin:0 0 6px;">داشبۆرد</h1>
+            <p style="margin:0;color:#64748b;font-size:0.9rem;font-weight:500;">بەخێربێیتەوە بۆ سیستەم، <span style="color:#4f46e5;font-weight:700;">دکتۆر {{ explode(' ', $user->name)[0] }}</span></p>
         </div>
-        <div class="text-sm font-medium text-slate-400 flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <div style="display:flex;align-items:center;gap:8px;background:#f8fafc;padding:8px 16px;border-radius:10px;font-size:0.82rem;color:#94a3b8;font-weight:600;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             {{ now()->format('Y-m-d') }}
         </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <!-- Today Appointments -->
-        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        @php
+            $stats = [
+                ['label' => 'نەخۆشەکانی ئەمڕۆ', 'value' => $todayAppointments ?? 24, 'color' => '#4f46e5', 'bg' => '#eef2ff', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+                ['label' => 'پشکنینی تەواوکراو', 'value' => $completedAppointments ?? 18, 'color' => '#059669', 'bg' => '#ecfdf5', 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+                ['label' => 'ڕاوێژی ئۆنلاین', 'value' => $pendingAppointments ?? 6, 'color' => '#7c3aed', 'bg' => '#f5f3ff', 'icon' => 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z'],
+                ['label' => 'هەڵسەنگاندن', 'value' => number_format($doctor->rating ?? 4.8, 1), 'color' => '#d97706', 'bg' => '#fffbeb', 'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
+            ];
+        @endphp
+        @foreach($stats as $i => $s)
+        <div style="background:#fff;border-radius:14px;padding:22px;border:1px solid #e2e8f0;transition:transform 0.2s ease,box-shadow 0.2s ease;cursor:default;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.06)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div style="width:44px;height:44px;border-radius:12px;background:{{ $s['bg'] }};display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" fill="none" stroke="{{ $s['color'] }}" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $s['icon'] }}"/></svg>
                 </div>
-                <span class="inline-flex items-center gap-1 text-sm font-bold text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-lg">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"/></svg>
-                    ١٥٪
-                </span>
             </div>
-            <div>
-                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $todayAppointments ?? 24 }}</h3>
-                <p class="text-slate-500 text-sm font-medium">نەخۆشەکانی ئەمڕۆ</p>
-            </div>
+            <div style="font-size:1.75rem;font-weight:800;color:#0f172a;margin-bottom:4px;" dir="ltr">{{ $s['value'] }}</div>
+            <div style="font-size:0.8rem;color:#64748b;font-weight:600;">{{ $s['label'] }}</div>
         </div>
-
-        <!-- Completed -->
-        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <span class="inline-flex items-center gap-1 text-sm font-bold text-emerald-500 bg-emerald-50 px-2.5 py-1 rounded-lg">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"/></svg>
-                    ٨٪
-                </span>
-            </div>
-            <div>
-                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $completedAppointments ?? 18 }}</h3>
-                <p class="text-slate-500 text-sm font-medium">پشکنینی تەواوکراو</p>
-            </div>
-        </div>
-
-        <!-- Online Consultations -->
-        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-3xl font-black text-slate-800 mb-1">{{ $pendingAppointments ?? 6 }}</h3>
-                <p class="text-slate-500 text-sm font-medium">ڕاوێژی ئۆنلاین</p>
-            </div>
-        </div>
-
-        <!-- Rating -->
-        <div class="bg-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300 group">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                </div>
-                <div class="flex gap-0.5">
-                    @for($i = 0; $i < 5; $i++)
-                        <svg class="w-4 h-4 {{ $i < round($doctor->rating ?? 4.8) ? 'text-amber-400' : 'text-slate-200' }}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    @endfor
-                </div>
-            </div>
-            <div>
-                <h3 class="text-3xl font-black text-slate-800 mb-1" dir="ltr">{{ number_format($doctor->rating ?? 4.8, 1) }}</h3>
-                <p class="text-slate-500 text-sm font-medium">هەڵسەنگاندنی گشتی</p>
-            </div>
-        </div>
+        @endforeach
     </div>
 
-    <!-- Main Content Area -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-        
-        <!-- Upcoming Appointments (Takes 2 columns on large screens) -->
-        <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 class="text-lg font-bold text-slate-800">خشتەی کارکردنی ئەمڕۆ</h3>
-                <a href="{{ route('doctor.appointments.index') }}" class="text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-xl transition-colors">هەمووی ببینە</a>
+    <!-- Content Grid -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
+
+        <!-- Appointments Table -->
+        <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;display:flex;flex-direction:column;">
+            <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;">
+                <h3 style="margin:0;font-size:1rem;font-weight:700;color:#0f172a;">خشتەی کارکردنی ئەمڕۆ</h3>
+                <a href="{{ route('doctor.appointments.index') }}" style="font-size:0.8rem;font-weight:700;color:#4f46e5;text-decoration:none;background:#eef2ff;padding:6px 14px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background='#e0e7ff'" onmouseout="this.style.background='#eef2ff'">هەمووی ببینە</a>
             </div>
-            <div class="p-2 sm:p-4 flex-1">
+            <div style="padding:8px 12px;flex:1;">
                 @if(isset($upcomingAppointments) && $upcomingAppointments->count() > 0)
-                    <div class="space-y-2">
-                        @foreach($upcomingAppointments->take(5) as $appointment)
-                            <div class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-transparent hover:border-slate-100">
-                                <div class="w-16 text-center">
-                                    <div class="text-lg font-black text-slate-800">{{ $appointment->appointment_date->format('h:i') }}</div>
-                                    <div class="text-xs font-bold text-slate-400">{{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
-                                </div>
-                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
-                                    @if($appointment->patient->profile_image)
-                                        <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" class="w-full h-full object-cover">
-                                    @else
-                                        <span class="text-indigo-600 font-bold">{{ mb_substr($appointment->patient->name, 0, 1) }}</span>
-                                    @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="text-base font-bold text-slate-800 truncate">{{ $appointment->patient->name }}</h4>
-                                    <p class="text-sm font-medium text-slate-500 truncate">{{ $appointment->type == 'online' ? 'ڕاوێژی ئۆنلاین' : 'سەردانی نۆڕینگە' }}</p>
-                                </div>
-                                <div>
-                                    <span class="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap {{ $appointment->status == 'completed' ? 'bg-emerald-100 text-emerald-700' : ($appointment->status == 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700') }}">
-                                        {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'pending' ? 'چاوەڕێکراو' : 'بەڕێوەیە') }}
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
+                    @foreach($upcomingAppointments->take(5) as $appointment)
+                    <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <div style="width:52px;text-align:center;">
+                            <div style="font-size:1rem;font-weight:800;color:#0f172a;">{{ $appointment->appointment_date->format('h:i') }}</div>
+                            <div style="font-size:0.65rem;font-weight:700;color:#94a3b8;">{{ $appointment->appointment_date->format('A') == 'AM' ? 'ب.ن' : 'د.ن' }}</div>
+                        </div>
+                        <div style="width:40px;height:40px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:700;color:#64748b;font-size:0.9rem;flex-shrink:0;overflow:hidden;">
+                            @if($appointment->patient->profile_image)
+                                <img src="{{ asset('storage/' . $appointment->patient->profile_image) }}" style="width:100%;height:100%;object-fit:cover;">
+                            @else
+                                {{ mb_substr($appointment->patient->name, 0, 1) }}
+                            @endif
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.88rem;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $appointment->patient->name }}</div>
+                            <div style="font-size:0.78rem;color:#94a3b8;font-weight:500;">{{ $appointment->type == 'online' ? 'ڕاوێژی ئۆنلاین' : 'سەردانی نۆڕینگە' }}</div>
+                        </div>
+                        <span style="font-size:0.72rem;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap;{{ $appointment->status == 'completed' ? 'background:#ecfdf5;color:#059669;' : ($appointment->status == 'pending' ? 'background:#fffbeb;color:#d97706;' : 'background:#eef2ff;color:#4f46e5;') }}">
+                            {{ $appointment->status == 'completed' ? 'تەواوکراو' : ($appointment->status == 'pending' ? 'چاوەڕێکراو' : 'بەڕێوەیە') }}
+                        </span>
                     </div>
+                    @endforeach
                 @else
-                    <!-- Placeholder Data for UI presentation if no data -->
-                    <div class="space-y-2">
-                        @php
-                            $dummies = [
-                                ['time' => '09:00', 'ampm' => 'ب.ن', 'name' => 'عەلی ئەحمەد', 'type' => 'سەردانی نۆڕینگە', 'status' => 'completed', 'status_text' => 'تەواوکراو', 'color' => 'emerald'],
-                                ['time' => '10:30', 'ampm' => 'ب.ن', 'name' => 'سارا کەریم', 'type' => 'بەدواداچوون', 'status' => 'upcoming', 'status_text' => 'بەڕێوەیە', 'color' => 'blue'],
-                                ['time' => '11:30', 'ampm' => 'ب.ن', 'name' => 'حەسەن قادر', 'type' => 'ڕاوێژی ئۆنلاین', 'status' => 'upcoming', 'status_text' => 'بەڕێوەیە', 'color' => 'blue'],
-                                ['time' => '01:00', 'ampm' => 'د.ن', 'name' => 'زانا عوسمان', 'type' => 'سەردانی نۆڕینگە', 'status' => 'pending', 'status_text' => 'چاوەڕێکراو', 'color' => 'amber'],
-                            ];
-                        @endphp
-                        @foreach($dummies as $dummy)
-                            <div class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-slate-50 rounded-2xl transition-colors border border-transparent hover:border-slate-100">
-                                <div class="w-12 sm:w-16 text-center">
-                                    <div class="text-base sm:text-lg font-black text-slate-800">{{ $dummy['time'] }}</div>
-                                    <div class="text-[10px] sm:text-xs font-bold text-slate-400">{{ $dummy['ampm'] }}</div>
-                                </div>
-                                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500 font-bold text-sm sm:text-base">
-                                    {{ mb_substr($dummy['name'], 0, 1) }}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="text-sm sm:text-base font-bold text-slate-800 truncate">{{ $dummy['name'] }}</h4>
-                                    <p class="text-xs sm:text-sm font-medium text-slate-500 truncate">{{ $dummy['type'] }}</p>
-                                </div>
-                                <div>
-                                    <span class="inline-flex items-center justify-center px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-{{ $dummy['color'] }}-100 text-{{ $dummy['color'] }}-700 whitespace-nowrap">
-                                        {{ $dummy['status_text'] }}
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
+                    @php
+                        $dummies = [
+                            ['time' => '09:00', 'ampm' => 'ب.ن', 'name' => 'عەلی ئەحمەد', 'type' => 'سەردانی نۆڕینگە', 'status' => 'تەواوکراو', 'sc' => '#059669', 'sb' => '#ecfdf5'],
+                            ['time' => '10:30', 'ampm' => 'ب.ن', 'name' => 'سارا کەریم', 'type' => 'بەدواداچوون', 'status' => 'بەڕێوەیە', 'sc' => '#4f46e5', 'sb' => '#eef2ff'],
+                            ['time' => '11:30', 'ampm' => 'ب.ن', 'name' => 'حەسەن قادر', 'type' => 'ڕاوێژی ئۆنلاین', 'status' => 'بەڕێوەیە', 'sc' => '#4f46e5', 'sb' => '#eef2ff'],
+                            ['time' => '01:00', 'ampm' => 'د.ن', 'name' => 'زانا عوسمان', 'type' => 'سەردانی نۆڕینگە', 'status' => 'چاوەڕێکراو', 'sc' => '#d97706', 'sb' => '#fffbeb'],
+                        ];
+                    @endphp
+                    @foreach($dummies as $d)
+                    <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <div style="width:52px;text-align:center;">
+                            <div style="font-size:1rem;font-weight:800;color:#0f172a;">{{ $d['time'] }}</div>
+                            <div style="font-size:0.65rem;font-weight:700;color:#94a3b8;">{{ $d['ampm'] }}</div>
+                        </div>
+                        <div style="width:40px;height:40px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:700;color:#64748b;font-size:0.9rem;flex-shrink:0;">{{ mb_substr($d['name'], 0, 1) }}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.88rem;font-weight:700;color:#0f172a;">{{ $d['name'] }}</div>
+                            <div style="font-size:0.78rem;color:#94a3b8;font-weight:500;">{{ $d['type'] }}</div>
+                        </div>
+                        <span style="font-size:0.72rem;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap;background:{{ $d['sb'] }};color:{{ $d['sc'] }};">{{ $d['status'] }}</span>
                     </div>
+                    @endforeach
                 @endif
             </div>
         </div>
 
-        <!-- Right Side: Chart & Recent Patients -->
-        <div class="flex flex-col gap-6 lg:gap-8">
-            
-            <!-- Earnings Chart -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-lg font-bold text-slate-800">پوختەی سەردانەکان</h3>
-                    <select class="bg-slate-50 border-none text-sm font-bold text-slate-600 py-2 px-3 rounded-xl cursor-pointer outline-none focus:ring-2 focus:ring-blue-500/20">
-                        <option>ئەم هەفتەیە</option>
-                        <option>ئەم مانگە</option>
-                    </select>
+        <!-- Right Column -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <!-- Chart -->
+            <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:22px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h3 style="margin:0;font-size:1rem;font-weight:700;color:#0f172a;">پوختەی سەردانەکان</h3>
                 </div>
-                <div class="relative h-48 w-full">
+                <div style="position:relative;height:200px;">
                     <canvas id="appointmentsChart"></canvas>
                 </div>
             </div>
 
             <!-- Recent Patients -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 flex-1 flex flex-col">
-                <div class="p-6 pb-2">
-                    <h3 class="text-lg font-bold text-slate-800">دوایین نەخۆشەکان</h3>
+            <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;flex:1;display:flex;flex-direction:column;">
+                <div style="padding:18px 22px 8px;">
+                    <h3 style="margin:0;font-size:1rem;font-weight:700;color:#0f172a;">دوایین نەخۆشەکان</h3>
                 </div>
-                <div class="p-4 flex-1">
-                    <div class="space-y-1">
-                        @php
-                            $recentDummies = [
-                                ['name' => 'عەلی ئەحمەد', 'desc' => 'نێر، ٣٨ ساڵ', 'date' => 'ئەمڕۆ'],
-                                ['name' => 'سارا کەریم', 'desc' => 'مێ، ٣٥ ساڵ', 'date' => 'ئەمڕۆ'],
-                                ['name' => 'حەسەن قادر', 'desc' => 'نێر، ٤٢ ساڵ', 'date' => 'دوێنێ'],
-                            ];
-                        @endphp
-                        @foreach($recentDummies as $p)
-                            <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-2xl transition-colors">
-                                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                                    {{ mb_substr($p['name'], 0, 1) }}
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-sm font-bold text-slate-800">{{ $p['name'] }}</div>
-                                    <div class="text-xs font-medium text-slate-500">{{ $p['desc'] }}</div>
-                                </div>
-                                <div class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg">{{ $p['date'] }}</div>
-                            </div>
-                        @endforeach
+                <div style="padding:6px 12px;flex:1;">
+                    @php
+                        $recentDummies = [
+                            ['name' => 'عەلی ئەحمەد', 'desc' => 'نێر، ٣٨ ساڵ', 'date' => 'ئەمڕۆ'],
+                            ['name' => 'سارا کەریم', 'desc' => 'مێ، ٣٥ ساڵ', 'date' => 'ئەمڕۆ'],
+                            ['name' => 'حەسەن قادر', 'desc' => 'نێر، ٤٢ ساڵ', 'date' => 'دوێنێ'],
+                        ];
+                    @endphp
+                    @foreach($recentDummies as $p)
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <div style="width:36px;height:36px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">{{ mb_substr($p['name'], 0, 1) }}</div>
+                        <div style="flex:1;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#0f172a;">{{ $p['name'] }}</div>
+                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:500;">{{ $p['desc'] }}</div>
+                        </div>
+                        <div style="font-size:0.7rem;font-weight:700;color:#94a3b8;background:#f1f5f9;padding:4px 10px;border-radius:6px;">{{ $p['date'] }}</div>
                     </div>
+                    @endforeach
                 </div>
-                <div class="p-4 pt-0">
-                    <a href="{{ route('doctor.patients.index') }}" class="block w-full text-center py-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold transition-colors text-sm">
-                        بینینی هەموو نەخۆشەکان
-                    </a>
+                <div style="padding:12px 16px 16px;">
+                    <a href="{{ route('doctor.patients.index') }}" style="display:block;text-align:center;padding:10px;border-radius:10px;background:#f8fafc;color:#64748b;font-weight:700;font-size:0.82rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">بینینی هەموو نەخۆشەکان</a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
+
+<style>
+    @media (max-width: 1023px) {
+        div[style*="grid-template-columns:2fr 1fr"] { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 639px) {
+        div[style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -224,13 +163,13 @@
                     datasets: [{
                         label: 'سەردانەکان',
                         data: [12, 19, 15, 25, 22, 30, 28],
-                        borderColor: '#3B82F6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 3,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.08)',
+                        borderWidth: 2.5,
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#3B82F6',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#4f46e5',
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
@@ -241,8 +180,8 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#94A3B8', font: { family: 'Rabar', weight: 'bold' } } },
-                        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, border: { display: false, dash: [4, 4] }, ticks: { color: '#94A3B8', maxTicksLimit: 5, font: { weight: 'bold' } } }
+                        x: { grid: { display: false }, border: { display: false }, ticks: { color: '#94a3b8', font: { family: 'Rabar', weight: 'bold', size: 11 } } },
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false }, ticks: { color: '#94a3b8', maxTicksLimit: 5, font: { weight: 'bold', size: 11 } } }
                     },
                     interaction: { intersect: false, mode: 'index' }
                 }
