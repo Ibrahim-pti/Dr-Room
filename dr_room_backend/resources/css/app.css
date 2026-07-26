@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../views/**/*.blade.php";
+@source "../../app/**/*.php";
 
 @theme {
   --color-primary: #3B82F6;

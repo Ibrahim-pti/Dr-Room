@@ -17,15 +17,15 @@
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
+        <table class="w-full text-start text-sm table-fixed">
             <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-medium">
                 <tr>
-                    <th class="px-6 py-4">نەخۆش</th>
-                    <th class="px-6 py-4">بەروار و کات</th>
-                    <th class="px-6 py-4">جۆر</th>
-                    <th class="px-6 py-4">تێبینی</th>
-                    <th class="px-6 py-4">دۆخ</th>
-                    <th class="px-6 py-4 text-center">کردارەکان</th>
+                    <th class="px-6 py-4 whitespace-nowrap">نەخۆش</th>
+                    <th class="px-6 py-4 whitespace-nowrap">بەروار و کات</th>
+                    <th class="px-6 py-4 whitespace-nowrap">جۆر</th>
+                    <th class="px-6 py-4 whitespace-nowrap">تێبینی</th>
+                    <th class="px-6 py-4 whitespace-nowrap">دۆخ</th>
+                    <th class="px-6 py-4 text-center whitespace-nowrap">کردارەکان</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">

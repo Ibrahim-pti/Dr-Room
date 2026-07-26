@@ -36,12 +36,12 @@
         <h3 class="text-lg font-bold text-slate-800">چاوپێکەوتنە پارە دراوەکان</h3>
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
+        <table class="w-full text-start text-sm table-fixed">
             <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-medium">
                 <tr>
-                    <th class="px-6 py-4">نەخۆش</th>
-                    <th class="px-6 py-4">بەروار</th>
-                    <th class="px-6 py-4">بڕی پارە</th>
+                    <th class="px-6 py-4 whitespace-nowrap">نەخۆش</th>
+                    <th class="px-6 py-4 whitespace-nowrap">بەروار</th>
+                    <th class="px-6 py-4 whitespace-nowrap">بڕی پارە</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">

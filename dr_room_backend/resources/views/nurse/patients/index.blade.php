@@ -11,13 +11,13 @@
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full text-right text-sm">
+        <table class="w-full text-start text-sm table-fixed">
             <thead class="bg-slate-50 border-b border-slate-100 text-slate-500 font-medium">
                 <tr>
-                    <th class="px-6 py-4">ناوی نەخۆش</th>
-                    <th class="px-6 py-4">مۆبایل</th>
-                    <th class="px-6 py-4">ژمارەی سەردانەکان</th>
-                    <th class="px-6 py-4">کۆتا سەردان</th>
+                    <th class="px-6 py-4 whitespace-nowrap">ناوی نەخۆش</th>
+                    <th class="px-6 py-4 whitespace-nowrap">مۆبایل</th>
+                    <th class="px-6 py-4 whitespace-nowrap">ژمارەی سەردانەکان</th>
+                    <th class="px-6 py-4 whitespace-nowrap">کۆتا سەردان</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">

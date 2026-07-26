@@ -72,6 +72,7 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
     
     // Profile
     Route::get('/profile', [NurseProfileController::class, 'index'])->name('nurse.profile.index');
+    Route::put('/profile', [NurseProfileController::class, 'update'])->name('nurse.profile.update');
 });
 
 Route::get('/{locale?}', function ($locale = 'ckb') {
