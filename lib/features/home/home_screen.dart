@@ -381,7 +381,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                 ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
 
-                                // ── Top Labs Header ──
+                const SizedBox(height: 32),
+
+                // ── Top Labs Header ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
@@ -805,72 +807,101 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoryGrid(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 0.9, // Adjust ratio to reduce vertical space
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      children: [
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/lab.png',
-          titleKey: 'cat_lab',
-          id: 'lab',
-          isActive: true,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/doctor_bag.png',
-          titleKey: 'cat_nursing',
-          id: 'nursing',
-          isActive: true,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/doctor.png',
-          titleKey: 'cat_doctor',
-          id: 'doctor',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/medicine.png',
-          titleKey: 'cat_pharmacy',
-          id: 'pharmacy',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/xray.png',
-          titleKey: 'cat_xray',
-          id: 'xray',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/report.png',
-          titleKey: 'cat_news',
-          id: 'news',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/add.png',
-          titleKey: 'cat_ambulance',
-          id: 'ambulance',
-          isActive: false,
-        ),
-        _buildGridCard(
-          context,
-          imagePath: 'assets/images/apps.png',
-          titleKey: 'cat_more',
-          id: 'more',
-          isActive: false,
-        ),
-      ],
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/lab.png',
+              titleKey: 'cat_lab',
+              id: 'lab',
+              isActive: true,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/doctor_bag.png',
+              titleKey: 'cat_nursing',
+              id: 'nursing',
+              isActive: true,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/doctor.png',
+              titleKey: 'cat_doctor',
+              id: 'doctor',
+              isActive: false,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/medicine.png',
+              titleKey: 'cat_pharmacy',
+              id: 'pharmacy',
+              isActive: false,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/xray.png',
+              titleKey: 'cat_xray',
+              id: 'xray',
+              isActive: false,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/report.png',
+              titleKey: 'cat_news',
+              id: 'news',
+              isActive: false,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/add.png',
+              titleKey: 'cat_ambulance',
+              id: 'ambulance',
+              isActive: false,
+            ),
+          ),
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 86,
+            child: _buildGridCard(
+              context,
+              imagePath: 'assets/images/apps.png',
+              titleKey: 'cat_more',
+              id: 'more',
+              isActive: false,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1038,8 +1069,8 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Container(
-                width: 58,
-                height: 58,
+                width: 66,
+                height: 66,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -1069,8 +1100,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (!isActive)
             PositionedDirectional(
-              top: -6,
-              end: -6,
+              top: -4,
+              end: -8,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
