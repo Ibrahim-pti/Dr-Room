@@ -375,5 +375,10 @@
   "finish_setup": "إنهاء",
   "nurse_gender_preference": "الجنس المفضل للممرض",
   "patient_name": "اسم المريض",
-  "patient_gender": "جنس المريض"
+  "patient_gender": "جنس المريض",
+  "special_offers": "عروض خاصة",
+  "top_pharmacies": "أفضل الصيدليات",
+  "health_articles": "نصائح ومقالات صحية",
+  "limited_time_offers": "عروض لفترة محدودة!",
+  "click_to_see_offers": "انقر لرؤية جميع الخصومات والباقات"
 }

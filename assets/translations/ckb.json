@@ -374,5 +374,10 @@
   "finish_setup": "تەواوکردن",
   "nurse_gender_preference": "ڕەگەزی پەرستار (ئارەزووکراو)",
   "patient_name": "ناوی نەخۆش",
-  "patient_gender": "ڕەگەزی نەخۆش"
+  "patient_gender": "ڕەگەزی نەخۆش",
+  "special_offers": "ئۆفەرە تایبەتەکان",
+  "top_pharmacies": "باشترین دەرمانخانەکان",
+  "health_articles": "ڕێنمایی و وتاری تەندروستی",
+  "limited_time_offers": "ئۆفەری کاتی!",
+  "click_to_see_offers": "کلیک بکە بۆ بینینی سەرجەم ئۆفەرەکان"
 }

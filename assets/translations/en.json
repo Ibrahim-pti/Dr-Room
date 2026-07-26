@@ -375,5 +375,10 @@
   "finish_setup": "Finish",
   "nurse_gender_preference": "Nurse Gender Preference",
   "patient_name": "Patient Name",
-  "patient_gender": "Patient Gender"
+  "patient_gender": "Patient Gender",
+  "special_offers": "Special Offers",
+  "top_pharmacies": "Top Pharmacies",
+  "health_articles": "Health Tips & Articles",
+  "limited_time_offers": "Limited Time Offers!",
+  "click_to_see_offers": "Click to see all discounts and packages"
 }

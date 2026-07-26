@@ -309,7 +309,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: AppColors.getSurface(context),
                                           size: 20,
                                         ),
-                                      ),
+                                      )
+                                      .animate(onPlay: (controller) => controller.repeat())
+                                      .shimmer(duration: 2000.ms, color: Colors.white.withValues(alpha: 0.5)),
                                     ],
                                   ),
                                 )
@@ -380,6 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildCategoryGrid(
                   context,
                 ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+
 
                 const SizedBox(height: 32),
 
@@ -602,6 +605,189 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
+
+
+                // ── Top Pharmacies ──
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'top_pharmacies'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'see_all'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF3B82F6),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 600.ms),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 180,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      final pharms = [
+                        {'name': 'دەرمانخانەی شفا', 'city': 'Erbil', 'time': '24 Hours', 'img': 'assets/images/pharmacy1.jpg'},
+                        {'name': 'دەرمانخانەی پزیشکان', 'city': 'Sulaymaniyah', 'time': '8am - 12pm', 'img': 'assets/images/pharmacy2.jpg'},
+                        {'name': 'دەرمانخانەی زانکۆ', 'city': 'Duhok', 'time': '9am - 10pm', 'img': 'assets/images/pharmacy1.jpg'},
+                        {'name': 'دەرمانخانەی مێدیکا', 'city': 'Kirkuk', 'time': '24 Hours', 'img': 'assets/images/pharmacy2.jpg'},
+                      ];
+                      final pharm = pharms[index];
+                      return Container(
+                        width: 170,
+                        margin: const EdgeInsetsDirectional.only(end: 14, bottom: 12, top: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(color: const Color(0xFFF1F5F9)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Top Image Section
+                            Container(
+                              height: 80,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                                color: const Color(0xFFF8FAFC),
+                                image: DecorationImage(
+                                  image: AssetImage(pharm['img']!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: Stack(
+                                children: [
+                                  // Rating Badge
+                                  Positioned(
+                                    bottom: 6,
+                                    right: 6,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.1),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '4.9',
+                                            style: GoogleFonts.poppins(
+                                              color: const Color(0xFF1E293B),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            // Details Section
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    pharm['name']!,
+                                    style: TextStyle(
+                                      fontFamily: 'Rabar',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.getTextTitle(context),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Iconsax.location, color: Color(0xFF3B82F6), size: 10),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          pharm['city']!,
+                                          style: GoogleFonts.poppins(
+                                            color: const Color(0xFF64748B),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Iconsax.clock, color: Color(0xFF94A3B8), size: 10),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        pharm['time']!,
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF94A3B8),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      const Icon(Iconsax.verify, color: Color(0xFF10B981), size: 10),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        'Verified',
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF10B981),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
+                    },
+                  ),
+                ),
 
                 // ── Top Doctors Header ──
                 Padding(
