@@ -25,4 +25,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function assignedNurse()
+    {
+        return $this->belongsTo(User::class, 'assigned_nurse_id');
+    }
 }

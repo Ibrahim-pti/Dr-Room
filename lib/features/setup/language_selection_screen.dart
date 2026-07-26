@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'health_profile_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -27,12 +26,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   void _proceedToHealthProfile() {
     context.setLocale(Locale(_selectedLocale));
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => HealthProfileScreen(onFinished: widget.onFinished),
-      ),
-    );
+    widget.onFinished();
   }
 
   @override

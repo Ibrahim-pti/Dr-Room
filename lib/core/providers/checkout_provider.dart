@@ -15,7 +15,7 @@ class CheckoutProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> processPayment(CartProvider cart) async {
+  Future<String?> processPayment(CartProvider cart) async {
     _isProcessing = true;
     notifyListeners();
 
@@ -36,16 +36,17 @@ class CheckoutProvider extends ChangeNotifier {
       notifyListeners();
 
       if (response.statusCode == 201) {
-        return true;
+        final data = jsonDecode(response.body);
+        return data['order']?['id']?.toString();
       } else {
         debugPrint('Checkout Failed: ${response.body}');
-        return false;
+        return null;
       }
     } catch (e) {
       debugPrint('Checkout Error: $e');
       _isProcessing = false;
       notifyListeners();
-      return false;
+      return null;
     }
   }
 }

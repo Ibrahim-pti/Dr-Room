@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/providers/admin_order_provider.dart';
 import 'admin_app_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -232,6 +234,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen>
       items = [];
     }
 
+    final double? lat = locationDetails['lat'] != null ? double.tryParse(locationDetails['lat'].toString()) : null;
+    final double? lng = locationDetails['lng'] != null ? double.tryParse(locationDetails['lng'].toString()) : null;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -358,6 +363,59 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen>
                     ),
                   ],
                 ),
+
+                if (lat != null && lng != null) ...[
+                  const SizedBox(height: 16),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: SizedBox(
+                      height: 160,
+                      width: double.infinity,
+                      child: IgnorePointer(
+                        child: GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(lat, lng),
+                            zoom: 15.0,
+                          ),
+                          markers: {
+                            Marker(
+                              markerId: const MarkerId('patient_location'),
+                              position: LatLng(lat, lng),
+                            ),
+                          },
+                          myLocationButtonEnabled: false,
+                          zoomControlsEnabled: false,
+                          mapToolbarEnabled: false,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: () async {
+                      final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Iconsax.map_1, size: 18, color: Color(0xFF3B82F6)),
+                        SizedBox(width: 6),
+                        Text(
+                          'کردنەوە لە گۆگڵ ماپ',
+                          style: TextStyle(
+                            fontFamily: 'Rabar',
+                            fontSize: 14,
+                            color: Color(0xFF3B82F6),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 if (items.isNotEmpty) ...[
                   const SizedBox(height: 20),

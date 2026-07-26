@@ -75,24 +75,14 @@ class _MedicalHistoryScreenState extends State<MedicalHistoryScreen> {
     await prefs.setBool('guest_smokes', _smokes!);
 
     if (mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      widget.onFinished();
     }
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        widget.onFinished();
-      }
-    });
   }
 
   void _skipSetup() {
     if (mounted) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      widget.onFinished();
     }
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        widget.onFinished();
-      }
-    });
   }
 
   void _showError() {

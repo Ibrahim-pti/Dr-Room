@@ -1,13 +1,17 @@
+import 'package:dr_room/core/providers/cart_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:http/http.dart';
 import '../../core/theme/app_colors.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'payment_method_screen.dart';
 
 class CheckoutDetailsScreen extends StatefulWidget {
@@ -31,7 +35,7 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
   bool _isLoadingLocation = false;
   String _locationDetails = 'no_location_selected'.tr();
 
-  final MapController _mapController = MapController();
+  GoogleMapController? _mapController;
   LatLng? _currentLatLng;
 
   @override
@@ -84,22 +88,24 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         setState(() {
           _currentLatLng = LatLng(position.latitude, position.longitude);
         });
-        _mapController.move(_currentLatLng!, 15.0);
+        _mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: _currentLatLng!, zoom: 15.0),
+          ),
+        );
       }
 
       try {
         final geo.Geocoding geocoder = geo.Geocoding();
-        List<geo.Placemark> placemarks = await geocoder.placemarkFromCoordinates(
-          position.latitude,
-          position.longitude,
-        );
+        List<geo.Placemark> placemarks = await geocoder
+            .placemarkFromCoordinates(position.latitude, position.longitude)
+            .timeout(const Duration(seconds: 10));
 
         if (placemarks.isNotEmpty) {
           geo.Placemark place = placemarks[0];
           if (mounted) {
             setState(() {
-              _locationDetails =
-                  '${place.street}, ${place.subAdministrativeArea ?? place.locality}, ${place.country}';
+              _locationDetails = _formatAddress(place);
             });
           }
         }
@@ -107,7 +113,8 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         // Geocoding often fails on iOS simulators
         if (mounted) {
           setState(() {
-            _locationDetails = 'Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
+            _locationDetails =
+                'Location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
           });
         }
       }
@@ -136,17 +143,15 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
   Future<void> _updateAddressFromLatLng(LatLng point) async {
     try {
       final geo.Geocoding geocoder = geo.Geocoding();
-      List<geo.Placemark> placemarks = await geocoder.placemarkFromCoordinates(
-        point.latitude,
-        point.longitude,
-      );
+      List<geo.Placemark> placemarks = await geocoder
+          .placemarkFromCoordinates(point.latitude, point.longitude)
+          .timeout(const Duration(seconds: 10));
 
       if (placemarks.isNotEmpty) {
         geo.Placemark place = placemarks[0];
         if (mounted) {
           setState(() {
-            _locationDetails =
-                '${place.street}, ${place.subAdministrativeArea ?? place.locality}, ${place.country}';
+            _locationDetails = _formatAddress(place);
           });
         }
       }
@@ -154,10 +159,28 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
       // Handle error gracefully if reverse geocoding fails
       if (mounted) {
         setState(() {
-          _locationDetails = 'Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})';
+          _locationDetails =
+              'Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})';
         });
       }
     }
+  }
+
+  String _formatAddress(geo.Placemark place) {
+    List<String> parts = [];
+    
+    // Ignore Plus Codes (which contain '+') or generic unnamed roads
+    if (place.street != null && place.street!.isNotEmpty && !place.street!.contains('+') && !place.street!.toLowerCase().contains('unnamed')) {
+      parts.add(place.street!);
+    }
+    
+    if (place.subLocality != null && place.subLocality!.isNotEmpty) parts.add(place.subLocality!);
+    if (place.locality != null && place.locality!.isNotEmpty) parts.add(place.locality!);
+    if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) parts.add(place.administrativeArea!);
+    if (place.country != null && place.country!.isNotEmpty) parts.add(place.country!);
+
+    // Remove duplicates (e.g. "Erbil, Erbil")
+    return parts.toSet().toList().join(', ');
   }
 
   void _submitForm() {
@@ -181,6 +204,18 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
         );
         return;
       }
+      // Save details to CartProvider
+      context.read<CartProvider>().setPatientDetails({
+        'name': _nameController.text.trim(),
+        'age': _ageController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'patient_gender': _selectedGender,
+        'nurse_gender': _selectedNurseGender,
+        'location': _locationDetails,
+        'lat': _currentLatLng!.latitude,
+        'lng': _currentLatLng!.longitude,
+      });
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const PaymentMethodScreen()),
@@ -396,135 +431,92 @@ class _CheckoutDetailsScreenState extends State<CheckoutDetailsScreen> {
                         borderRadius: BorderRadius.circular(24),
                         child: Stack(
                           children: [
-                            FlutterMap(
-                              mapController: _mapController,
-                              options: MapOptions(
-                                initialCenter:
+                            GoogleMap(
+                              onMapCreated: (controller) {
+                                _mapController = controller;
+                              },
+                              initialCameraPosition: CameraPosition(
+                                target:
                                     _currentLatLng ??
-                                    const LatLng(
-                                      36.1911,
-                                      44.0092,
-                                    ), // Erbil default
-                                initialZoom: 15.0,
-                                onMapEvent: (event) {
-                                  if (event is MapEventMoveEnd) {
-                                    final center = event.camera.center;
-                                    setState(() {
-                                      _currentLatLng = center;
-                                    });
-                                    _updateAddressFromLatLng(center);
-                                  }
-                                },
+                                    const LatLng(36.1911, 44.0092),
+                                zoom: 15.0,
                               ),
-                              children: [
-                                TileLayer(
-                                  urlTemplate:
-                                      'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-                                  userAgentPackageName: 'com.drroom.app',
-                                ),
-                              ],
-                            ),
-                            // Fixed center marker
-                            Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 38.0),
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFEF4444,
-                                    ).withOpacity(0.15),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.location_on,
-                                    color: Color(0xFFEF4444),
-                                    size: 38,
-                                  ),
-                                ),
+                              onCameraIdle: () {
+                                if (_currentLatLng != null) {
+                                  _updateAddressFromLatLng(_currentLatLng!);
+                                }
+                              },
+                              onTap: (LatLng location) {
+                                setState(() {
+                                  _currentLatLng = location;
+                                });
+                                _updateAddressFromLatLng(location);
+                              },
+                              markers: _currentLatLng != null
+                                  ? {
+                                      Marker(
+                                        markerId: const MarkerId(
+                                          'selected_location',
+                                        ),
+                                        position: _currentLatLng!,
+                                        icon:
+                                            BitmapDescriptor.defaultMarkerWithHue(
+                                              BitmapDescriptor.hueRed,
+                                            ),
+                                      ),
+                                    }
+                                  : {},
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: false,
+                              zoomControlsEnabled: true,
+                              mapToolbarEnabled: true,
+                              padding: const EdgeInsets.only(
+                                bottom: 24,
+                                right: 12,
                               ),
+                              gestureRecognizers:
+                                  <Factory<OneSequenceGestureRecognizer>>{
+                                    Factory<OneSequenceGestureRecognizer>(
+                                      () => EagerGestureRecognizer(),
+                                    ),
+                                  },
                             ),
                             // Floating map controls
                             Positioned(
                               right: 12,
-                              bottom: 12,
+                              bottom: 24,
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // Zoom Controls
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.getSurface(context),
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            _mapController.move(
-                                              _mapController.camera.center,
-                                              _mapController.camera.zoom + 1,
-                                            );
-                                          },
-                                          borderRadius:
-                                              const BorderRadius.vertical(
-                                                top: Radius.circular(12),
-                                              ),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Icon(Icons.add, size: 20),
+                                  InkWell(
+                                    onTap: _getCurrentLocation,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.getSurface(context),
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.1,
+                                            ),
+                                            blurRadius: 8,
                                           ),
-                                        ),
-                                        Container(
-                                          height: 1,
-                                          width: 24,
-                                          color: Colors.grey.withOpacity(0.2),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            _mapController.move(
-                                              _mapController.camera.center,
-                                              _mapController.camera.zoom - 1,
-                                            );
-                                          },
-                                          borderRadius:
-                                              const BorderRadius.vertical(
-                                                bottom: Radius.circular(12),
-                                              ),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Icon(Icons.remove, size: 20),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  // My Location
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.getSurface(context),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Icons.my_location,
-                                        color: Color(0xFF3B82F6),
-                                        size: 20,
+                                        ],
                                       ),
-                                      onPressed: _getCurrentLocation,
+                                      child: _isLoadingLocation
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.my_location,
+                                              size: 20,
+                                              color: Color(0xFF3B82F6),
+                                            ),
                                     ),
                                   ),
                                 ],

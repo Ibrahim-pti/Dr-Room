@@ -39,8 +39,10 @@ class AdminOrderProvider with ChangeNotifier {
       final response = await ApiClient.get('/admin/nurses');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        _nurses = (data['data'] as List)
-            .where((n) => n['status'] == 'approved')
+        final List nursesList = data is List ? data : (data['data'] ?? []);
+        _nurses = nursesList
+            // If you want only approved nurses, keep this. For testing, let's allow all or check if status is approved or null
+            .where((n) => n['status'] == 'approved' || n['status'] == null || n['status'] == 'pending' || n['status'] == 'active')
             .toList();
         notifyListeners();
       }

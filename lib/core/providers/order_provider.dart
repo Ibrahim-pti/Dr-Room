@@ -12,6 +12,9 @@ class OrderModel {
   final Color iconColor;
   final double price;
   final DateTime date;
+  final String? assignedNurseId;
+  final String? assignedNurseName;
+  final String? assignedNurseAvatar;
 
   OrderModel({
     required this.id,
@@ -22,6 +25,9 @@ class OrderModel {
     required this.iconColor,
     required this.price,
     required this.date,
+    this.assignedNurseId,
+    this.assignedNurseName,
+    this.assignedNurseAvatar,
   });
 }
 
@@ -46,19 +52,22 @@ class OrderProvider extends ChangeNotifier {
         final data = jsonDecode(response.body)['data'] as List;
         _orders = data.map((json) {
           return OrderModel(
-            id: json['id'].toString(),
-            title: "\${json['service_type']} Order",
-            status: json['status'],
-            statusColor: _getStatusColor(json['status']),
+            id: json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+            title: "${json['service_type'] ?? 'General'} Order",
+            status: json['status']?.toString() ?? 'Pending',
+            statusColor: _getStatusColor(json['status']?.toString() ?? 'Pending'),
             icon: Iconsax.health,
             iconColor: const Color(0xFF3B82F6),
-            price: double.tryParse(json['total_price'].toString()) ?? 0.0,
-            date: DateTime.parse(json['created_at']),
+            price: double.tryParse(json['total_price']?.toString() ?? '0') ?? 0.0,
+            date: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+            assignedNurseId: json['assigned_nurse'] != null ? json['assigned_nurse']['id']?.toString() : null,
+            assignedNurseName: json['assigned_nurse'] != null ? json['assigned_nurse']['name']?.toString() : null,
+            assignedNurseAvatar: json['assigned_nurse'] != null ? json['assigned_nurse']['avatar']?.toString() : null,
           );
         }).toList();
       }
     } catch (e) {
-      debugPrint('Error fetching orders: \$e');
+      debugPrint('Error fetching orders: $e');
     }
 
     _isLoading = false;
@@ -93,6 +102,9 @@ class OrderProvider extends ChangeNotifier {
           iconColor: order.iconColor,
           price: order.price,
           date: order.date,
+          assignedNurseId: order.assignedNurseId,
+          assignedNurseName: order.assignedNurseName,
+          assignedNurseAvatar: order.assignedNurseAvatar,
         );
       }
       return order;

@@ -4,8 +4,14 @@ import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../home/main_shell.dart';
 
+import '../orders/order_details_screen.dart';
+import '../../core/providers/order_provider.dart';
+import 'package:provider/provider.dart';
+
 class OrderSuccessScreen extends StatelessWidget {
-  const OrderSuccessScreen({super.key});
+  final String orderId;
+
+  const OrderSuccessScreen({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context) {
@@ -85,13 +91,24 @@ class OrderSuccessScreen extends StatelessWidget {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        // In a real app, this might navigate to Orders tab specifically
+                        // Find the newly added order in the provider
+                        final orderProvider = context.read<OrderProvider>();
+                        final order = orderProvider.orders.firstWhere((o) => o.id == orderId);
+                        
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const MainShell(),
                           ),
                           (route) => false,
+                        );
+                        
+                        // Push details on top
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderDetailsScreen(order: order),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(

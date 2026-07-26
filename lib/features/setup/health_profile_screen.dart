@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'medical_history_screen.dart';
 
 class HealthProfileScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -78,22 +77,12 @@ class _HealthProfileScreenState extends State<HealthProfileScreen> {
     }
 
     if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => MedicalHistoryScreen(onFinished: widget.onFinished),
-        ),
-      );
+      widget.onFinished();
     }
   }
 
   void _skipSetup() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MedicalHistoryScreen(onFinished: widget.onFinished),
-      ),
-    );
+    widget.onFinished();
   }
 
   @override

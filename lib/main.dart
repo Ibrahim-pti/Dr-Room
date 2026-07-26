@@ -19,6 +19,8 @@ import 'features/auth/otp_screen.dart';
 import 'features/home/main_shell.dart';
 import 'features/admin/admin_dashboard_shell.dart';
 import 'features/setup/language_selection_screen.dart';
+import 'features/setup/health_profile_screen.dart';
+import 'features/setup/medical_history_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -125,7 +127,7 @@ class AppFlowState extends State<AppFlow> {
           key: const ValueKey('splash'),
           onFinished: (bool isLoggedIn, String role, bool isFirstTime) {
             if (isFirstTime) {
-              _goTo(_FlowState.setup);
+              _goTo(_FlowState.onboarding);
             } else if (isLoggedIn) {
               if (role == 'admin') {
                 _goTo(_FlowState.admin);
@@ -133,7 +135,7 @@ class AppFlowState extends State<AppFlow> {
                 _goTo(_FlowState.home);
               }
             } else {
-              _goTo(_FlowState.home);
+              _goTo(_FlowState.login);
             }
           },
         );
@@ -141,13 +143,25 @@ class AppFlowState extends State<AppFlow> {
       case _FlowState.setup:
         return LanguageSelectionScreen(
           key: const ValueKey('setup_language'),
-          onFinished: () => _goTo(_FlowState.home),
+          onFinished: () => _goTo(_FlowState.health_profile),
+        );
+
+      case _FlowState.health_profile:
+        return HealthProfileScreen(
+          key: const ValueKey('health_profile'),
+          onFinished: () => _goTo(_FlowState.medical_history),
+        );
+
+      case _FlowState.medical_history:
+        return MedicalHistoryScreen(
+          key: const ValueKey('medical_history'),
+          onFinished: () => _goTo(_FlowState.login),
         );
 
       case _FlowState.onboarding:
         return OnboardingScreen(
           key: const ValueKey('onboarding'),
-          onFinished: () => _goTo(_FlowState.home),
+          onFinished: () => _goTo(_FlowState.setup),
         );
 
       case _FlowState.login:
@@ -196,6 +210,8 @@ class AppFlowState extends State<AppFlow> {
 enum _FlowState {
   splash,
   setup,
+  health_profile,
+  medical_history,
   onboarding,
   login,
   register,

@@ -14,7 +14,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $orders = Order::where('patient_id', Auth::id())
-            ->with('items')
+            ->with(['items', 'assignedNurse'])
             ->orderBy('created_at', 'desc')
             ->get();
             
