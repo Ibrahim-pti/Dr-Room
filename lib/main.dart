@@ -11,6 +11,7 @@ import 'core/utils/ckb_localizations.dart';
 import 'core/providers/health_provider.dart';
 import 'core/providers/cart_provider.dart';
 import 'core/providers/admin_order_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' hide ChangeNotifierProvider, Provider, Consumer;
 import 'features/auth/splash_screen.dart';
 import 'features/auth/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
@@ -33,12 +34,14 @@ void main() async {
     ),
   );
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('ar'), Locale('ckb')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en'),
-      startLocale: const Locale('ckb'),
-      child: const DrRoomApp(),
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: const [Locale('en'), Locale('ar'), Locale('ckb')],
+        path: 'assets/translations',
+        fallbackLocale: const Locale('en'),
+        startLocale: const Locale('ckb'),
+        child: const DrRoomApp(),
+      ),
     ),
   );
 }

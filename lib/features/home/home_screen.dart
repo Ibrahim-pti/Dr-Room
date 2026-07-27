@@ -6,6 +6,8 @@ import '../categories/all_categories_screen.dart';
 import '../appointments/all_schedules_screen.dart';
 import '../doctors/all_doctors_screen.dart';
 import '../pharmacy/screens/pharmacies_screen.dart';
+import '../pharmacy/screens/pharmacy_detail_screen.dart';
+import '../pharmacy/models/pharmacy_model.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -666,13 +668,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             return GestureDetector(
                               onTap: () {
-                                // Navigate to specific pharmacy logic here if needed
-                                // Currently we just push to the Pharmacies screen which shows all.
-                                // If needed, we can construct a Pharmacy object and pass to detail screen.
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => PharmaciesScreen(),
+                                    builder: (context) => PharmacyDetailScreen(
+                                      pharmacy: Pharmacy(
+                                        id: pharm['id'] ?? 1,
+                                        name: pharm['name'] ?? 'دەرمانخانە',
+                                        rating: double.tryParse(pharm['rating']?.toString() ?? '4.8') ?? 4.8,
+                                        deliveryFee: double.tryParse(pharm['delivery_fee']?.toString() ?? '1500.0') ?? 1500.0,
+                                        profileImage: pharm['profile_image'],
+                                      ),
+                                    ),
                                   ),
                                 );
                               },

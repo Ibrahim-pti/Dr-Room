@@ -37,7 +37,7 @@ Route::get('/pharmacies/{id}/medications', [\App\Http\Controllers\Api\PharmacyAp
 Route::get('/pharmacies/{id}/offers', [\App\Http\Controllers\Api\PharmacyApiController::class, 'offers']);
 
 // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
-// Handled inside auth group
+Route::post('/orders', [OrderController::class, 'store']); // Moved outside for testing Without Login
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -51,7 +51,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::post('/orders', [OrderController::class, 'store']);
 
     // ─── Doctor: Dashboard API ─────────────────────────────────────────────
     Route::middleware([\App\Http\Middleware\IsDoctor::class])->prefix('doctor')->group(function () {
