@@ -31,6 +31,11 @@ Route::get('/articles', [AppController::class, 'articles']);
 Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
 
+// ─── Pharmacy Mobile App API ──────────────────────────────────────────────
+Route::get('/pharmacies', [\App\Http\Controllers\Api\PharmacyApiController::class, 'index']);
+Route::get('/pharmacies/{id}/medications', [\App\Http\Controllers\Api\PharmacyApiController::class, 'medications']);
+Route::get('/pharmacies/{id}/offers', [\App\Http\Controllers\Api\PharmacyApiController::class, 'offers']);
+
 // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
 // Handled inside auth group
 

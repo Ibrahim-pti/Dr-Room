@@ -19,6 +19,7 @@ class AppController extends Controller
             'categories' => Category::all(),
             'latest_articles' => Article::where('is_published', true)->latest()->take(5)->get(),
             'top_doctors' => \App\Models\Doctor::with('user:id,name,email,is_doctor')->orderBy('rating', 'desc')->take(5)->get(),
+            'top_pharmacies' => \App\Models\User::where('role', 'pharmacy')->where('status', 'approved')->take(4)->get(),
         ]);
     }
 
