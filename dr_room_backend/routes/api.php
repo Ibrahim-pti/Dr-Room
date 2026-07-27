@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AppController;
 use App\Http\Controllers\Api\DoctorController;
 use App\Http\Controllers\Api\AppointmentBookingController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\GlobalSearchController;
 use App\Http\Controllers\Api\Admin\BannerController;
 use App\Http\Controllers\Api\Admin\ArticleController;
 use App\Http\Controllers\Api\Admin\NotificationController;
@@ -30,6 +31,7 @@ Route::get('/banners', [AppController::class, 'banners']);
 Route::get('/articles', [AppController::class, 'articles']);
 Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
+Route::get('/global-search', [GlobalSearchController::class, 'search']);
 
 // ─── Pharmacy Mobile App API ──────────────────────────────────────────────
 Route::get('/pharmacies', [\App\Http\Controllers\Api\PharmacyApiController::class, 'index']);

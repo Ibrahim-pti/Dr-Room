@@ -20,6 +20,7 @@ import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
 import '../locator/clinic_locator_screen.dart';
 import '../lab/lab_details_screen.dart';
+import '../search/global_search_screen.dart';
 
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
@@ -328,53 +329,65 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 24),
 
                             // ── Search Bar ──
-                            Container(
-                                  height: 60,
-                                  padding: const EdgeInsetsDirectional.only(
-                                    start: 20,
-                                    end: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.getSurface(context),
-                                    borderRadius: BorderRadius.circular(30),
-                                    border: Border.all(
-                                      color: AppColors.getBorder(context),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const GlobalSearchScreen()),
+                                );
+                              },
+                              child: Container(
+                                height: 60,
+                                padding: const EdgeInsetsDirectional.only(
+                                  start: 20,
+                                  end: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.getSurface(context),
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 24,
+                                      offset: const Offset(0, 12),
                                     ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Iconsax.search_normal_1,
-                                        color: Color(0xFF94A3B8),
-                                        size: 22,
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Iconsax.search_normal_1,
+                                      color: Color(0xFF94A3B8),
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'search_doctors'.tr(),
+                                      style: GoogleFonts.poppins(
+                                        color: const Color(0xFF94A3B8),
+                                        fontSize: 15,
                                       ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        'search_doctors'.tr(),
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF94A3B8),
-                                          fontSize: 15,
-                                        ),
+                                    ),
+                                    const Spacer(),
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFF3B82F6),
+                                        shape: BoxShape.circle,
                                       ),
-                                      const Spacer(),
-                                      Container(
-                                        width: 44,
-                                        height: 44,
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFF3B82F6),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Iconsax.microphone,
-                                          color: AppColors.getSurface(context),
-                                          size: 20,
-                                        ),
-                                      )
-                                      .animate(onPlay: (controller) => controller.repeat())
-                                      .shimmer(duration: 2000.ms, color: Colors.white.withValues(alpha: 0.5)),
-                                    ],
-                                  ),
-                                )
+                                      child: Icon(
+                                        Iconsax.microphone,
+                                        color: AppColors.getSurface(context),
+                                        size: 20,
+                                      ),
+                                    )
+                                    .animate(onPlay: (controller) => controller.repeat())
+                                    .shimmer(duration: 2000.ms, color: Colors.white.withValues(alpha: 0.5)),
+                                  ],
+                                ),
+                              ),
+                            )
                                 .animate()
                                 .fadeIn(delay: 200.ms, duration: 400.ms)
                                 .slideY(begin: 0.2, end: 0),
