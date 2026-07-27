@@ -589,9 +589,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         final rating = doc['rating']?.toString() ?? '4.8';
                         final reviews =
                             doc['reviews']?.toString() ?? '120+ Reviews';
+                            
+                        final fallbackImages = [
+                          'assets/images/doctor1.png',
+                          'assets/images/doctor2.png',
+                          'assets/images/doctor3.png',
+                          'assets/images/doctor.png',
+                        ];
+                        final fallbackImage = fallbackImages[index % fallbackImages.length];
+
                         final image = (doc['image_path'] != null)
                             ? '${ApiClient.storageUrl}/${doc['image_path']}'
-                            : 'assets/images/doctor1.png';
+                            : fallbackImage;
                         final doctorId = doc['id'];
 
                         return GestureDetector(
