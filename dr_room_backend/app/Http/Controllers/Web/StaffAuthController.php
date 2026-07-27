@@ -41,7 +41,7 @@ class StaffAuthController extends Controller
                 ]);
             }
             
-            if (in_array($user->role, ['doctor', 'nurse', 'lab'])) {
+            if (in_array($user->role, ['doctor', 'nurse', 'lab', 'pharmacy'])) {
                 $request->session()->regenerate();
                 return $this->redirectBasedOnRole($user->role);
             } else {
@@ -72,7 +72,7 @@ class StaffAuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:20', 'unique:users'],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
-            'role' => ['required', 'string', 'in:doctor,nurse,lab'],
+            'role' => ['required', 'string', 'in:doctor,nurse,lab,pharmacy'],
         ]);
 
         $user = User::create([
@@ -104,6 +104,8 @@ class StaffAuthController extends Controller
             return redirect('/nurse/dashboard');
         } elseif ($role === 'lab') {
             return redirect('/lab/dashboard');
+        } elseif ($role === 'pharmacy') {
+            return redirect('/pharmacy/dashboard');
         }
         return redirect()->route('staff.login');
     }

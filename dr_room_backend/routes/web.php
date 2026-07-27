@@ -192,6 +192,50 @@ Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->g
     Route::get('/profile/staff', fn() => $labPlaceholder('ستافی تاقیگە'))->name('lab.profile.staff');
 });
 
+// Pharmacy Dashboard Routes
+Route::prefix('pharmacy')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Web\PharmacyDashboardController::class, 'index'])->name('pharmacy.dashboard');
+    
+    // New Feature Placeholders (Pharmacy)
+    $pharmacyPlaceholder = function ($title) {
+        return view('shared.placeholder', ['layout' => 'pharmacy.layouts.app', 'title' => $title]);
+    };
+    
+    Route::get('/prescriptions', fn() => $pharmacyPlaceholder('ڕەچەتەکان'))->name('pharmacy.prescriptions.index');
+    Route::get('/orders', fn() => $pharmacyPlaceholder('داواکارییەکان'))->name('pharmacy.orders.index');
+    
+    // Medications CRUD
+    Route::resource('/medications', \App\Http\Controllers\Web\PharmacyMedicationController::class, [
+        'as' => 'pharmacy'
+    ]);
+    
+    // Orders
+    Route::get('/orders', [\App\Http\Controllers\Web\PharmacyOrderController::class, 'index'])->name('pharmacy.orders.index');
+    Route::get('/orders/{id}', [\App\Http\Controllers\Web\PharmacyOrderController::class, 'show'])->name('pharmacy.orders.show');
+    Route::post('/orders/{id}/status', [\App\Http\Controllers\Web\PharmacyOrderController::class, 'updateStatus'])->name('pharmacy.orders.status');
+    
+    // Prescriptions
+    Route::get('/prescriptions', [\App\Http\Controllers\Web\PharmacyPrescriptionController::class, 'index'])->name('pharmacy.prescriptions.index');
+    Route::post('/prescriptions/{id}/dispense', [\App\Http\Controllers\Web\PharmacyPrescriptionController::class, 'dispense'])->name('pharmacy.prescriptions.dispense');
+    
+    // Customers
+    Route::get('/customers', [\App\Http\Controllers\Web\PharmacyCustomerController::class, 'index'])->name('pharmacy.customers.index');
+    
+    // Earnings
+    Route::get('/earnings', [\App\Http\Controllers\Web\PharmacyEarningsController::class, 'index'])->name('pharmacy.earnings.index');
+    
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\Web\PharmacyNotificationController::class, 'index'])->name('pharmacy.notifications.index');
+    
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\Web\PharmacyProfileController::class, 'index'])->name('pharmacy.profile.index');
+    Route::post('/profile', [\App\Http\Controllers\Web\PharmacyProfileController::class, 'update'])->name('pharmacy.profile.update');
+    
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\Web\PharmacySettingsController::class, 'index'])->name('pharmacy.settings.index');
+    Route::post('/settings', [\App\Http\Controllers\Web\PharmacySettingsController::class, 'update'])->name('pharmacy.settings.update');
+});
+
 Route::get('/{locale?}', function ($locale = 'ckb') {
     if (!in_array($locale, ['en', 'ar', 'ckb'])) {
         abort(404);

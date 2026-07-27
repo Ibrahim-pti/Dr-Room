@@ -215,6 +215,7 @@
                             <option value="doctor" {{ old('role') == 'doctor' ? 'selected' : '' }}>Doctor</option>
                             <option value="nurse" {{ old('role') == 'nurse' ? 'selected' : '' }}>Nurse</option>
                             <option value="lab" {{ old('role') == 'lab' ? 'selected' : '' }}>Laboratory</option>
+                            <option value="pharmacy" {{ old('role') == 'pharmacy' ? 'selected' : '' }}>Pharmacy</option>
                         </select>
                     </div>
 
