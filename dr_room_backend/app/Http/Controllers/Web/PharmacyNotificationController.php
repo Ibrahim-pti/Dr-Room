@@ -1,11 +1,6 @@
 <?php
-
 namespace App\Http\Controllers\Web;
-
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-class PharmacyNotificationController extends Controller
-{
-    //
+class PharmacyNotificationController extends Controller {
+    public function index() { return view('pharmacy.notifications.index'); }
 }
