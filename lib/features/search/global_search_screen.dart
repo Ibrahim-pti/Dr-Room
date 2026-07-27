@@ -30,6 +30,13 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
   final List<String> _categories = ['All', 'Doctors', 'Pharmacies', 'Medications', 'Labs'];
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch initial data when screen opens
+    _performSearch('');
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _debounce?.cancel();
@@ -38,17 +45,6 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
 
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    
-    if (query.isEmpty) {
-      setState(() {
-        _doctors = [];
-        _pharmacies = [];
-        _medications = [];
-        _labs = [];
-        _isLoading = false;
-      });
-      return;
-    }
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _performSearch(query);
@@ -158,18 +154,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _searchController.text.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Iconsax.search_status, size: 64, color: Colors.grey.withValues(alpha: 0.3)),
-                            const SizedBox(height: 16),
-                            Text('What are you looking for?', style: GoogleFonts.inter(color: Colors.grey, fontSize: 16)),
-                          ],
-                        ),
-                      )
-                    : ListView(
+                : ListView(
                         padding: const EdgeInsets.all(16),
                         children: [
                           if ((_selectedCategory == 'All' || _selectedCategory == 'Doctors') && _doctors.isNotEmpty) ...[
