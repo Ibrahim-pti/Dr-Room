@@ -20,7 +20,8 @@ class PharmacyDetailScreen extends ConsumerStatefulWidget {
     : super(key: key);
 
   @override
-  ConsumerState<PharmacyDetailScreen> createState() => _PharmacyDetailScreenState();
+  ConsumerState<PharmacyDetailScreen> createState() =>
+      _PharmacyDetailScreenState();
 }
 
 class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
@@ -79,7 +80,13 @@ class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
         actions: [
           InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PharmacyChatScreen(pharmacy: widget.pharmacy)));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PharmacyChatScreen(pharmacy: widget.pharmacy),
+                ),
+              );
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
@@ -89,7 +96,11 @@ class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
               ),
-              child: const Icon(Iconsax.messages_2, color: Colors.black87, size: 20),
+              child: const Icon(
+                Iconsax.messages_2,
+                color: Colors.black87,
+                size: 20,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -119,14 +130,25 @@ class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
               ),
             ),
       bottomNavigationBar: _buildBottomNavigationBar(),
-      floatingActionButton: cartState.items.isNotEmpty ? FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const CartScreen()));
-        },
-        backgroundColor: const Color(0xFF3B82F6),
-        label: Text('View Cart (${cartState.totalItems}) - ${cartState.subtotal.toInt()} IQD', style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
-        icon: const Icon(Iconsax.shopping_cart, color: Colors.white),
-      ) : null,
+      floatingActionButton: cartState.items.isNotEmpty
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CartScreen()),
+                );
+              },
+              backgroundColor: const Color(0xFF3B82F6),
+              label: Text(
+                'View Cart (${cartState.totalItems}) - ${cartState.subtotal.toInt()} IQD',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              icon: const Icon(Iconsax.shopping_cart, color: Colors.white),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
@@ -167,9 +189,7 @@ class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
                       fit: BoxFit.cover,
                     )
                   : const DecorationImage(
-                      image: AssetImage(
-                        'assets/images/pharmacy1.jpg',
-                      ),
+                      image: AssetImage('assets/images/pharmacy1.jpg'),
                       fit: BoxFit.cover,
                     ),
             ),
@@ -1087,7 +1107,9 @@ class _PharmacyDetailScreenState extends ConsumerState<PharmacyDetailScreen> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        ref.read(cartProvider.notifier).addItem(med, widget.pharmacy);
+                        ref
+                            .read(cartProvider.notifier)
+                            .addItem(med, widget.pharmacy);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('${med.name} added to cart'),

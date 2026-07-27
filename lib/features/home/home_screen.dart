@@ -24,6 +24,10 @@ import '../lab/lab_details_screen.dart';
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../pharmacy/providers/cart_provider.dart';
+import '../pharmacy/screens/cart_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -179,6 +183,60 @@ class _HomeScreenState extends State<HomeScreen> {
                                     // Right Icons (Menu & Notification)
                                     Row(
                                       children: [
+                                        // Cart Icon
+                                        Consumer(
+                                          builder: (context, ref, child) {
+                                            final cartState = ref.watch(cartProvider);
+                                            return GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => const CartScreen(),
+                                                  ),
+                                                );
+                                              },
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    width: 40,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors.getSurface(context),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: const Icon(
+                                                      Iconsax.shopping_cart,
+                                                      color: Color(0xFF0F172A),
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                  if (cartState.totalItems > 0)
+                                                    PositionedDirectional(
+                                                      top: 8,
+                                                      end: 8,
+                                                      child: Container(
+                                                        padding: const EdgeInsets.all(4),
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.redAccent,
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: Text(
+                                                          cartState.totalItems.toString(),
+                                                          style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 10,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        const SizedBox(width: 8),
                                         // Notification Icon
                                         GestureDetector(
                                           onTap: () {
@@ -193,8 +251,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Stack(
                                             children: [
                                               Container(
-                                                width: 46,
-                                                height: 46,
+                                                width: 40,
+                                                height: 40,
                                                 decoration: BoxDecoration(
                                                   color: AppColors.getSurface(
                                                     context,
@@ -204,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 child: const Icon(
                                                   Iconsax.notification,
                                                   color: Color(0xFF0F172A),
-                                                  size: 22,
+                                                  size: 20,
                                                 ),
                                               ),
                                               PositionedDirectional(
@@ -223,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ],
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: 8),
                                         // Menu Icon
                                         GestureDetector(
                                           onTap: () {
@@ -232,8 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ).openEndDrawer();
                                           },
                                           child: Container(
-                                            width: 46,
-                                            height: 46,
+                                            width: 40,
+                                            height: 40,
                                             decoration: BoxDecoration(
                                               color: AppColors.getSurface(
                                                 context,
@@ -243,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: const Icon(
                                               Iconsax.menu_1,
                                               color: Color(0xFF0F172A),
-                                              size: 22,
+                                              size: 20,
                                             ),
                                           ),
                                         ),
