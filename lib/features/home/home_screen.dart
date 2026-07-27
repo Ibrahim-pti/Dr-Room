@@ -199,16 +199,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                               child: Stack(
                                                 children: [
                                                   Container(
-                                                    width: 40,
-                                                    height: 40,
+                                                    width: 44,
+                                                    height: 44,
                                                     decoration: BoxDecoration(
-                                                      color: AppColors.getSurface(context),
+                                                      color: Colors.white.withValues(alpha: 0.2),
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: const Icon(
                                                       Iconsax.shopping_cart,
-                                                      color: Color(0xFF0F172A),
-                                                      size: 20,
+                                                      color: Colors.white,
+                                                      size: 22,
                                                     ),
                                                   ),
                                                   if (cartState.totalItems > 0)
@@ -251,18 +251,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Stack(
                                             children: [
                                               Container(
-                                                width: 40,
-                                                height: 40,
+                                                width: 44,
+                                                height: 44,
                                                 decoration: BoxDecoration(
-                                                  color: AppColors.getSurface(
-                                                    context,
-                                                  ),
+                                                  color: Colors.white.withValues(alpha: 0.2),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
                                                   Iconsax.notification,
-                                                  color: Color(0xFF0F172A),
-                                                  size: 20,
+                                                  color: Colors.white,
+                                                  size: 22,
                                                 ),
                                               ),
                                               PositionedDirectional(
@@ -290,18 +288,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ).openEndDrawer();
                                           },
                                           child: Container(
-                                            width: 40,
-                                            height: 40,
+                                            width: 44,
+                                            height: 44,
                                             decoration: BoxDecoration(
-                                              color: AppColors.getSurface(
-                                                context,
-                                              ),
+                                              color: Colors.white.withValues(alpha: 0.2),
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
                                               Iconsax.menu_1,
-                                              color: Color(0xFF0F172A),
-                                              size: 20,
+                                              color: Colors.white,
+                                              size: 22,
                                             ),
                                           ),
                                         ),
