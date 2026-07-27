@@ -64,7 +64,40 @@ class _HomeScreenState extends State<HomeScreen> {
         if (mounted) {
           setState(() {
             _banners = data['banners'] ?? [];
-            _topDoctors = data['top_doctors'] ?? [];
+            _topDoctors = [
+              {
+                'id': 1,
+                'user': {'name': 'Dr. Sara Ahmed'},
+                'specialty': 'Cardiologist',
+                'rating': '4.9',
+                'reviews': '120+ Reviews',
+                'image_path': null,
+              },
+              {
+                'id': 2,
+                'user': {'name': 'Dr. Hekmat Jalal'},
+                'specialty': 'Dermatologist',
+                'rating': '4.8',
+                'reviews': '98+ Reviews',
+                'image_path': null,
+              },
+              {
+                'id': 3,
+                'user': {'name': 'Dr. Ava Karim'},
+                'specialty': 'General Physician',
+                'rating': '4.8',
+                'reviews': '76+ Reviews',
+                'image_path': null,
+              },
+              {
+                'id': 4,
+                'user': {'name': 'Dr. Roni Yousif'},
+                'specialty': 'Pediatrician',
+                'rating': '4.7',
+                'reviews': '60+ Reviews',
+                'image_path': null,
+              },
+            ];
             _topPharmacies = data['top_pharmacies'] ?? [];
             _userName = userName;
           });
@@ -491,6 +524,287 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildCategoryGrid(
                   context,
                 ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
+
+                const SizedBox(height: 32),
+
+                // ── Top Doctors Header ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'top_doctors'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllDoctorsScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'see_all'.tr(),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(delay: 450.ms),
+
+                const SizedBox(height: 16),
+
+                // ── Doctor List Card ──
+                if (_topDoctors.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(
+                      child: Text('No doctors available right now.'),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 220, // Smaller height
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      itemCount: _topDoctors.length,
+                      itemBuilder: (context, index) {
+                        final doc = _topDoctors[index];
+                        final name = doc['user'] != null
+                            ? doc['user']['name']
+                            : 'Doctor';
+                        final specialty = doc['specialty'] ?? 'Specialist';
+                        final rating = doc['rating']?.toString() ?? '4.8';
+                        final reviews =
+                            doc['reviews']?.toString() ?? '120+ Reviews';
+                        final image = (doc['image_path'] != null)
+                            ? '${ApiClient.storageUrl}/${doc['image_path']}'
+                            : 'assets/images/doctor1.png';
+                        final doctorId = doc['id'];
+
+                        return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DoctorDetailsScreen(
+                                      doctorId: doctorId,
+                                      name: name,
+                                      specialty: specialty,
+                                      image: image,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 145, // Smaller width
+                                margin: const EdgeInsetsDirectional.only(
+                                  end: 14,
+                                  bottom: 12,
+                                  top: 4,
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                      sigmaX: 10,
+                                      sigmaY: 10,
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.3,
+                                        ), // Transparent effect
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Stack(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(
+                                              10,
+                                            ), // Smaller padding
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                // Image
+                                                Container(
+                                                  width: 70, // Smaller image
+                                                  height: 70,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: const Color(
+                                                      0xFFF8FAFC,
+                                                    ),
+                                                    image: doc['image_path'] != null
+                                                    ? DecorationImage(
+                                                        image: NetworkImage(image),
+                                                        fit: BoxFit.cover,
+                                                        alignment: Alignment.topCenter,
+                                                      )
+                                                    : DecorationImage(
+                                                        image: AssetImage(image),
+                                                        fit: BoxFit.cover,
+                                                        alignment: Alignment.topCenter,
+                                                      ),
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                // Name
+                                                Text(
+                                                  name,
+                                                  style: GoogleFonts.poppins(
+                                                    color: const Color(
+                                                      0xFF1E293B,
+                                                    ),
+                                                    fontSize:
+                                                        13, // Smaller font
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 2),
+                                                // Specialty
+                                                Text(
+                                                  specialty,
+                                                  style: GoogleFonts.poppins(
+                                                    color: const Color(
+                                                      0xFF64748B,
+                                                    ),
+                                                    fontSize:
+                                                        11, // Smaller font
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 6),
+                                                // Rating Row
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.star_rounded,
+                                                      color: Color(0xFFF59E0B),
+                                                      size: 12,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      rating,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            color: const Color(
+                                                              0xFF1E293B,
+                                                            ),
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      reviews,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            color: const Color(
+                                                              0xFF94A3B8,
+                                                            ),
+                                                            fontSize: 9,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Spacer(),
+                                                // Book Now Button
+                                                Container(
+                                                  width: double.infinity,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 6,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFFEFF6FF,
+                                                    ).withValues(alpha: 0.8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  child: Text(
+                                                    'Book Now',
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.poppins(
+                                                      color: const Color(
+                                                        0xFF3B82F6,
+                                                      ),
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Favorite Icon (Top Right)
+                                          PositionedDirectional(
+                                            top: 10,
+                                            end: 10,
+                                            child: Container(
+                                              width: 24,
+                                              height: 24,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(
+                                                Icons.favorite_border_rounded,
+                                                color: Color(0xFF3B82F6),
+                                                size: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(delay: (500 + (index * 100)).ms)
+                            .slideX(begin: 0.1, end: 0);
+                      },
+                    ),
+                  ),
 
                 const SizedBox(height: 32),
 
@@ -1101,204 +1415,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                 ),
-
-                // ── Top Doctors Header ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'top_doctors'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllDoctorsScreen(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 450.ms),
-
-                const SizedBox(height: 16),
-
-                // ── Doctor List Card ──
-                if (_topDoctors.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(
-                      child: Text('No doctors available right now.'),
-                    ),
-                  )
-                else
-                  ..._topDoctors.map((doc) {
-                    final name = doc['user'] != null
-                        ? doc['user']['name']
-                        : 'Doctor';
-                    final specialty = doc['specialty'] ?? 'Specialist';
-                    final rating = doc['rating']?.toString() ?? '5.0';
-                    final image = (doc['image_path'] != null)
-                        ? '${ApiClient.storageUrl}/${doc['image_path']}'
-                        : 'assets/images/doctor1.png';
-                    final doctorId = doc['id'];
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DoctorDetailsScreen(
-                                doctorId: doctorId,
-                                name: name,
-                                specialty: specialty,
-                                image: image,
-                              ),
-                            ),
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              height: 160,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.4),
-                                ),
-                              ),
-                              child: Stack(
-                                children: [
-                                  // Text Info on the left
-                                  Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          name.replaceFirst(' ', '\n'),
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.getTextTitle(
-                                              context,
-                                            ),
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.2,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          specialty,
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.getTextSubtitle(
-                                              context,
-                                            ),
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        // Rating
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.star_rounded,
-                                              color: Color(0xFFFBBF24),
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              rating,
-                                              style: GoogleFonts.poppins(
-                                                color: AppColors.getTextTitle(
-                                                  context,
-                                                ),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  // Doctor Image on the right
-                                  PositionedDirectional(
-                                    end: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius:
-                                          const BorderRadiusDirectional.only(
-                                            bottomEnd: Radius.circular(24),
-                                          ),
-                                      child: doc['image_path'] != null
-                                          ? Image.network(
-                                              image,
-                                              height: 150,
-                                              width: 120,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.asset(
-                                              image,
-                                              height: 150,
-                                              width: 120,
-                                              fit: BoxFit.cover,
-                                            ),
-                                    ),
-                                  ),
-
-                                  // Heart Icon
-                                  PositionedDirectional(
-                                    top: 16,
-                                    end: 16,
-                                    child: Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFF0F4FD),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.favorite,
-                                        color: Color(0xFF3B82F6),
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0);
-                  }),
               ],
             ),
           ),
