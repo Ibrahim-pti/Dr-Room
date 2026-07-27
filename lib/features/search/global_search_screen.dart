@@ -20,14 +20,20 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
   bool _isLoading = false;
-  
+
   List<dynamic> _doctors = [];
   List<dynamic> _pharmacies = [];
   List<dynamic> _medications = [];
   List<dynamic> _labs = [];
-  
+
   String _selectedCategory = 'All';
-  final List<String> _categories = ['All', 'Doctors', 'Pharmacies', 'Medications', 'Labs'];
+  final List<String> _categories = [
+    'All',
+    'Doctors',
+    'Pharmacies',
+    'Medications',
+    'Labs',
+  ];
 
   @override
   void initState() {
@@ -81,7 +87,11 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black87,
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
@@ -99,9 +109,16 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
             decoration: InputDecoration(
               hintText: 'Search doctors, pharmacies, labs...',
               hintStyle: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
-              prefixIcon: const Icon(Iconsax.search_normal_1, color: Colors.grey, size: 20),
+              prefixIcon: const Icon(
+                Iconsax.search_normal_1,
+                color: Colors.grey,
+                size: 20,
+              ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ),
@@ -127,10 +144,14 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF3B82F6) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFF3B82F6)
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF3B82F6) : Colors.grey.withValues(alpha: 0.3),
+                          color: isSelected
+                              ? const Color(0xFF3B82F6)
+                              : Colors.grey.withValues(alpha: 0.3),
                         ),
                       ),
                       alignment: Alignment.center,
@@ -138,7 +159,9 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                         category,
                         style: GoogleFonts.inter(
                           color: isSelected ? Colors.white : Colors.black87,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           fontSize: 13,
                         ),
                       ),
@@ -149,53 +172,78 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
             ),
           ),
           const Divider(height: 1, color: Color(0xFFE5E7EB)),
-          
+
           // Results
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView(
-                        padding: const EdgeInsets.all(16),
-                        children: [
-                          if ((_selectedCategory == 'All' || _selectedCategory == 'Doctors') && _doctors.isNotEmpty) ...[
-                            _buildSectionHeader('Doctors'),
-                            ..._doctors.map((d) => _buildDoctorCard(context, d)),
-                            const SizedBox(height: 16),
-                          ],
-                          
-                          if ((_selectedCategory == 'All' || _selectedCategory == 'Pharmacies') && _pharmacies.isNotEmpty) ...[
-                            _buildSectionHeader('Pharmacies'),
-                            ..._pharmacies.map((p) => _buildPharmacyCard(context, p)),
-                            const SizedBox(height: 16),
-                          ],
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      if ((_selectedCategory == 'All' ||
+                              _selectedCategory == 'Doctors') &&
+                          _doctors.isNotEmpty) ...[
+                        _buildSectionHeader('Doctors'),
+                        ..._doctors.map((d) => _buildDoctorCard(context, d)),
+                        const SizedBox(height: 16),
+                      ],
 
-                          if ((_selectedCategory == 'All' || _selectedCategory == 'Labs') && _labs.isNotEmpty) ...[
-                            _buildSectionHeader('Laboratories'),
-                            ..._labs.map((l) => _buildLabCard(context, l)),
-                            const SizedBox(height: 16),
-                          ],
+                      if ((_selectedCategory == 'All' ||
+                              _selectedCategory == 'Pharmacies') &&
+                          _pharmacies.isNotEmpty) ...[
+                        _buildSectionHeader('Pharmacies'),
+                        ..._pharmacies.map(
+                          (p) => _buildPharmacyCard(context, p),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
 
-                          if ((_selectedCategory == 'All' || _selectedCategory == 'Medications') && _medications.isNotEmpty) ...[
-                            _buildSectionHeader('Medications'),
-                            ..._medications.map((m) => _buildMedicationCard(context, m)),
-                            const SizedBox(height: 16),
-                          ],
+                      if ((_selectedCategory == 'All' ||
+                              _selectedCategory == 'Labs') &&
+                          _labs.isNotEmpty) ...[
+                        _buildSectionHeader('Laboratories'),
+                        ..._labs.map((l) => _buildLabCard(context, l)),
+                        const SizedBox(height: 16),
+                      ],
 
-                          if (_doctors.isEmpty && _pharmacies.isEmpty && _labs.isEmpty && _medications.isEmpty)
-                             Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 40),
-                                  child: Column(
-                                    children: [
-                                      Icon(Iconsax.search_favorite, size: 48, color: Colors.grey.withValues(alpha: 0.3)),
-                                      const SizedBox(height: 16),
-                                      Text('No results found', style: GoogleFonts.inter(color: Colors.grey, fontSize: 16)),
-                                    ],
+                      if ((_selectedCategory == 'All' ||
+                              _selectedCategory == 'Medications') &&
+                          _medications.isNotEmpty) ...[
+                        _buildSectionHeader('Medications'),
+                        ..._medications.map(
+                          (m) => _buildMedicationCard(context, m),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      if (_doctors.isEmpty &&
+                          _pharmacies.isEmpty &&
+                          _labs.isEmpty &&
+                          _medications.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 40),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Iconsax.search_favorite,
+                                  size: 48,
+                                  color: Colors.grey.withValues(alpha: 0.3),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No results found',
+                                  style: GoogleFonts.inter(
+                                    color: Colors.grey,
+                                    fontSize: 16,
                                   ),
                                 ),
-                             ),
-                        ],
-                      ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -248,12 +296,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        assetPath,
-        width: 70,
-        height: 70,
-        fit: BoxFit.cover,
-      ),
+      child: Image.asset(assetPath, width: 70, height: 70, fit: BoxFit.cover),
     );
   }
 
@@ -269,10 +312,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset(
-            'assets/images/medicine.png',
-            fit: BoxFit.contain,
-          ),
+          child: Image.asset('assets/images/medicine.png', fit: BoxFit.contain),
         ),
       ),
     );
@@ -284,12 +324,17 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => DoctorDetailsScreen(
-          doctorId: d['id'],
-          name: doctorName,
-          specialty: d['specialization'] ?? d['"specialization"'] ?? '',
-          image: imageUrl ?? '',
-        )));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DoctorDetailsScreen(
+              doctorId: d['id'],
+              name: doctorName,
+              specialty: d['specialization'] ?? d['"specialization"'] ?? '',
+              image: imageUrl ?? '',
+            ),
+          ),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -307,21 +352,22 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           ],
         ),
         child: Row(
-              children: [
-                if (imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      imageUrl,
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildAvatarFallback('doctor'),
-                    ),
-                  )
-                else
-                  _buildAvatarFallback('doctor'),
-                const SizedBox(width: 16),
+          children: [
+            if (imageUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildAvatarFallback('doctor'),
+                ),
+              )
+            else
+              _buildAvatarFallback('doctor'),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,35 +378,77 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                       Expanded(
                         child: Text(
                           doctorName,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: const Color(0xFF0F172A)),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: const Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Iconsax.star_1, color: Color(0xFFF59E0B), size: 14),
+                          const Icon(
+                            Iconsax.star_1,
+                            color: Color(0xFFF59E0B),
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
-                          Text(d['rating']?.toString() ?? '5.0', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: const Color(0xFF475569))),
+                          Text(
+                            d['rating']?.toString() ?? '5.0',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: const Color(0xFF475569),
+                            ),
+                          ),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    d['specialization'] ?? d['"specialization"'] ?? 'Specialist',
-                    style: GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 13),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    d['specialization'] ??
+                        d['"specialization"'] ??
+                        'Specialist',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF64748B),
+                      fontSize: 13,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0xFFEFF6FF), borderRadius: BorderRadius.circular(6)),
-                        child: Text('Book Now', style: GoogleFonts.inter(color: const Color(0xFF3B82F6), fontSize: 11, fontWeight: FontWeight.w600)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'Book Now',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF3B82F6),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                       const Spacer(),
-                      Text('${d['fee'] ?? d['"fee"'] ?? '25,000'} IQD', style: GoogleFonts.inter(color: const Color(0xFF10B981), fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text(
+                        '${d['fee'] ?? d['"fee"'] ?? '25,000'} IQD',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF10B981),
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -385,7 +473,12 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           rating: double.tryParse(p['rating']?.toString() ?? '5.0') ?? 5.0,
           isOpen: p['is_open'] == 1 || p['"is_open"'] == '1',
         );
-        Navigator.push(context, MaterialPageRoute(builder: (context) => PharmacyDetailScreen(pharmacy: pharmacyModel)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PharmacyDetailScreen(pharmacy: pharmacyModel),
+          ),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -403,21 +496,22 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           ],
         ),
         child: Row(
-              children: [
-                if (imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      imageUrl,
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildAvatarFallback('pharmacy'),
-                    ),
-                  )
-                else
-                  _buildAvatarFallback('pharmacy'),
-                const SizedBox(width: 16),
+          children: [
+            if (imageUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildAvatarFallback('pharmacy'),
+                ),
+              )
+            else
+              _buildAvatarFallback('pharmacy'),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,15 +522,31 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                       Expanded(
                         child: Text(
                           pharmacyName,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: const Color(0xFF0F172A)),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: const Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Iconsax.star_1, color: Color(0xFFF59E0B), size: 14),
+                          const Icon(
+                            Iconsax.star_1,
+                            color: Color(0xFFF59E0B),
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
-                          Text(p['rating']?.toString() ?? '5.0', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: const Color(0xFF475569))),
+                          Text(
+                            p['rating']?.toString() ?? '5.0',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: const Color(0xFF475569),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -444,13 +554,21 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Iconsax.location, size: 12, color: Color(0xFF94A3B8)),
+                      const Icon(
+                        Iconsax.location,
+                        size: 12,
+                        color: Color(0xFF94A3B8),
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           p['address'] ?? p['"address"'] ?? 'Local Pharmacy',
-                          style: GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 12),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF64748B),
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -458,14 +576,41 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Iconsax.clock, size: 12, color: (p['is_open'] == 1 || p['"is_open"'] == '1') ? const Color(0xFF10B981) : Colors.red),
+                      Icon(
+                        Iconsax.clock,
+                        size: 12,
+                        color: (p['is_open'] == 1 || p['"is_open"'] == '1')
+                            ? const Color(0xFF10B981)
+                            : Colors.red,
+                      ),
                       const SizedBox(width: 4),
-                      Text((p['is_open'] == 1 || p['"is_open"'] == '1') ? 'Open Now' : 'Closed', style: GoogleFonts.inter(color: (p['is_open'] == 1 || p['"is_open"'] == '1') ? const Color(0xFF10B981) : Colors.red, fontSize: 12, fontWeight: FontWeight.w500)),
+                      Text(
+                        (p['is_open'] == 1 || p['"is_open"'] == '1')
+                            ? 'Open Now'
+                            : 'Closed',
+                        style: GoogleFonts.inter(
+                          color: (p['is_open'] == 1 || p['"is_open"'] == '1')
+                              ? const Color(0xFF10B981)
+                              : Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const Spacer(),
-                      const Icon(Iconsax.truck_fast, size: 14, color: Color(0xFF3B82F6)),
+                      const Icon(
+                        Iconsax.truck_fast,
+                        size: 14,
+                        color: Color(0xFF3B82F6),
+                      ),
                       const SizedBox(width: 4),
-                      Text('${p['delivery_time'] ?? p['"delivery_time"'] ?? '15-20'} min', style: GoogleFonts.inter(color: const Color(0xFF3B82F6), fontSize: 12, fontWeight: FontWeight.w600)),
-
+                      Text(
+                        '${p['delivery_time'] ?? p['"delivery_time"'] ?? '15-20'} min',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF3B82F6),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -483,7 +628,10 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
 
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => LabDetailsScreen(lab: l)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LabDetailsScreen(lab: l)),
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
@@ -501,21 +649,22 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           ],
         ),
         child: Row(
-              children: [
-                if (imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      imageUrl,
-                      width: 70,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildAvatarFallback('lab'),
-                    ),
-                  )
-                else
-                  _buildAvatarFallback('lab'),
-                const SizedBox(width: 16),
+          children: [
+            if (imageUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildAvatarFallback('lab'),
+                ),
+              )
+            else
+              _buildAvatarFallback('lab'),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,15 +675,31 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                       Expanded(
                         child: Text(
                           labName,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: const Color(0xFF0F172A)),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: const Color(0xFF0F172A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Row(
                         children: [
-                          const Icon(Iconsax.star_1, color: Color(0xFFF59E0B), size: 14),
+                          const Icon(
+                            Iconsax.star_1,
+                            color: Color(0xFFF59E0B),
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
-                          Text(l['rating']?.toString() ?? '5.0', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: const Color(0xFF475569))),
+                          Text(
+                            l['rating']?.toString() ?? '5.0',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              color: const Color(0xFF475569),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -542,22 +707,43 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Iconsax.location, size: 12, color: Color(0xFF94A3B8)),
+                      const Icon(
+                        Iconsax.location,
+                        size: 12,
+                        color: Color(0xFF94A3B8),
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           l['address'] ?? l['"address"'] ?? 'Medical Lab',
-                          style: GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 12),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF64748B),
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFF3F4F6), borderRadius: BorderRadius.circular(6)),
-                    child: Text('View Tests', style: GoogleFonts.inter(color: const Color(0xFF475569), fontSize: 11, fontWeight: FontWeight.w600)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'View Tests',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF475569),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -578,11 +764,19 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           final pharmacyModel = Pharmacy(
             id: m['pharmacy_id'],
             name: m['pharmacy']?['name'] ?? m['pharmacy']?['"name"'] ?? '',
-            profileImage: _getImageUrl(m['pharmacy']?['image'] ?? m['pharmacy']?['"image"']),
+            profileImage: _getImageUrl(
+              m['pharmacy']?['image'] ?? m['pharmacy']?['"image"'],
+            ),
             rating: 5.0,
             isOpen: true,
           );
-          Navigator.push(context, MaterialPageRoute(builder: (context) => PharmacyDetailScreen(pharmacy: pharmacyModel)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  PharmacyDetailScreen(pharmacy: pharmacyModel),
+            ),
+          );
         }
       },
       child: Container(
@@ -601,40 +795,56 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
           ],
         ),
         child: Row(
-              children: [
-                if (imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      imageUrl,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => _buildMedAvatarFallback(),
-                    ),
-                  )
-                else
-                  _buildMedAvatarFallback(),
-                const SizedBox(width: 12),
+          children: [
+            if (imageUrl != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageUrl,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      _buildMedAvatarFallback(),
+                ),
+              )
+            else
+              _buildMedAvatarFallback(),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     medName,
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF0F172A)),
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: const Color(0xFF0F172A),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Row(
                     children: [
-                      const Icon(Iconsax.shop, size: 12, color: Color(0xFF94A3B8)),
+                      const Icon(
+                        Iconsax.shop,
+                        size: 12,
+                        color: Color(0xFF94A3B8),
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          m['pharmacy']?['name'] ?? m['pharmacy']?['"name"'] ?? 'Available in pharmacy',
-                          style: GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 11),
-                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          m['pharmacy']?['name'] ??
+                              m['pharmacy']?['"name"'] ??
+                              'Available in pharmacy',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF64748B),
+                            fontSize: 11,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -651,7 +861,11 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
               ),
               child: Text(
                 '${m['price'] ?? '0'} IQD',
-                style: GoogleFonts.inter(color: const Color(0xFF3B82F6), fontWeight: FontWeight.bold, fontSize: 12),
+                style: GoogleFonts.inter(
+                  color: const Color(0xFF3B82F6),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
             ),
           ],

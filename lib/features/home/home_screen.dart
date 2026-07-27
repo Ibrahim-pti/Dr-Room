@@ -1,5 +1,6 @@
 import 'package:dr_room/features/nursing/nursing_services_screen.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../core/theme/app_colors.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../categories/all_categories_screen.dart';
@@ -187,13 +188,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                         // Cart Icon
                                         Consumer(
                                           builder: (context, ref, child) {
-                                            final cartState = ref.watch(cartProvider);
+                                            final cartState = ref.watch(
+                                              cartProvider,
+                                            );
                                             return GestureDetector(
                                               onTap: () {
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) => const CartScreen(),
+                                                    builder: (context) =>
+                                                        const CartScreen(),
                                                   ),
                                                 );
                                               },
@@ -203,7 +207,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     width: 44,
                                                     height: 44,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.white.withValues(alpha: 0.2),
+                                                      color: Colors.white
+                                                          .withValues(
+                                                            alpha: 0.2,
+                                                          ),
                                                       shape: BoxShape.circle,
                                                     ),
                                                     child: const Icon(
@@ -217,18 +224,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       top: 8,
                                                       end: 8,
                                                       child: Container(
-                                                        padding: const EdgeInsets.all(4),
-                                                        decoration: const BoxDecoration(
-                                                          color: Colors.redAccent,
-                                                          shape: BoxShape.circle,
-                                                        ),
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              4,
+                                                            ),
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                              color: Colors
+                                                                  .redAccent,
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                            ),
                                                         child: Text(
-                                                          cartState.totalItems.toString(),
-                                                          style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 10,
-                                                            fontWeight: FontWeight.bold,
-                                                          ),
+                                                          cartState.totalItems
+                                                              .toString(),
+                                                          style:
+                                                              const TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                         ),
                                                       ),
                                                     ),
@@ -255,7 +273,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 width: 44,
                                                 height: 44,
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white.withValues(alpha: 0.2),
+                                                  color: Colors.white
+                                                      .withValues(alpha: 0.2),
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: const Icon(
@@ -292,7 +311,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             width: 44,
                                             height: 44,
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withValues(alpha: 0.2),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.2,
+                                              ),
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
@@ -330,64 +351,79 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             // ── Search Bar ──
                             GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const GlobalSearchScreen()),
-                                );
-                              },
-                              child: Container(
-                                height: 60,
-                                padding: const EdgeInsetsDirectional.only(
-                                  start: 20,
-                                  end: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.getSurface(context),
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.08),
-                                      blurRadius: 24,
-                                      offset: const Offset(0, 12),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Iconsax.search_normal_1,
-                                      color: Color(0xFF94A3B8),
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'search_doctors'.tr(),
-                                      style: GoogleFonts.poppins(
-                                        color: const Color(0xFF94A3B8),
-                                        fontSize: 15,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const GlobalSearchScreen(),
                                       ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 60,
+                                    padding: const EdgeInsetsDirectional.only(
+                                      start: 20,
+                                      end: 8,
                                     ),
-                                    const Spacer(),
-                                    Container(
-                                      width: 44,
-                                      height: 44,
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFF3B82F6),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Iconsax.microphone,
-                                        color: AppColors.getSurface(context),
-                                        size: 20,
-                                      ),
-                                    )
-                                    .animate(onPlay: (controller) => controller.repeat())
-                                    .shimmer(duration: 2000.ms, color: Colors.white.withValues(alpha: 0.5)),
-                                  ],
-                                ),
-                              ),
-                            )
+                                    decoration: BoxDecoration(
+                                      color: AppColors.getSurface(context),
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.08,
+                                          ),
+                                          blurRadius: 24,
+                                          offset: const Offset(0, 12),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Iconsax.search_normal_1,
+                                          color: Color(0xFF94A3B8),
+                                          size: 22,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'search_doctors'.tr(),
+                                          style: GoogleFonts.poppins(
+                                            color: const Color(0xFF94A3B8),
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Container(
+                                              width: 44,
+                                              height: 44,
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xFF3B82F6),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Iconsax.microphone,
+                                                color: AppColors.getSurface(
+                                                  context,
+                                                ),
+                                                size: 20,
+                                              ),
+                                            )
+                                            .animate(
+                                              onPlay: (controller) =>
+                                                  controller.repeat(),
+                                            )
+                                            .shimmer(
+                                              duration: 2000.ms,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.5,
+                                              ),
+                                            ),
+                                      ],
+                                    ),
+                                  ),
+                                )
                                 .animate()
                                 .fadeIn(delay: 200.ms, duration: 400.ms)
                                 .slideY(begin: 0.2, end: 0),
@@ -414,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 32),
 
-                                // ── Categories (Grid) ──
+                // ── Categories (Grid) ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Row(
@@ -455,7 +491,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildCategoryGrid(
                   context,
                 ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
-
 
                 const SizedBox(height: 32),
 
@@ -507,20 +542,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       final labs = [
                         {
-                          'name': 'تاقیگەی ناوەندی هەولێر', 'city': 'Erbil', 'time': '25-35 min',
-                          'image': 'assets/images/lab1.jpg'
+                          'name': 'تاقیگەی ناوەندی هەولێر',
+                          'city': 'Erbil',
+                          'time': '25-35 min',
+                          'image': 'assets/images/lab1.jpg',
                         },
                         {
-                          'name': 'تاقیگەی سلێمانی نموونەیی', 'city': 'Sulaymaniyah', 'time': '30-40 min',
-                          'image': 'assets/images/lab2.jpg'
+                          'name': 'تاقیگەی سلێمانی نموونەیی',
+                          'city': 'Sulaymaniyah',
+                          'time': '30-40 min',
+                          'image': 'assets/images/lab2.jpg',
                         },
                         {
-                          'name': 'تاقیگەی دهۆک', 'city': 'Duhok', 'time': '20-30 min',
-                          'image': 'assets/images/lab3.jpg'
+                          'name': 'تاقیگەی دهۆک',
+                          'city': 'Duhok',
+                          'time': '20-30 min',
+                          'image': 'assets/images/lab3.jpg',
                         },
                         {
-                          'name': 'تاقیگەی کەرکوک مێدیکا', 'city': 'Kirkuk', 'time': '15-25 min',
-                          'image': 'assets/images/lab4.jpg'
+                          'name': 'تاقیگەی کەرکوک مێدیکا',
+                          'city': 'Kirkuk',
+                          'time': '15-25 min',
+                          'image': 'assets/images/lab4.jpg',
                         },
                       ];
                       final lab = labs[index];
@@ -529,26 +572,31 @@ class _HomeScreenState extends State<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => LabDetailsScreen(lab: lab),
+                                  builder: (context) =>
+                                      LabDetailsScreen(lab: lab),
                                 ),
                               );
                             },
                             child: Container(
                               width: 170, // Even smaller width
-                              margin: const EdgeInsetsDirectional.only(end: 14, bottom: 12, top: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                                border: Border.all(color: const Color(0xFFF1F5F9)),
+                              margin: const EdgeInsetsDirectional.only(
+                                end: 14,
+                                bottom: 12,
+                                top: 4,
                               ),
-                              child: Column(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: 0.4),
+                                      ),
+                                    ),
+                                    child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   // Top Image Section
@@ -556,7 +604,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 80, // Even smaller image height
                                     width: double.infinity,
                                     decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(15),
+                                      ),
                                       color: const Color(0xFFF8FAFC),
                                       image: DecorationImage(
                                         image: AssetImage(lab['image']!),
@@ -570,13 +620,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                           bottom: 6,
                                           right: 6,
                                           child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(10),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withValues(alpha: 0.1),
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.1),
                                                   blurRadius: 4,
                                                   offset: const Offset(0, 2),
                                                 ),
@@ -584,12 +639,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                             child: Row(
                                               children: [
-                                                const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
+                                                const Icon(
+                                                  Icons.star_rounded,
+                                                  color: Color(0xFFF59E0B),
+                                                  size: 12,
+                                                ),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   '4.8',
                                                   style: GoogleFonts.poppins(
-                                                    color: const Color(0xFF1E293B),
+                                                    color: const Color(
+                                                      0xFF1E293B,
+                                                    ),
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.w700,
                                                   ),
@@ -601,12 +662,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ),
-                                  
+
                                   // Details Section
                                   Padding(
                                     padding: const EdgeInsets.all(10),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           lab['name']!,
@@ -614,7 +676,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             fontFamily: 'Rabar',
                                             fontSize: 12, // Even smaller font
                                             fontWeight: FontWeight.bold,
-                                            color: AppColors.getTextTitle(context),
+                                            color: AppColors.getTextTitle(
+                                              context,
+                                            ),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
@@ -622,13 +686,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            const Icon(Iconsax.location, color: Color(0xFF3B82F6), size: 10),
+                                            const Icon(
+                                              Iconsax.location,
+                                              color: Color(0xFF3B82F6),
+                                              size: 10,
+                                            ),
                                             const SizedBox(width: 4),
                                             Expanded(
                                               child: Text(
                                                 lab['city']!,
                                                 style: GoogleFonts.poppins(
-                                                  color: const Color(0xFF64748B),
+                                                  color: const Color(
+                                                    0xFF64748B,
+                                                  ),
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w400,
                                                 ),
@@ -641,7 +711,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         const SizedBox(height: 4),
                                         Row(
                                           children: [
-                                            const Icon(Iconsax.clock, color: Color(0xFF94A3B8), size: 10),
+                                            const Icon(
+                                              Iconsax.clock,
+                                              color: Color(0xFF94A3B8),
+                                              size: 10,
+                                            ),
                                             const SizedBox(width: 2),
                                             Text(
                                               lab['time']!,
@@ -652,7 +726,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                             const Spacer(),
-                                            const Icon(Iconsax.shield_tick, color: Color(0xFF10B981), size: 10),
+                                            const Icon(
+                                              Iconsax.shield_tick,
+                                              color: Color(0xFF10B981),
+                                              size: 10,
+                                            ),
                                             const SizedBox(width: 2),
                                             Text(
                                               'Open',
@@ -670,15 +748,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                          )
-                          .animate()
+                          ),
+                        ),
+                      ),
+                    )
+                    .animate()
                           .fadeIn(delay: (500 + (index * 100)).ms)
                           .slideY(begin: 0.1, end: 0);
                     },
                   ),
                 ),
-
-
 
                 // ── Top Pharmacies ──
                 const SizedBox(height: 16),
@@ -729,172 +808,257 @@ class _HomeScreenState extends State<HomeScreen> {
                             final pharm = _topPharmacies[index];
                             final name = pharm['name'] ?? 'دەرمانخانە';
                             // We don't have city/time in DB yet, so placeholder:
-                            final city = 'Erbil'; 
+                            final city = 'Erbil';
                             final time = '24 Hours';
                             final profileImage = pharm['profile_image'];
 
                             return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PharmacyDetailScreen(
-                                      pharmacy: Pharmacy(
-                                        id: pharm['id'] ?? 1,
-                                        name: pharm['name'] ?? 'دەرمانخانە',
-                                        rating: double.tryParse(pharm['rating']?.toString() ?? '4.8') ?? 4.8,
-                                        deliveryFee: double.tryParse(pharm['delivery_fee']?.toString() ?? '1500.0') ?? 1500.0,
-                                        profileImage: pharm['profile_image'],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                width: 170,
-                                margin: const EdgeInsetsDirectional.only(end: 14, bottom: 12, top: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Top Image Section
-                                    Container(
-                                      height: 80,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-                                        color: const Color(0xFFF8FAFC),
-                                        image: profileImage != null
-                                            ? DecorationImage(
-                                                image: NetworkImage('http://127.0.0.1:8000/storage/$profileImage'),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : DecorationImage(
-                                                image: AssetImage('assets/images/pharmacy1.jpg'),
-                                                fit: BoxFit.cover,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PharmacyDetailScreen(
+                                              pharmacy: Pharmacy(
+                                                id: pharm['id'] ?? 1,
+                                                name:
+                                                    pharm['name'] ??
+                                                    'دەرمانخانە',
+                                                rating:
+                                                    double.tryParse(
+                                                      pharm['rating']
+                                                              ?.toString() ??
+                                                          '4.8',
+                                                    ) ??
+                                                    4.8,
+                                                deliveryFee:
+                                                    double.tryParse(
+                                                      pharm['delivery_fee']
+                                                              ?.toString() ??
+                                                          '1500.0',
+                                                    ) ??
+                                                    1500.0,
+                                                profileImage:
+                                                    pharm['profile_image'],
                                               ),
+                                            ),
                                       ),
-                                      child: Stack(
-                                        children: [
-                                          // Rating Badge
-                                          Positioned(
-                                            bottom: 6,
-                                            right: 6,
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.circular(10),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withValues(alpha: 0.1),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 170,
+                                    margin: const EdgeInsetsDirectional.only(
+                                      end: 14,
+                                      bottom: 12,
+                                      top: 4,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withValues(alpha: 0.2),
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: Colors.white.withValues(alpha: 0.4),
+                                            ),
+                                          ),
+                                          child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Top Image Section
+                                        Container(
+                                          height: 80,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                  top: Radius.circular(15),
+                                                ),
+                                            color: const Color(0xFFF8FAFC),
+                                            image: profileImage != null
+                                                ? DecorationImage(
+                                                    image: NetworkImage(
+                                                      'http://127.0.0.1:8000/storage/$profileImage',
+                                                    ),
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : DecorationImage(
+                                                    image: AssetImage(
+                                                      'assets/images/pharmacy1.jpg',
+                                                    ),
+                                                    fit: BoxFit.cover,
                                                   ),
-                                                ],
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              // Rating Badge
+                                              Positioned(
+                                                bottom: 6,
+                                                right: 6,
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withValues(
+                                                              alpha: 0.1,
+                                                            ),
+                                                        blurRadius: 4,
+                                                        offset: const Offset(
+                                                          0,
+                                                          2,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.star_rounded,
+                                                        color: Color(
+                                                          0xFFF59E0B,
+                                                        ),
+                                                        size: 12,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        '4.9',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1E293B,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                              child: Row(
+                                            ],
+                                          ),
+                                        ),
+
+                                        // Details Section
+                                        Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                name,
+                                                style: TextStyle(
+                                                  fontFamily: 'Rabar',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: AppColors.getTextTitle(
+                                                    context,
+                                                  ),
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Row(
                                                 children: [
-                                                  const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 12),
+                                                  const Icon(
+                                                    Iconsax.location,
+                                                    color: Color(0xFF3B82F6),
+                                                    size: 10,
+                                                  ),
                                                   const SizedBox(width: 4),
-                                                  Text(
-                                                    '4.9',
-                                                    style: GoogleFonts.poppins(
-                                                      color: const Color(0xFF1E293B),
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w700,
+                                                  Expanded(
+                                                    child: Text(
+                                                      city,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            color: const Color(
+                                                              0xFF64748B,
+                                                            ),
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    
-                                    // Details Section
-                                    Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            name,
-                                            style: TextStyle(
-                                              fontFamily: 'Rabar',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.getTextTitle(context),
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              const Icon(Iconsax.location, color: Color(0xFF3B82F6), size: 10),
-                                              const SizedBox(width: 4),
-                                              Expanded(
-                                                child: Text(
-                                                  city,
-                                                  style: GoogleFonts.poppins(
-                                                    color: const Color(0xFF64748B),
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w400,
+                                              const SizedBox(height: 4),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Iconsax.clock,
+                                                    color: Color(0xFF94A3B8),
+                                                    size: 10,
                                                   ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
+                                                  const SizedBox(width: 2),
+                                                  Text(
+                                                    time,
+                                                    style: GoogleFonts.poppins(
+                                                      color: const Color(
+                                                        0xFF94A3B8,
+                                                      ),
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                  const Spacer(),
+                                                  const Icon(
+                                                    Iconsax.verify,
+                                                    color: Color(0xFF10B981),
+                                                    size: 10,
+                                                  ),
+                                                  const SizedBox(width: 2),
+                                                  Text(
+                                                    'Verified',
+                                                    style: GoogleFonts.poppins(
+                                                      color: const Color(
+                                                        0xFF10B981,
+                                                      ),
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              const Icon(Iconsax.clock, color: Color(0xFF94A3B8), size: 10),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                time,
-                                                style: GoogleFonts.poppins(
-                                                  color: const Color(0xFF94A3B8),
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              const Icon(Iconsax.verify, color: Color(0xFF10B981), size: 10),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                'Verified',
-                                                style: GoogleFonts.poppins(
-                                                  color: const Color(0xFF10B981),
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
-                            ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
-                    },
-                  ),
+                            ),
+                          )
+                          .animate()
+                                .fadeIn(delay: (650 + (index * 100)).ms)
+                                .slideY(begin: 0.1, end: 0);
+                          },
+                        ),
                 ),
 
                 // ── Top Doctors Header ──
@@ -1091,7 +1255,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         .fadeIn(delay: 500.ms)
                         .slideY(begin: 0.1, end: 0);
                   }),
-
               ],
             ),
           ),
