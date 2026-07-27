@@ -1,5 +1,6 @@
 import 'package:dr_room/features/orders/orders_screen.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../doctors/favorite_doctors_screen.dart';
 import '../ai_assistant/ai_symptom_checker_screen.dart';
@@ -53,26 +54,31 @@ class _MainShellState extends State<MainShell> {
             bottom: 30, // Floats above the bottom
             child: Container(
               height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(35),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(35),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(0, Iconsax.home_2),
+                        _buildNavItem(1, Iconsax.folder_2),
+                        _buildNavItem(2, Iconsax.calendar_1),
+                        _buildNavItem(3, Iconsax.book),
+                        _buildNavItem(4, Iconsax.user),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildNavItem(0, Iconsax.home_2),
-                  _buildNavItem(1, Iconsax.folder_2),
-                  _buildNavItem(2, Iconsax.calendar_1),
-                  _buildNavItem(3, Iconsax.book),
-                  _buildNavItem(4, Iconsax.user),
-                ],
+                ),
               ),
             ),
           ),
