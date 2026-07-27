@@ -209,6 +209,11 @@ Route::prefix('pharmacy')->middleware(['auth'])->group(function () {
         'as' => 'pharmacy'
     ]);
     
+    // Offers CRUD
+    Route::resource('/offers', \App\Http\Controllers\Web\PharmacyOfferController::class, [
+        'as' => 'pharmacy'
+    ]);
+    
     // Orders
     Route::get('/orders', [\App\Http\Controllers\Web\PharmacyOrderController::class, 'index'])->name('pharmacy.orders.index');
     Route::get('/orders/{id}', [\App\Http\Controllers\Web\PharmacyOrderController::class, 'show'])->name('pharmacy.orders.show');
