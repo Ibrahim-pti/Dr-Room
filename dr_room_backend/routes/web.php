@@ -93,6 +93,12 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
     Route::get('/messages', fn() => $doctorPlaceholder('نامەکان'))->name('doctor.messages.index');
     Route::get('/messages/patients', fn() => $doctorPlaceholder('نامەی نەخۆشەکان'))->name('doctor.messages.patients');
     Route::get('/messages/staff', fn() => $doctorPlaceholder('نامەی ستاف'))->name('doctor.messages.staff');
+    
+    // Notifications
+    Route::get('/notifications', fn() => $doctorPlaceholder('ئاگادارکردنەوەکان'))->name('doctor.notifications.index');
+    
+    // Settings
+    Route::get('/settings', fn() => $doctorPlaceholder('ڕێکخستنەکان'))->name('doctor.settings.index');
 });
 
 // Nurse Dashboard Routes
