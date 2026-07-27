@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/utils/api_client.dart';
+import 'pharmacy_checkout_screen.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -16,101 +17,13 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
-  bool _isLoading = false;
-
-  Future<void> _submitOrder() async {
+  void _proceedToCheckout() {
     final cartState = ref.read(cartProvider);
-    if (cartState.items.isEmpty || cartState.pharmacy == null) return;
+    if (cartState.items.isEmpty) return;
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-
-      final orderData = {
-        'service_type': 'pharmacy',
-        'subtotal': cartState.subtotal,
-        'extra_fee': cartState.pharmacy!.deliveryFee,
-        'total_price': cartState.total,
-        'payment_method': 'cash',
-        'items': cartState.items.map((item) => {
-          'id': item.medication.id,
-          'name': item.medication.name,
-          'price': item.medication.price,
-          'quantity': item.quantity,
-          'extra_data': {'pharmacy_id': cartState.pharmacy!.id}
-        }).toList(),
-      };
-
-      final response = await ApiClient.post('/orders', body: orderData);
-
-      if (response.statusCode == 201) {
-        if (!mounted) return;
-        ref.read(cartProvider.notifier).clearCart();
-        _showSuccessDialog();
-      } else {
-        throw Exception('Failed to create order: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 64),
-            const SizedBox(height: 16),
-            Text(
-              'Order Placed Successfully',
-              style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Your order has been sent to the pharmacy.',
-              style: GoogleFonts.inter(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close dialog
-                  Navigator.of(context).pop(); // Close cart
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text('Done', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ),
-          ],
-        ),
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PharmacyCheckoutScreen()),
     );
   }
 
@@ -282,7 +195,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _isLoading ? null : _submitOrder,
+                            onPressed: cartState.items.isEmpty ? null : _proceedToCheckout,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3B82F6),
                               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -291,20 +204,14 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               ),
                               elevation: 0,
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  )
-                                : Text(
-                                    'Checkout',
-                                    style: GoogleFonts.inter(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            child: Text(
+                              'Proceed to Checkout',
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ],
