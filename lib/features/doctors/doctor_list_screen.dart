@@ -198,7 +198,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                 color: AppColors.textDark,
               ),
             ),
-            ...[null, 3.0, 4.0, 4.5, 5.0].map((rating) {
+            ...([null, 3.0, 4.0, 4.5, 5.0].map((rating) {
               final isSelected = _selectedRating == rating;
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
@@ -226,7 +226,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          Iconsax.star1,
+                          Iconsax.star,
                           size: 14,
                           color: isSelected
                               ? Colors.white
@@ -245,7 +245,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   ),
                 ),
               );
-            }).toList(),
+            }).toList()),
           ],
         ),
       ),
