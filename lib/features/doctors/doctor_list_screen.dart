@@ -5,7 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/providers/appointment_provider.dart';
 import '../../core/models/appointment_model.dart' show Doctor;
-import 'doctor_details_screen.dart';
+import 'doctor_profile_screen.dart';
 
 class DoctorListScreen extends StatefulWidget {
   const DoctorListScreen({super.key});
@@ -271,7 +271,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DoctorDetailsScreen(
+            builder: (context) => DoctorProfileScreen(
               doctorId: doctor.id,
             ),
           ),
