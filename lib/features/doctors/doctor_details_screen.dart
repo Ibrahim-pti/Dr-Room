@@ -1,29 +1,17 @@
-import 'package:dr_room/main.dart';
 import 'package:flutter/material.dart';
-import 'package:dr_room/core/theme/dr_room_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/theme/app_colors.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
-import '../../core/providers/favorite_provider.dart';
-import '../../core/utils/api_client.dart';
-import 'chat_screen.dart';
-import 'doctor_reviews_screen.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../core/providers/appointment_provider.dart';
+import 'booking_slot_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
-  final int doctorId;
-  final String name;
-  final String specialty;
-  final String image;
+  final String doctorId;
 
   const DoctorDetailsScreen({
     super.key,
     required this.doctorId,
-    required this.name,
-    required this.specialty,
-    required this.image,
   });
 
   @override
@@ -31,620 +19,127 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  int _selectedDateIndex = 0;
-  int _selectedTimeIndex = -1;
-  bool _isBooking = false;
-
-  final List<Map<String, String>> _dates = [
-    {'day': 'Mon', 'date': '12'},
-    {'day': 'Tue', 'date': '13'},
-    {'day': 'Wed', 'date': '14'},
-    {'day': 'Thu', 'date': '15'},
-    {'day': 'Fri', 'date': '16'},
-    {'day': 'Sat', 'date': '17'},
-  ];
-
-  final List<String> _times = [
-    '09:00 AM',
-    '10:30 AM',
-    '11:00 AM',
-    '01:00 PM',
-    '02:30 PM',
-    '04:00 PM',
-  ];
-
-  Future<void> _bookAppointment() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-
-    if (token == null || token.isEmpty) {
-      if (!mounted) return;
-      _showLoginPrompt();
-      return;
-    }
-
-    setState(() {
-      _isBooking = true;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<AppointmentProvider>(context, listen: false);
+      provider.fetchDoctorDetails(widget.doctorId);
+      provider.fetchDoctorReviews(widget.doctorId);
+      provider.fetchAvailableSlots(widget.doctorId);
     });
-
-    try {
-      // Mocking a valid future date based on selection
-      final date = _dates[_selectedDateIndex]['date']!;
-      final timeStr = _times[_selectedTimeIndex];
-      // Simple parse to make a valid date for API (e.g. 2026-11-XX HH:MM)
-      // Just a dummy conversion for the sake of the API
-      final isPM = timeStr.contains('PM');
-      var hour = int.parse(timeStr.split(':')[0]);
-      if (isPM && hour != 12) hour += 12;
-      if (!isPM && hour == 12) hour = 0;
-
-      final minute = timeStr.split(':')[1].substring(0, 2);
-      final formattedDate =
-          '2026-11-$date ${hour.toString().padLeft(2, '0')}:$minute:00';
-
-      final response = await ApiClient.post(
-        '/appointments',
-        body: {
-          'doctor_id': widget.doctorId,
-          'appointment_date': formattedDate,
-          'type': 'in_person',
-        },
-      );
-
-      if (response.statusCode == 201) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Appointment booked successfully!'),
-            backgroundColor: Color(0xFF10B981),
-          ),
-        );
-        Navigator.pop(context); // Go back after booking
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to book appointment: ${response.body}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isBooking = false;
-        });
-      }
-    }
-  }
-
-  void _showLoginPrompt() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'پێویستە چوونەژوورەوە بکەیت',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: AppColors.getTextTitle(context),
-          ),
-        ),
-        content: Text(
-          'بۆ وەرگرتنی کات لای دکتۆر پێویستە سەرەتا خۆت تۆمار بکەیت یان چوونەژوورەوە بکەیت.',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: AppColors.getTextSubtitle(context),
-            height: 1.5,
-          ),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'دواتر',
-              style: GoogleFonts.poppins(
-                color: AppColors.getTextSubtitle(context),
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AppFlow(startAtLogin: true),
-                ),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Text(
-              'چوونەژوورەوە',
-              style: GoogleFonts.poppins(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.getBackground(context),
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        title: Text('Doctor Profile', style: AppTypography.headingSm),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.getSurface(context).withValues(alpha: 0.8),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: 20,
-                color: AppColors.getTextTitle(context),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.getSurface(context).withValues(alpha: 0.8),
-                shape: BoxShape.circle,
-              ),
-              child: Consumer<FavoriteProvider>(
-                builder: (context, favoriteProvider, child) {
-                  final isFavorite = favoriteProvider.isFavorite(
-                    widget.doctorId,
-                  );
-                  return IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Iconsax.heart,
-                      color: isFavorite
-                          ? const Color(0xFFEF4444)
-                          : AppColors.getTextTitle(context),
-                    ),
-                    onPressed: () {
-                      favoriteProvider.toggleFavorite({
-                        'id': widget.doctorId,
-                        'doctor': widget.name,
-                        'specialty': widget.specialty,
-                        'image': widget.image,
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            isFavorite
-                                ? 'Removed from favorites'
-                                : 'Added to favorites',
-                          ),
-                          backgroundColor: isFavorite
-                              ? Colors.red
-                              : const Color(0xFF10B981),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsetsDirectional.only(bottom: 120),
+      body: Consumer<AppointmentProvider>(
+        builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (provider.selectedDoctor == null) {
+            return Center(
+              child: Text('Doctor not found', style: AppTypography.labelMd),
+            );
+          }
+
+          final doctor = provider.selectedDoctor!;
+
+          return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Header Profile ──
-                Container(
-                      width: double.infinity,
-                      padding: const EdgeInsetsDirectional.only(
-                        top: 70,
-                        bottom: 20,
-                        start: 24,
-                        end: 24,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.getSurface(context),
-                        borderRadius: const BorderRadiusDirectional.only(
-                          bottomStart: Radius.circular(40),
-                          bottomEnd: Radius.circular(40),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Hero(
-                            tag: widget.name,
-                            child: Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF3B82F6),
-                                  width: 3,
-                                ),
-                                image: DecorationImage(
-                                  image: AssetImage(widget.image),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            widget.name,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextTitle(context),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.specialty,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textLight,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildStatItem(
-                                'patients'.tr(),
-                                '1.5k+',
-                                Iconsax.people,
-                              ),
-                              _buildStatItem(
-                                'experience'.tr(),
-                                '8 yr+',
-                                Iconsax.briefcase,
-                              ),
-                              _buildStatItem(
-                                'rating'.tr(),
-                                '4.9',
-                                Iconsax.star,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                    .animate()
-                    .slideY(begin: -0.2, end: 0)
-                    .fadeIn(duration: 500.ms),
-
-                const SizedBox(height: 24),
-
-                // ── About Section ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'about_doctor'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${widget.name} is one of the most professional doctors in the region. Specializing in ${widget.specialty}, providing excellent care and precise diagnostics for all patients.',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextSubtitle(context),
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.1, end: 0),
-
-                const SizedBox(height: 20),
-
-                // ── Reviews Section ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Iconsax.star_1,
-                            color: Color(0xFFF59E0B),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '4.9 (124 reviews)',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextTitle(context),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DoctorReviewsScreen(
-                                doctorName: widget.name,
-                                rating: '4.9',
-                              ),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate(delay: 250.ms).fadeIn(),
-
-                const SizedBox(height: 24),
-
-                // ── Calendar Selection ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'select_date'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ).animate(delay: 300.ms).fadeIn(),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 76,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _dates.length,
-                    itemBuilder: (context, index) {
-                      final isSelected = _selectedDateIndex == index;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedDateIndex = index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 60,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF3B82F6)
-                                : AppColors.getSurface(context),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getBorder(context),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _dates[index]['day']!,
-                                style: GoogleFonts.poppins(
-                                  color: isSelected
-                                      ? Colors.white.withValues(alpha: 0.8)
-                                      : AppColors.getTextSubtitle(context),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _dates[index]['date']!,
-                                style: GoogleFonts.poppins(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : AppColors.getTextTitle(context),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ).animate(delay: 400.ms).fadeIn().slideX(begin: 0.2, end: 0),
-
-                const SizedBox(height: 24),
-
-                // ── Time Slots ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'available_time'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ).animate(delay: 500.ms).fadeIn(),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: List.generate(_times.length, (index) {
-                      final isSelected = _selectedTimeIndex == index;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedTimeIndex = index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF3B82F6).withValues(alpha: 0.1)
-                                : AppColors.getSurface(context),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getBorder(context),
-                            ),
-                          ),
-                          child: Text(
-                            _times[index],
-                            style: GoogleFonts.poppins(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getTextTitle(context),
-                              fontSize: 13,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.1, end: 0),
+                _buildDoctorHeader(doctor),
+                _buildStatsRow(doctor),
+                _buildAboutSection(doctor),
+                _buildQualificationSection(doctor),
+                _buildReviewsSection(provider),
+                _buildBookButton(context, doctor),
               ],
             ),
-          ),
+          );
+        },
+      ),
+    );
+  }
 
-          // ── Bottom Action Bar ──
-          PositionedDirectional(
-            bottom: 0,
-            start: 0,
-            end: 0,
-            child: Container(
-              padding: EdgeInsetsDirectional.only(
-                top: 0,
-                start: 24,
-                end: 24,
-                bottom: 0,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
+  Widget _buildDoctorHeader(dynamic doctor) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryLight],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.primary, width: 3),
+            ),
+            child: doctor.profileImage.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      doctor.profileImage,
+                      fit: BoxFit.cover,
                     ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Iconsax.message,
-                        color: Color(0xFF10B981),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChatScreen(
-                              doctorName: widget.name,
-                              doctorImage: widget.image,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                  )
+                : Icon(
+                    Iconsax.user,
+                    size: 64,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: SizedBox(
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: (_selectedTimeIndex != -1 && !_isBooking)
-                            ? _bookAppointment
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3B82F6),
-                          disabledBackgroundColor: const Color(
-                            0xFF3B82F6,
-                          ).withValues(alpha: 0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: _isBooking
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                'book_appointment'.tr(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            doctor.name,
+            style: AppTypography.headingSm.copyWith(color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            doctor.speciality,
+            style: AppTypography.bodySm.copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Iconsax.star,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${doctor.rating} • ${doctor.reviewCount} reviews',
+                  style: AppTypography.bodySm.copyWith(color: Colors.white),
+                ),
+              ],
             ),
           ),
         ],
@@ -652,32 +147,314 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            shape: BoxShape.circle,
+  Widget _buildStatsRow(dynamic doctor) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              icon: Iconsax.star,
+              value: '${doctor.rating}',
+              label: 'Rating',
+              valueColor: const Color(0xFFF59E0B),
+            ),
           ),
-          child: Icon(icon, color: const Color(0xFF3B82F6), size: 20),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            color: AppColors.getTextTitle(context),
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              icon: Iconsax.briefcase,
+              value: '${doctor.yearsExperience}',
+              label: 'Years',
+              valueColor: AppColors.success,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              icon: Iconsax.moneys,
+              value: '\$${doctor.consultationFee.toStringAsFixed(0)}',
+              label: 'Fee',
+              valueColor: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String value,
+    required String label,
+    required Color valueColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.cardBorderLight),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: valueColor, size: 24),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: AppTypography.labelMd.copyWith(color: valueColor),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: AppTypography.bodySm.copyWith(color: AppColors.textMedium),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutSection(dynamic doctor) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'About',
+            style: AppTypography.headingSm.copyWith(color: AppColors.textDark),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            doctor.bio,
+            style: AppTypography.bodySm.copyWith(color: AppColors.textMedium),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLightSecondary,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Iconsax.location, color: AppColors.primary, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Clinic',
+                        style: AppTypography.bodySm.copyWith(
+                          color: AppColors.textMedium,
+                        ),
+                      ),
+                      Text(
+                        doctor.clinicName,
+                        style: AppTypography.labelSm.copyWith(
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQualificationSection(dynamic doctor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Qualification',
+            style: AppTypography.headingSm.copyWith(color: AppColors.textDark),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            doctor.qualification,
+            style: AppTypography.bodySm.copyWith(color: AppColors.textMedium),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Iconsax.tick_circle,
+                  color: AppColors.success,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Verified Doctor',
+                  style: AppTypography.labelSm.copyWith(
+                    color: AppColors.success,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewsSection(AppointmentProvider provider) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Reviews',
+                style: AppTypography.headingSm.copyWith(
+                  color: AppColors.textDark,
+                ),
+              ),
+              Text(
+                'See all',
+                style: AppTypography.bodySm.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (provider.doctorReviews.isEmpty)
+            Text(
+              'No reviews yet',
+              style: AppTypography.bodySm.copyWith(
+                color: AppColors.textMedium,
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: (provider.doctorReviews.length > 3
+                  ? 3
+                  : provider.doctorReviews.length),
+              itemBuilder: (context, index) {
+                final review = provider.doctorReviews[index];
+                return _buildReviewCard(review);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewCard(dynamic review) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.cardBorderLight),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Iconsax.user,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      review.userName,
+                      style: AppTypography.labelSm.copyWith(
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (i) => Icon(
+                          Iconsax.star,
+                          size: 12,
+                          color: i < review.rating.toInt()
+                              ? const Color(0xFFF59E0B)
+                              : AppColors.textMedium,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            review.review,
+            style: AppTypography.bodySm.copyWith(
+              color: AppColors.textMedium,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookButton(BuildContext context, dynamic doctor) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BookingSlotScreen(
+                  doctor: doctor,
+                ),
+              ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            'Book Appointment - \$${doctor.consultationFee.toStringAsFixed(0)}',
+            style: AppTypography.button.copyWith(color: Colors.white),
           ),
         ),
-        Text(
-          label,
-          style: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 11),
-        ),
-      ],
+      ),
     );
   }
 }
