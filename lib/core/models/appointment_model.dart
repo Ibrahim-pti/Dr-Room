@@ -1,277 +1,258 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
-class Doctor {
-  final String id;
-  final String name;
-  final String speciality;
-  final String qualification;
-  final int yearsExperience;
-  final double rating;
-  final int reviewCount;
-  final String profileImage;
-  final String bio;
-  final double consultationFee;
-  final String clinicId;
-  final String clinicName;
-  final List<String> languages;
-  final bool acceptsInsurance;
+import '../config/app_config.dart';
 
-  Doctor({
+/// Mirrors the `doctors` table as returned by `GET /api/doctors`.
+///
+/// The endpoint returns a bare array of Doctor rows with the owning `user`
+/// eager-loaded, so the display name lives at `user.name`, not on the row
+/// itself. Field names here match the migration exactly — `specialty`,
+/// `experience_years`, `total_reviews`, `image_path` — because an earlier
+/// version guessed at them and every value came back empty.
+class Doctor {
+  final int id;
+  final int userId;
+  final String name;
+  final String specialty;
+  final String bio;
+  final double rating;
+  final int totalReviews;
+  final double consultationFee;
+  final int experienceYears;
+  final String phone;
+  final List<String> availableDays;
+
+  /// Storage-relative path, e.g. `doctors/abc.jpg`. Use [imageUrl].
+  final String? imagePath;
+
+  const Doctor({
     required this.id,
+    required this.userId,
     required this.name,
-    required this.speciality,
-    required this.qualification,
-    required this.yearsExperience,
-    required this.rating,
-    required this.reviewCount,
-    required this.profileImage,
+    required this.specialty,
     required this.bio,
+    required this.rating,
+    required this.totalReviews,
     required this.consultationFee,
-    required this.clinicId,
-    required this.clinicName,
-    required this.languages,
-    required this.acceptsInsurance,
+    required this.experienceYears,
+    required this.phone,
+    required this.availableDays,
+    this.imagePath,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      speciality: json['speciality'] ?? '',
-      qualification: json['qualification'] ?? '',
-      yearsExperience: json['years_experience'] ?? 0,
-      rating: (json['rating'] ?? 0).toDouble(),
-      reviewCount: json['review_count'] ?? 0,
-      profileImage: json['profile_image'] ?? '',
-      bio: json['bio'] ?? '',
-      consultationFee: (json['consultation_fee'] ?? 0).toDouble(),
-      clinicId: json['clinic_id'] ?? '',
-      clinicName: json['clinic_name'] ?? '',
-      languages: List<String>.from(json['languages'] ?? []),
-      acceptsInsurance: json['accepts_insurance'] ?? false,
+      id: _asInt(json['id']),
+      userId: _asInt(json['user_id']),
+      // Eager-loaded relation; falls back to a flat `name` if a future
+      // endpoint flattens it.
+      name: (json['user']?['name'] ?? json['name'] ?? '') as String,
+      specialty: (json['specialty'] ?? '') as String,
+      bio: (json['bio'] ?? '') as String,
+      rating: _asDouble(json['rating']),
+      totalReviews: _asInt(json['total_reviews']),
+      consultationFee: _asDouble(json['consultation_fee']),
+      experienceYears: _asInt(json['experience_years']),
+      phone: (json['phone'] ?? '') as String,
+      availableDays: _asStringList(json['available_days']),
+      imagePath: json['image_path'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'speciality': speciality,
-    'qualification': qualification,
-    'years_experience': yearsExperience,
-    'rating': rating,
-    'review_count': reviewCount,
-    'profile_image': profileImage,
-    'bio': bio,
-    'consultation_fee': consultationFee,
-    'clinic_id': clinicId,
-    'clinic_name': clinicName,
-    'languages': languages,
-    'accepts_insurance': acceptsInsurance,
-  };
+        'id': id,
+        'user_id': userId,
+        'name': name,
+        'specialty': specialty,
+        'bio': bio,
+        'rating': rating,
+        'total_reviews': totalReviews,
+        'consultation_fee': consultationFee,
+        'experience_years': experienceYears,
+        'phone': phone,
+        'available_days': availableDays,
+        'image_path': imagePath,
+      };
+
+  /// Absolute URL for the profile photo, or null when none is set.
+  String? get imageUrl => (imagePath == null || imagePath!.isEmpty)
+      ? null
+      : '${AppConfig.storageUrl}/$imagePath';
+
+  String get formattedFee => '\$${consultationFee.toStringAsFixed(0)}';
 }
 
-class DoctorSlot {
-  final String id;
-  final String doctorId;
-  final DateTime date;
-  final String time;
-  final bool isAvailable;
-  final int maxPatients;
-  final int bookedPatients;
-
-  DoctorSlot({
-    required this.id,
-    required this.doctorId,
-    required this.date,
-    required this.time,
-    required this.isAvailable,
-    required this.maxPatients,
-    required this.bookedPatients,
-  });
-
-  factory DoctorSlot.fromJson(Map<String, dynamic> json) {
-    return DoctorSlot(
-      id: json['id'] ?? '',
-      doctorId: json['doctor_id'] ?? '',
-      date: DateTime.parse(json['date'] ?? DateTime.now().toIso8601String()),
-      time: json['time'] ?? '',
-      isAvailable: json['is_available'] ?? false,
-      maxPatients: json['max_patients'] ?? 1,
-      bookedPatients: json['booked_patients'] ?? 0,
-    );
-  }
-
-  String get displayTime => time;
-  String get formattedDate => DateFormat('EEEE, MMMM d').format(date);
-}
-
+/// Mirrors the `appointments` table.
+///
+/// The schema stores a single `appointment_date` datetime — there is no
+/// separate slot date and time, and no slot table — plus `fee`, `type`,
+/// `notes` and `status`.
 class Appointment {
-  final String id;
-  final String doctorId;
-  final String doctorName;
-  final String doctorImage;
-  final String speciality;
-  final DateTime slotDate;
-  final String slotTime;
-  final AppointmentStatus status;
-  final double amount;
-  final String? transactionId;
+  final int id;
+  final int doctorId;
+  final int patientId;
+  final DateTime appointmentDate;
+  final double fee;
+  final AppointmentType type;
   final String? notes;
-  final String? reason;
-  final DateTime createdAt;
-  final DateTime? completedAt;
-  final String? cancellationReason;
+  final AppointmentStatus status;
 
-  Appointment({
+  /// Present when the API eager-loads `doctor.user`.
+  final String doctorName;
+  final String doctorSpecialty;
+  final String? doctorImagePath;
+
+  const Appointment({
     required this.id,
     required this.doctorId,
-    required this.doctorName,
-    required this.doctorImage,
-    required this.speciality,
-    required this.slotDate,
-    required this.slotTime,
-    required this.status,
-    required this.amount,
-    this.transactionId,
+    required this.patientId,
+    required this.appointmentDate,
+    required this.fee,
+    required this.type,
     this.notes,
-    this.reason,
-    required this.createdAt,
-    this.completedAt,
-    this.cancellationReason,
+    required this.status,
+    required this.doctorName,
+    required this.doctorSpecialty,
+    this.doctorImagePath,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
+    final doctor = json['doctor'] as Map<String, dynamic>?;
+
     return Appointment(
-      id: json['id'] ?? '',
-      doctorId: json['doctor_id'] ?? '',
-      doctorName: json['doctor_name'] ?? '',
-      doctorImage: json['doctor_image'] ?? '',
-      speciality: json['speciality'] ?? '',
-      slotDate: DateTime.parse(json['slot_date'] ?? DateTime.now().toIso8601String()),
-      slotTime: json['slot_time'] ?? '',
-      status: AppointmentStatus.values.firstWhere(
-        (e) => e.toString() == 'AppointmentStatus.${json['status']}',
-        orElse: () => AppointmentStatus.pending,
-      ),
-      amount: (json['amount'] ?? 0).toDouble(),
-      transactionId: json['transaction_id'],
-      notes: json['notes'],
-      reason: json['reason'],
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
-      cancellationReason: json['cancellation_reason'],
+      id: _asInt(json['id']),
+      doctorId: _asInt(json['doctor_id']),
+      patientId: _asInt(json['patient_id']),
+      appointmentDate: _asDate(json['appointment_date']),
+      fee: _asDouble(json['fee']),
+      type: AppointmentType.fromApi(json['type'] as String?),
+      notes: json['notes'] as String?,
+      status: AppointmentStatus.fromApi(json['status'] as String?),
+      doctorName: (doctor?['user']?['name'] ?? '') as String,
+      doctorSpecialty: (doctor?['specialty'] ?? '') as String,
+      doctorImagePath: doctor?['image_path'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'doctor_id': doctorId,
-    'doctor_name': doctorName,
-    'doctor_image': doctorImage,
-    'speciality': speciality,
-    'slot_date': slotDate.toIso8601String(),
-    'slot_time': slotTime,
-    'status': status.toString().split('.').last,
-    'amount': amount,
-    'transaction_id': transactionId,
-    'notes': notes,
-    'reason': reason,
-    'created_at': createdAt.toIso8601String(),
-    'completed_at': completedAt?.toIso8601String(),
-    'cancellation_reason': cancellationReason,
-  };
+        'id': id,
+        'doctor_id': doctorId,
+        'patient_id': patientId,
+        'appointment_date': appointmentDate.toIso8601String(),
+        'fee': fee,
+        'type': type.apiValue,
+        'notes': notes,
+        'status': status.apiValue,
+        'doctor': {
+          'specialty': doctorSpecialty,
+          'image_path': doctorImagePath,
+          'user': {'name': doctorName},
+        },
+      };
 
-  String get formattedDate => DateFormat('MMM dd, yyyy').format(slotDate);
-  String get formattedDateTime => '$formattedDate at $slotTime';
-  bool get isUpcoming => slotDate.isAfter(DateTime.now());
-  bool get canCancel => status == AppointmentStatus.confirmed && isUpcoming;
-  bool get canReschedule => status == AppointmentStatus.confirmed && isUpcoming;
+  String? get doctorImageUrl =>
+      (doctorImagePath == null || doctorImagePath!.isEmpty)
+          ? null
+          : '${AppConfig.storageUrl}/$doctorImagePath';
+
+  String get formattedDate => DateFormat('MMM dd, yyyy').format(appointmentDate);
+  String get formattedTime => DateFormat('hh:mm a').format(appointmentDate);
+  String get formattedDateTime => '$formattedDate • $formattedTime';
+  String get formattedFee => '\$${fee.toStringAsFixed(2)}';
+
+  bool get isUpcoming => appointmentDate.isAfter(DateTime.now());
+
+  /// The API refuses to cancel a completed appointment; mirror that here so
+  /// the button is hidden rather than failing with a 422.
+  bool get canCancel =>
+      status != AppointmentStatus.completed &&
+      status != AppointmentStatus.cancelled &&
+      isUpcoming;
 }
 
+/// `appointments.type` — the API validates `in:in_person,online`.
+enum AppointmentType {
+  inPerson('in_person'),
+  online('online');
+
+  const AppointmentType(this.apiValue);
+  final String apiValue;
+
+  static AppointmentType fromApi(String? value) => AppointmentType.values
+      .firstWhere((t) => t.apiValue == value, orElse: () => inPerson);
+
+  String get displayName => switch (this) {
+        AppointmentType.inPerson => 'In person',
+        AppointmentType.online => 'Online',
+      };
+
+  String get kurdiName => switch (this) {
+        AppointmentType.inPerson => 'سەردانی نۆرینگە',
+        AppointmentType.online => 'ڕاوێژی ئۆنلاین',
+      };
+}
+
+/// `appointments.status` — the API validates
+/// `in:pending,confirmed,cancelled,completed`. Note the British spelling of
+/// "cancelled"; the backend is the source of truth for these strings.
 enum AppointmentStatus {
-  pending,
-  confirmed,
-  completed,
-  canceled,
-  noShow,
+  pending('pending'),
+  confirmed('confirmed'),
+  cancelled('cancelled'),
+  completed('completed');
+
+  const AppointmentStatus(this.apiValue);
+  final String apiValue;
+
+  static AppointmentStatus fromApi(String? value) => AppointmentStatus.values
+      .firstWhere((s) => s.apiValue == value, orElse: () => pending);
+
+  String get displayName => switch (this) {
+        AppointmentStatus.pending => 'Pending',
+        AppointmentStatus.confirmed => 'Confirmed',
+        AppointmentStatus.cancelled => 'Cancelled',
+        AppointmentStatus.completed => 'Completed',
+      };
+
+  String get kurdiName => switch (this) {
+        AppointmentStatus.pending => 'چاوەڕوانکراو',
+        AppointmentStatus.confirmed => 'پەسەندکراو',
+        AppointmentStatus.cancelled => 'هەڵوەشاوە',
+        AppointmentStatus.completed => 'تەواوکراو',
+      };
+
+  Color get color => switch (this) {
+        AppointmentStatus.pending => const Color(0xFFF39C12),
+        AppointmentStatus.confirmed => const Color(0xFF2E86DE),
+        AppointmentStatus.cancelled => const Color(0xFFEF4444),
+        AppointmentStatus.completed => const Color(0xFF27AE60),
+      };
 }
 
-extension AppointmentStatusExt on AppointmentStatus {
-  String get displayName {
-    switch (this) {
-      case AppointmentStatus.pending:
-        return 'Pending';
-      case AppointmentStatus.confirmed:
-        return 'Confirmed';
-      case AppointmentStatus.completed:
-        return 'Completed';
-      case AppointmentStatus.canceled:
-        return 'Canceled';
-      case AppointmentStatus.noShow:
-        return 'No Show';
-    }
-  }
+// ── Coercion helpers ────────────────────────────────────────────────────────
+// Laravel serialises decimals as strings ("50.00") and ids can arrive as
+// either int or string depending on the driver, so parse defensively.
 
-  String get kurdiName {
-    switch (this) {
-      case AppointmentStatus.pending:
-        return 'چاوەڕێدان';
-      case AppointmentStatus.confirmed:
-        return 'پەسند کراو';
-      case AppointmentStatus.completed:
-        return 'تەواو بوو';
-      case AppointmentStatus.canceled:
-        return 'لەبیر کرا';
-      case AppointmentStatus.noShow:
-        return 'تێنەگەیشت';
-    }
-  }
+int _asInt(dynamic value) => switch (value) {
+      int v => v,
+      num v => v.toInt(),
+      String v => int.tryParse(v) ?? 0,
+      _ => 0,
+    };
 
-  Color getColor() {
-    switch (this) {
-      case AppointmentStatus.pending:
-        return const Color(0xFFF59E0B);
-      case AppointmentStatus.confirmed:
-        return const Color(0xFF2E86DE);
-      case AppointmentStatus.completed:
-        return const Color(0xFF27AE60);
-      case AppointmentStatus.canceled:
-        return const Color(0xFFEF4444);
-      case AppointmentStatus.noShow:
-        return const Color(0xFF6E7191);
-    }
-  }
-}
+double _asDouble(dynamic value) => switch (value) {
+      double v => v,
+      num v => v.toDouble(),
+      String v => double.tryParse(v) ?? 0,
+      _ => 0,
+    };
 
-class DoctorReview {
-  final String id;
-  final String doctorId;
-  final String userName;
-  final String userImage;
-  final double rating;
-  final String review;
-  final DateTime createdAt;
+DateTime _asDate(dynamic value) =>
+    value is String ? (DateTime.tryParse(value) ?? DateTime.now()) : DateTime.now();
 
-  DoctorReview({
-    required this.id,
-    required this.doctorId,
-    required this.userName,
-    required this.userImage,
-    required this.rating,
-    required this.review,
-    required this.createdAt,
-  });
-
-  factory DoctorReview.fromJson(Map<String, dynamic> json) {
-    return DoctorReview(
-      id: json['id'] ?? '',
-      doctorId: json['doctor_id'] ?? '',
-      userName: json['user_name'] ?? '',
-      userImage: json['user_image'] ?? '',
-      rating: (json['rating'] ?? 0).toDouble(),
-      review: json['review'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-    );
-  }
-}
+List<String> _asStringList(dynamic value) => switch (value) {
+      List v => v.map((e) => e.toString()).toList(),
+      String v when v.isNotEmpty => [v],
+      _ => <String>[],
+    };

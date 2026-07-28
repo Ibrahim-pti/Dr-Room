@@ -1,273 +1,114 @@
 import 'package:flutter/material.dart';
+
 import '../models/appointment_model.dart';
 import '../services/appointment_service.dart';
 
 class AppointmentProvider extends ChangeNotifier {
-  final AppointmentService _appointmentService = AppointmentService();
+  AppointmentProvider({AppointmentService? service})
+      : _service = service ?? AppointmentService();
+
+  final AppointmentService _service;
 
   List<Doctor> _doctors = [];
   List<Appointment> _appointments = [];
-  List<DoctorSlot> _availableSlots = [];
-  List<DoctorReview> _doctorReviews = [];
-
   Doctor? _selectedDoctor;
-  DoctorSlot? _selectedSlot;
-  Appointment? _currentAppointment;
-
+  Appointment? _lastBooked;
   bool _isLoading = false;
   String? _error;
 
-  // Getters
   List<Doctor> get doctors => _doctors;
   List<Appointment> get appointments => _appointments;
-  List<DoctorSlot> get availableSlots => _availableSlots;
-  List<DoctorReview> get doctorReviews => _doctorReviews;
   Doctor? get selectedDoctor => _selectedDoctor;
-  DoctorSlot? get selectedSlot => _selectedSlot;
-  Appointment? get currentAppointment => _currentAppointment;
+  Appointment? get lastBooked => _lastBooked;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  double get appointmentFee => _selectedDoctor?.consultationFee ?? 0;
+  List<Appointment> get upcomingAppointments =>
+      _appointments.where((a) => a.isUpcoming).toList();
 
-  /// Fetch doctors
+  /// Runs [action], funnelling loading state and errors into the UI.
+  /// Returns true when it completed without throwing.
+  Future<bool> _run(Future<void> Function() action) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await action();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> fetchDoctors({
     String? search,
-    String? speciality,
+    String? specialty,
     double? minRating,
-  }) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
+  }) =>
+      _run(() async {
+        _doctors = await _service.getDoctors(
+          search: search,
+          specialty: specialty,
+          minRating: minRating,
+        );
+      });
 
-      _doctors = await _appointmentService.getDoctors(
-        search: search,
-        speciality: speciality,
-        minRating: minRating,
-      );
+  Future<bool> fetchAppointments({AppointmentStatus? status}) => _run(() async {
+        _appointments = await _service.getAppointments(status: status);
+      });
 
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Fetch doctor details
-  Future<bool> fetchDoctorDetails(String doctorId) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      final doctor = await _appointmentService.getDoctorDetails(doctorId);
-      _selectedDoctor = doctor;
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Fetch available slots
-  Future<bool> fetchAvailableSlots(
-    String doctorId, {
-    DateTime? fromDate,
-    DateTime? toDate,
-  }) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      _availableSlots = await _appointmentService.getDoctorSlots(
-        doctorId,
-        fromDate: fromDate,
-        toDate: toDate,
-      );
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Fetch doctor reviews
-  Future<bool> fetchDoctorReviews(String doctorId) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      _doctorReviews = await _appointmentService.getDoctorReviews(doctorId);
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Select doctor
-  void selectDoctor(Doctor doctor) {
-    _selectedDoctor = doctor;
-    _selectedSlot = null;
-    _error = null;
-    notifyListeners();
-  }
-
-  /// Select slot
-  void selectSlot(DoctorSlot slot) {
-    _selectedSlot = slot;
-    _error = null;
-    notifyListeners();
-  }
-
-  /// Book appointment
+  /// Books with the currently selected doctor.
+  ///
+  /// [when] must carry both the day and the time — the backend stores a single
+  /// `appointment_date` and rejects anything not in the future.
   Future<bool> bookAppointment({
-    required String reason,
+    required DateTime when,
+    AppointmentType type = AppointmentType.inPerson,
     String? notes,
-  }) async {
-    if (_selectedDoctor == null || _selectedSlot == null) {
-      _error = 'Please select doctor and time slot';
+  }) {
+    final doctor = _selectedDoctor;
+    if (doctor == null) {
+      _error = 'Choose a doctor first';
       notifyListeners();
-      return false;
+      return Future.value(false);
     }
 
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      _currentAppointment = await _appointmentService.bookAppointment(
-        doctorId: _selectedDoctor!.id,
-        slotDate: _selectedSlot!.date,
-        slotTime: _selectedSlot!.time,
-        reason: reason,
+    return _run(() async {
+      _lastBooked = await _service.bookAppointment(
+        doctorId: doctor.id,
+        when: when,
+        type: type,
         notes: notes,
       );
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
+      _appointments = [_lastBooked!, ..._appointments];
+    });
   }
 
-  /// Fetch appointments
-  Future<bool> fetchAppointments({String? status}) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
+  Future<bool> cancelAppointment(int appointmentId) => _run(() async {
+        await _service.cancelAppointment(appointmentId);
+        _appointments = _appointments
+            .where((a) => a.id != appointmentId)
+            .toList(growable: false);
+      });
 
-      _appointments = await _appointmentService.getAppointments(status: status);
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Cancel appointment
-  Future<bool> cancelAppointment(
-    String appointmentId, {
-    required String reason,
-  }) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      await _appointmentService.cancelAppointment(
-        appointmentId,
-        reason: reason,
-        requestRefund: true,
-      );
-
-      _appointments.removeWhere((a) => a.id == appointmentId);
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Reschedule appointment
-  Future<bool> rescheduleAppointment(
-    String appointmentId, {
-    required DateTime newDate,
-    required String newTime,
-  }) async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      final updated = await _appointmentService.rescheduleAppointment(
-        appointmentId,
-        newSlotDate: newDate,
-        newSlotTime: newTime,
-      );
-
-      final index = _appointments.indexWhere((a) => a.id == appointmentId);
-      if (index != -1) {
-        _appointments[index] = updated;
-      }
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    }
-  }
-
-  /// Clear selection
-  void clearSelection() {
-    _selectedDoctor = null;
-    _selectedSlot = null;
-    _currentAppointment = null;
+  void selectDoctor(Doctor doctor) {
+    _selectedDoctor = doctor;
     _error = null;
     notifyListeners();
   }
 
-  /// Clear error
+  void clearSelection() {
+    _selectedDoctor = null;
+    _lastBooked = null;
+    _error = null;
+    notifyListeners();
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();

@@ -1,253 +1,160 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/appointment_model.dart';
 import '../utils/api_client.dart';
 
+/// Talks to the appointment and doctor endpoints that actually exist.
+///
+/// The backend currently exposes only:
+///   GET    /doctors            — bare array, optional ?specialty=
+///   GET    /appointments       — { data: [...], total: n }
+///   POST   /appointments       — doctor_id, appointment_date, type, notes
+///   DELETE /appointments/{id}  — cancels (sets status=cancelled)
+///
+/// There is no per-doctor detail, reviews, or availability endpoint and no
+/// slot table, so this class deliberately does not pretend to offer them.
+/// Search and rating filters are applied client-side for the same reason.
 class AppointmentService {
-  /// Fetch all doctors
+  /// Fetches doctors, optionally narrowed by specialty server-side.
+  ///
+  /// [search] and [minRating] are filtered locally because `GET /doctors`
+  /// supports neither.
   Future<List<Doctor>> getDoctors({
     String? search,
-    String? speciality,
+    String? specialty,
     double? minRating,
-    int page = 1,
-    int limit = 20,
   }) async {
-    try {
-      final queryParams = <String, dynamic>{
-        'page': page,
-        'limit': limit,
-        if (search != null) 'search': search,
-        if (speciality != null) 'speciality': speciality,
-        if (minRating != null) 'rating': minRating,
-      };
+    final endpoint = (specialty == null || specialty.isEmpty)
+        ? '/doctors'
+        : '/doctors?specialty=${Uri.encodeQueryComponent(specialty)}';
 
-      final query = Uri(queryParameters: queryParams).query;
-      final endpoint = '/doctors?$query';
+    final response = await ApiClient.get(endpoint);
 
-      final response = await ApiClient.get(endpoint);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final doctors = (data['data'] as List)
-            .map((d) => Doctor.fromJson(d))
-            .toList();
-        return doctors;
-      } else {
-        throw Exception('Failed to fetch doctors: ${response.body}');
-      }
-    } catch (e) {
-      throw Exception('Error fetching doctors: $e');
+    if (response.statusCode != 200) {
+      throw ApiException.fromResponse(response, 'Could not load doctors');
     }
+
+    final decoded = jsonDecode(response.body);
+    // The endpoint returns a bare array; tolerate a wrapped shape in case it
+    // is paginated later.
+    final rows = decoded is List ? decoded : (decoded['data'] as List? ?? []);
+
+    var doctors = rows
+        .cast<Map<String, dynamic>>()
+        .map(Doctor.fromJson)
+        .toList();
+
+    if (search != null && search.trim().isNotEmpty) {
+      final needle = search.trim().toLowerCase();
+      doctors = doctors
+          .where((d) =>
+              d.name.toLowerCase().contains(needle) ||
+              d.specialty.toLowerCase().contains(needle))
+          .toList();
+    }
+
+    if (minRating != null) {
+      doctors = doctors.where((d) => d.rating >= minRating).toList();
+    }
+
+    return doctors;
   }
 
-  /// Get doctor details
-  Future<Doctor> getDoctorDetails(String doctorId) async {
-    try {
-      final response = await ApiClient.get('/doctors/$doctorId');
+  /// The patient's own appointments, newest first.
+  Future<List<Appointment>> getAppointments({AppointmentStatus? status}) async {
+    final endpoint = status == null
+        ? '/appointments'
+        : '/appointments?status=${status.apiValue}';
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return Doctor.fromJson(data['data']);
-      } else {
-        throw Exception('Failed to fetch doctor details');
-      }
-    } catch (e) {
-      throw Exception('Error fetching doctor details: $e');
+    final response = await ApiClient.get(endpoint);
+
+    if (response.statusCode != 200) {
+      throw ApiException.fromResponse(response, 'Could not load appointments');
     }
+
+    final rows = jsonDecode(response.body)['data'] as List? ?? [];
+    return rows.cast<Map<String, dynamic>>().map(Appointment.fromJson).toList();
   }
 
-  /// Get available slots for doctor
-  Future<List<DoctorSlot>> getDoctorSlots(
-    String doctorId, {
-    DateTime? fromDate,
-    DateTime? toDate,
-  }) async {
-    try {
-      final queryParams = <String, dynamic>{
-        if (fromDate != null) 'from_date': fromDate.toIso8601String(),
-        if (toDate != null) 'to_date': toDate.toIso8601String(),
-      };
-
-      final query = Uri(queryParameters: queryParams).query;
-      final endpoint = '/doctors/$doctorId/availability?$query';
-
-      final response = await ApiClient.get(endpoint);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final slots = (data['data'] as List)
-            .map((s) => DoctorSlot.fromJson(s))
-            .toList();
-        return slots;
-      } else {
-        throw Exception('Failed to fetch slots');
-      }
-    } catch (e) {
-      throw Exception('Error fetching slots: $e');
-    }
-  }
-
-  /// Book appointment
+  /// Books an appointment.
+  ///
+  /// The API validates `appointment_date` as a single datetime that must be in
+  /// the future, so [when] carries both the day and the time.
   Future<Appointment> bookAppointment({
-    required String doctorId,
-    required DateTime slotDate,
-    required String slotTime,
-    String? reason,
+    required int doctorId,
+    required DateTime when,
+    AppointmentType type = AppointmentType.inPerson,
     String? notes,
   }) async {
+    final response = await ApiClient.post(
+      '/appointments',
+      body: {
+        'doctor_id': doctorId,
+        // Laravel's `date` rule parses ISO-8601; send local time without the
+        // trailing Z so "after:now" compares against the same wall clock.
+        'appointment_date': _formatForApi(when),
+        'type': type.apiValue,
+        if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
+      },
+    );
+
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      throw ApiException.fromResponse(response, 'Could not book the appointment');
+    }
+
+    return Appointment.fromJson(jsonDecode(response.body)['appointment']);
+  }
+
+  /// Cancels an appointment. The API rejects this for completed appointments.
+  Future<void> cancelAppointment(int appointmentId) async {
+    final response = await ApiClient.delete('/appointments/$appointmentId');
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw ApiException.fromResponse(response, 'Could not cancel the appointment');
+    }
+  }
+
+  /// `2026-08-15 14:30:00` — the format Laravel's validator and the
+  /// `appointment_date` column both accept.
+  static String _formatForApi(DateTime when) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${when.year}-${two(when.month)}-${two(when.day)} '
+        '${two(when.hour)}:${two(when.minute)}:00';
+  }
+}
+
+/// Carries the server's own message so the UI can show why a call failed
+/// instead of a generic error.
+class ApiException implements Exception {
+  final int statusCode;
+  final String message;
+
+  const ApiException(this.statusCode, this.message);
+
+  factory ApiException.fromResponse(dynamic response, String fallback) {
+    String message = fallback;
+
     try {
-      final response = await ApiClient.post(
-        '/appointments',
-        body: {
-          'doctor_id': doctorId,
-          'slot_date': slotDate.toIso8601String(),
-          'slot_time': slotTime,
-          'reason': reason,
-          'notes': notes,
-        },
-      );
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final appointment = Appointment.fromJson(data['data']);
-        await _cacheAppointment(appointment);
-        return appointment;
-      } else {
-        throw Exception('Failed to book appointment: ${response.body}');
+      final body = jsonDecode(response.body);
+      if (body is Map) {
+        // Laravel returns {message, errors:{field:[...]}} on a 422.
+        final errors = body['errors'];
+        if (errors is Map && errors.isNotEmpty) {
+          final first = errors.values.first;
+          message = first is List && first.isNotEmpty
+              ? first.first.toString()
+              : errors.values.first.toString();
+        } else if (body['message'] is String) {
+          message = body['message'] as String;
+        }
       }
-    } catch (e) {
-      throw Exception('Error booking appointment: $e');
+    } catch (_) {
+      // Body was not JSON; keep the fallback.
     }
+
+    return ApiException(response.statusCode as int, message);
   }
 
-  /// Get user appointments
-  Future<List<Appointment>> getAppointments({
-    String? status,
-  }) async {
-    try {
-      final queryParams = <String, dynamic>{
-        if (status != null) 'status': status,
-      };
-
-      final query = Uri(queryParameters: queryParams).query;
-      final endpoint = '/appointments?$query';
-
-      final response = await ApiClient.get(endpoint);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final appointments = (data['data'] as List)
-            .map((a) => Appointment.fromJson(a))
-            .toList();
-        return appointments;
-      } else {
-        throw Exception('Failed to fetch appointments');
-      }
-    } catch (e) {
-      throw Exception('Error fetching appointments: $e');
-    }
-  }
-
-  /// Get single appointment
-  Future<Appointment> getAppointment(String appointmentId) async {
-    try {
-      final response = await ApiClient.get('/appointments/$appointmentId');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return Appointment.fromJson(data['data']);
-      } else {
-        throw Exception('Failed to fetch appointment');
-      }
-    } catch (e) {
-      throw Exception('Error fetching appointment: $e');
-    }
-  }
-
-  /// Cancel appointment
-  Future<bool> cancelAppointment(
-    String appointmentId, {
-    required String reason,
-    bool requestRefund = true,
-  }) async {
-    try {
-      final response = await ApiClient.post(
-        '/appointments/$appointmentId/cancel',
-        body: {
-          'reason': reason,
-          'request_refund': requestRefund,
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        return true;
-      } else {
-        throw Exception('Failed to cancel appointment');
-      }
-    } catch (e) {
-      throw Exception('Error canceling appointment: $e');
-    }
-  }
-
-  /// Reschedule appointment
-  Future<Appointment> rescheduleAppointment(
-    String appointmentId, {
-    required DateTime newSlotDate,
-    required String newSlotTime,
-  }) async {
-    try {
-      final response = await ApiClient.put(
-        '/appointments/$appointmentId',
-        body: {
-          'slot_date': newSlotDate.toIso8601String(),
-          'slot_time': newSlotTime,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return Appointment.fromJson(data['data']);
-      } else {
-        throw Exception('Failed to reschedule appointment');
-      }
-    } catch (e) {
-      throw Exception('Error rescheduling appointment: $e');
-    }
-  }
-
-  /// Get doctor reviews
-  Future<List<DoctorReview>> getDoctorReviews(String doctorId) async {
-    try {
-      final response = await ApiClient.get('/doctors/$doctorId/reviews');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final reviews = (data['data'] as List)
-            .map((r) => DoctorReview.fromJson(r))
-            .toList();
-        return reviews;
-      } else {
-        throw Exception('Failed to fetch reviews');
-      }
-    } catch (e) {
-      throw Exception('Error fetching reviews: $e');
-    }
-  }
-
-  // Local caching
-  Future<void> _cacheAppointment(Appointment appointment) async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = 'appointment_${appointment.id}';
-    await prefs.setString(key, jsonEncode(appointment.toJson()));
-  }
-
-  Future<Appointment?> getCachedAppointment(String appointmentId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = 'appointment_$appointmentId';
-    final data = prefs.getString(key);
-    if (data != null) {
-      return Appointment.fromJson(jsonDecode(data));
-    }
-    return null;
-  }
+  @override
+  String toString() => message;
 }
