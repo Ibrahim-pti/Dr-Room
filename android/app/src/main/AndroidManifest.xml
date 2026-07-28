@@ -1,10 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
+    <!-- Network: required in the main manifest. Flutter only injects INTERNET
+         into the debug/profile manifests, so without this release builds have
+         no network access at all. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <!-- Pill scanner and prescription upload (image_picker) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!-- Camera is optional: don't exclude tablets without one from the Play Store -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
-        android:label="dr_room"
+        android:label="DrRoom"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
@@ -35,9 +51,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
             
-        <!-- Google Maps API Key -->
+        <!-- Injected from android/local.properties (MAPS_API_KEY), which is
+             gitignored. Never hardcode the key here. -->
         <meta-data android:name="com.google.android.geo.API_KEY"
-                   android:value="AIzaSyCrWd9Xy4yYeV-zDgG1apWrdBzZg7fpIGI"/>
+                   android:value="${MAPS_API_KEY}"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

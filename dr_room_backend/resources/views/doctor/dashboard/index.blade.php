@@ -72,28 +72,17 @@
                     </div>
                     @endforeach
                 @else
-                    @php
-                        $dummies = [
-                            ['time' => '09:00', 'ampm' => 'ب.ن', 'name' => 'عەلی ئەحمەد', 'type' => 'سەردانی نۆڕینگە', 'status' => 'تەواوکراو', 'sc' => '#059669', 'sb' => '#ecfdf5'],
-                            ['time' => '10:30', 'ampm' => 'ب.ن', 'name' => 'سارا کەریم', 'type' => 'بەدواداچوون', 'status' => 'بەڕێوەیە', 'sc' => '#4f46e5', 'sb' => '#eef2ff'],
-                            ['time' => '11:30', 'ampm' => 'ب.ن', 'name' => 'حەسەن قادر', 'type' => 'ڕاوێژی ئۆنلاین', 'status' => 'بەڕێوەیە', 'sc' => '#4f46e5', 'sb' => '#eef2ff'],
-                            ['time' => '01:00', 'ampm' => 'د.ن', 'name' => 'زانا عوسمان', 'type' => 'سەردانی نۆڕینگە', 'status' => 'چاوەڕێکراو', 'sc' => '#d97706', 'sb' => '#fffbeb'],
-                        ];
-                    @endphp
-                    @foreach($dummies as $d)
-                    <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                        <div style="width:52px;text-align:center;">
-                            <div style="font-size:1rem;font-weight:800;color:#0f172a;">{{ $d['time'] }}</div>
-                            <div style="font-size:0.65rem;font-weight:700;color:#94a3b8;">{{ $d['ampm'] }}</div>
+                    {{-- Empty means empty. This branch used to render invented
+                         patients and visit types, which a doctor cannot tell
+                         apart from a real schedule. --}}
+                    <div style="padding:40px 20px;text-align:center;">
+                        <div style="font-size:0.9rem;font-weight:700;color:#0f172a;margin-bottom:6px;">
+                            هیچ سەردانێکی داهاتوو نییە
                         </div>
-                        <div style="width:40px;height:40px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:700;color:#64748b;font-size:0.9rem;flex-shrink:0;">{{ mb_substr($d['name'], 0, 1) }}</div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:0.88rem;font-weight:700;color:#0f172a;">{{ $d['name'] }}</div>
-                            <div style="font-size:0.78rem;color:#94a3b8;font-weight:500;">{{ $d['type'] }}</div>
+                        <div style="font-size:0.82rem;color:#94a3b8;line-height:1.7;">
+                            کاتێک نەخۆشێک کات وەردەگرێت، لێرە دەردەکەوێت.
                         </div>
-                        <span style="font-size:0.72rem;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap;background:{{ $d['sb'] }};color:{{ $d['sc'] }};">{{ $d['status'] }}</span>
                     </div>
-                    @endforeach
                 @endif
             </div>
         </div>
@@ -116,23 +105,23 @@
                     <h3 style="margin:0;font-size:1rem;font-weight:700;color:#0f172a;">دوایین نەخۆشەکان</h3>
                 </div>
                 <div style="padding:6px 12px;flex:1;">
-                    @php
-                        $recentDummies = [
-                            ['name' => 'عەلی ئەحمەد', 'desc' => 'نێر، ٣٨ ساڵ', 'date' => 'ئەمڕۆ'],
-                            ['name' => 'سارا کەریم', 'desc' => 'مێ، ٣٥ ساڵ', 'date' => 'ئەمڕۆ'],
-                            ['name' => 'حەسەن قادر', 'desc' => 'نێر، ٤٢ ساڵ', 'date' => 'دوێنێ'],
-                        ];
-                    @endphp
-                    @foreach($recentDummies as $p)
+                    {{-- Real patients this doctor has seen. Never sample rows:
+                         a fabricated name here reads as a real medical record. --}}
+                    @forelse($recentPatients as $appointment)
                     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                        <div style="width:36px;height:36px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">{{ mb_substr($p['name'], 0, 1) }}</div>
-                        <div style="flex:1;">
-                            <div style="font-size:0.82rem;font-weight:700;color:#0f172a;">{{ $p['name'] }}</div>
-                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:500;">{{ $p['desc'] }}</div>
+                        <div style="width:36px;height:36px;border-radius:50%;background:#eef2ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;">{{ mb_substr($appointment->patient->name ?? '؟', 0, 1) }}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $appointment->patient->name ?? 'نەخۆشی نەناسراو' }}</div>
+                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:500;">{{ $appointment->patient->phone ?? '—' }}</div>
                         </div>
-                        <div style="font-size:0.7rem;font-weight:700;color:#94a3b8;background:#f1f5f9;padding:4px 10px;border-radius:6px;">{{ $p['date'] }}</div>
+                        <div style="font-size:0.7rem;font-weight:700;color:#94a3b8;background:#f1f5f9;padding:4px 10px;border-radius:6px;white-space:nowrap;">{{ optional($appointment->appointment_date)->diffForHumans() ?? '—' }}</div>
                     </div>
-                    @endforeach
+                    @empty
+                    <div style="padding:28px 16px;text-align:center;">
+                        <div style="font-size:0.85rem;font-weight:700;color:#0f172a;margin-bottom:4px;">هێشتا هیچ نەخۆشێک نییە</div>
+                        <div style="font-size:0.75rem;color:#94a3b8;line-height:1.7;">دوای یەکەم سەردان لێرە دەردەکەون.</div>
+                    </div>
+                    @endforelse
                 </div>
                 <div style="padding:12px 16px 16px;">
                     <a href="{{ route('doctor.patients.index') }}" style="display:block;text-align:center;padding:10px;border-radius:10px;background:#f8fafc;color:#64748b;font-weight:700;font-size:0.82rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">بینینی هەموو نەخۆشەکان</a>
@@ -159,10 +148,11 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ه'],
+                    // Real counts for the last 7 days, from DoctorDashboardController.
+                    labels: @json($weeklyChart->pluck('label')),
                     datasets: [{
                         label: 'سەردانەکان',
-                        data: [12, 19, 15, 25, 22, 30, 28],
+                        data: @json($weeklyChart->pluck('count')),
                         borderColor: '#4f46e5',
                         backgroundColor: 'rgba(79, 70, 229, 0.08)',
                         borderWidth: 2.5,

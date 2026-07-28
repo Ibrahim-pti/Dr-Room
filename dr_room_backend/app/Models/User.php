@@ -51,6 +51,16 @@ class User extends Authenticatable
         return $this->role === 'lab';
     }
 
+    public function getIsPharmacyAttribute(): bool
+    {
+        return $this->role === 'pharmacy';
+    }
+
+    public function getIsXrayAttribute(): bool
+    {
+        return $this->role === 'xray';
+    }
+
     public function getIsBlockedAttribute(): bool
     {
         return $this->status === 'blocked';

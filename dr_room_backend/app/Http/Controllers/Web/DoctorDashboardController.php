@@ -30,12 +30,37 @@ class DoctorDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Appointments per day for the last 7 days, oldest first, for the chart.
+        $weeklyChart = collect(range(6, 0))->map(function (int $daysAgo) use ($doctor) {
+            $day = today()->subDays($daysAgo);
+
+            return [
+                'label' => $day->translatedFormat('D'),
+                'count' => $doctor->appointments()
+                    ->whereDate('appointment_date', $day)
+                    ->count(),
+            ];
+        });
+
+        // Most recently seen patients, newest first, one row per patient.
+        $recentPatients = $doctor->appointments()
+            ->with('patient')
+            ->whereNotNull('patient_id')
+            ->latest('appointment_date')
+            ->take(20)
+            ->get()
+            ->unique('patient_id')
+            ->take(3)
+            ->values();
+
         return view('doctor.dashboard.index', compact(
-            'user', 
-            'doctor', 
-            'todayAppointments', 
+            'user',
+            'doctor',
+            'todayAppointments',
             'totalPatients',
-            'upcomingAppointments'
+            'upcomingAppointments',
+            'recentPatients',
+            'weeklyChart'
         ));
     }
 }

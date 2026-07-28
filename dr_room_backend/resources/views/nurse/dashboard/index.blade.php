@@ -69,28 +69,17 @@
                     </div>
                     @endforeach
                 @else
-                    @php
-                        $dummies = [
-                            ['time' => '09:00', 'ampm' => 'ب.ن', 'name' => 'عەلی ئەحمەد', 'type' => 'پشکنینی خوێن', 'status' => 'تەواوکراو', 'sc' => '#059669', 'sb' => '#ecfdf5'],
-                            ['time' => '10:30', 'ampm' => 'ب.ن', 'name' => 'سارا کەریم', 'type' => 'پێدانی دەرمان', 'status' => 'بەڕێوەیە', 'sc' => '#0d9488', 'sb' => '#f0fdfa'],
-                            ['time' => '11:30', 'ampm' => 'ب.ن', 'name' => 'حەسەن قادر', 'type' => 'پشکنینی شەکرە', 'status' => 'بەڕێوەیە', 'sc' => '#0d9488', 'sb' => '#f0fdfa'],
-                            ['time' => '01:00', 'ampm' => 'د.ن', 'name' => 'زانا عوسمان', 'type' => 'گۆڕینی برین', 'status' => 'چاوەڕێکراو', 'sc' => '#d97706', 'sb' => '#fffbeb'],
-                        ];
-                    @endphp
-                    @foreach($dummies as $d)
-                    <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;transition:background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                        <div style="width:52px;text-align:center;">
-                            <div style="font-size:1rem;font-weight:800;color:#0f172a;">{{ $d['time'] }}</div>
-                            <div style="font-size:0.65rem;font-weight:700;color:#94a3b8;">{{ $d['ampm'] }}</div>
+                    {{-- Empty means empty. This branch used to render invented
+                         patients and procedures (blood draw, wound dressing),
+                         which a nurse cannot tell apart from a real round. --}}
+                    <div style="padding:40px 20px;text-align:center;">
+                        <div style="font-size:0.9rem;font-weight:700;color:#0f172a;margin-bottom:6px;">
+                            هیچ سەردانێکی داهاتوو نییە
                         </div>
-                        <div style="width:40px;height:40px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:700;color:#64748b;font-size:0.9rem;flex-shrink:0;">{{ mb_substr($d['name'], 0, 1) }}</div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:0.88rem;font-weight:700;color:#0f172a;">{{ $d['name'] }}</div>
-                            <div style="font-size:0.78rem;color:#94a3b8;font-weight:500;">{{ $d['type'] }}</div>
+                        <div style="font-size:0.82rem;color:#94a3b8;line-height:1.7;">
+                            کاتێک نەخۆشێک کات وەردەگرێت، لێرە دەردەکەوێت.
                         </div>
-                        <span style="font-size:0.72rem;font-weight:700;padding:5px 12px;border-radius:8px;white-space:nowrap;background:{{ $d['sb'] }};color:{{ $d['sc'] }};">{{ $d['status'] }}</span>
                     </div>
-                    @endforeach
                 @endif
             </div>
         </div>
@@ -124,10 +113,11 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ه'],
+                    // Real counts for the last 7 days, from NurseDashboardController.
+                    labels: @json($weeklyChart->pluck('label')),
                     datasets: [{
                         label: 'داواکارییەکان',
-                        data: [5, 8, 12, 7, 15, 10, 4],
+                        data: @json($weeklyChart->pluck('count')),
                         backgroundColor: '#0d9488',
                         borderRadius: 6,
                     }]

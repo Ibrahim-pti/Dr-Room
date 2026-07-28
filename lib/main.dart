@@ -8,6 +8,7 @@ import 'core/providers/order_provider.dart';
 import 'core/providers/checkout_provider.dart';
 import 'core/providers/favorite_provider.dart';
 import 'core/utils/ckb_localizations.dart';
+import 'core/utils/api_client.dart';
 import 'core/providers/health_provider.dart';
 import 'core/providers/cart_provider.dart';
 import 'core/providers/admin_order_provider.dart';
@@ -25,9 +26,22 @@ import 'features/setup/language_selection_screen.dart';
 import 'features/setup/health_profile_screen.dart';
 import 'features/setup/medical_history_screen.dart';
 
+/// Lets code without a BuildContext (notably [ApiClient]) drive navigation.
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  // A rejected token used to fail silently on every subsequent call. Now it
+  // tears the session down and returns the user to login.
+  ApiClient.onUnauthorized = () {
+    appNavigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const AppFlow(startAtLogin: true)),
+      (route) => false,
+    );
+  };
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -68,6 +82,7 @@ class DrRoomApp extends StatelessWidget {
         valueListenable: ThemeProvider().themeModeNotifier,
         builder: (context, themeMode, child) {
           return MaterialApp(
+            navigatorKey: appNavigatorKey,
             title: 'DrRoom',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,

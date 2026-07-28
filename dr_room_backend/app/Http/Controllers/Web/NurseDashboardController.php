@@ -31,12 +31,25 @@ class NurseDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Appointments per day for the last 7 days, oldest first, for the chart.
+        $weeklyChart = collect(range(6, 0))->map(function (int $daysAgo) use ($nurse) {
+            $day = today()->subDays($daysAgo);
+
+            return [
+                'label' => $day->translatedFormat('D'),
+                'count' => $nurse->nurseAppointments()
+                    ->whereDate('appointment_date', $day)
+                    ->count(),
+            ];
+        });
+
         return view('nurse.dashboard.index', compact(
-            'user', 
-            'nurse', 
-            'todayAppointments', 
+            'user',
+            'nurse',
+            'todayAppointments',
             'totalPatients',
-            'upcomingAppointments'
+            'upcomingAppointments',
+            'weeklyChart'
         ));
     }
 }

@@ -193,17 +193,9 @@ Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->g
 });
 
 // Pharmacy Dashboard Routes
-Route::prefix('pharmacy')->middleware(['auth'])->group(function () {
+Route::prefix('pharmacy')->middleware(['auth', \App\Http\Middleware\IsPharmacy::class])->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Web\PharmacyDashboardController::class, 'index'])->name('pharmacy.dashboard');
-    
-    // New Feature Placeholders (Pharmacy)
-    $pharmacyPlaceholder = function ($title) {
-        return view('shared.placeholder', ['layout' => 'pharmacy.layouts.app', 'title' => $title]);
-    };
-    
-    Route::get('/prescriptions', fn() => $pharmacyPlaceholder('ڕەچەتەکان'))->name('pharmacy.prescriptions.index');
-    Route::get('/orders', fn() => $pharmacyPlaceholder('داواکارییەکان'))->name('pharmacy.orders.index');
-    
+
     // Medications CRUD
     Route::resource('/medications', \App\Http\Controllers\Web\PharmacyMedicationController::class, [
         'as' => 'pharmacy'
