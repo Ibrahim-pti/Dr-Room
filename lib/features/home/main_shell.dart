@@ -169,19 +169,32 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
-      backgroundColor: Colors.white, // Ultra pure white
+      backgroundColor: AppColors.getSurface(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadiusDirectional.horizontal(start: Radius.circular(32)),
+        borderRadius: BorderRadiusDirectional.horizontal(
+          start: Radius.circular(32),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
+            width: double.infinity,
             padding: const EdgeInsetsDirectional.only(
               top: 60,
-              bottom: 24,
+              bottom: 28,
               start: 24,
               end: 24,
+            ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.primaryLight],
+              ),
+              borderRadius: const BorderRadiusDirectional.only(
+                bottomStart: Radius.circular(28),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -195,28 +208,22 @@ class _MainShellState extends State<MainShell> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: AppColors.getSurface(context),
+                          color: Colors.white.withValues(alpha: 0.16),
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.getBorder(context),
-                          ),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.close,
-                          color: AppColors.getTextTitle(context),
+                          color: Colors.white,
                           size: 20,
                         ),
                       ),
                     ),
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 64,
+                      height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.getBorder(context),
-                          width: 2,
-                        ),
+                        border: Border.all(color: Colors.white, width: 2.5),
                         image: const DecorationImage(
                           image: AssetImage(
                             'assets/images/doctor2.png',
@@ -232,8 +239,8 @@ class _MainShellState extends State<MainShell> {
                   'sara_ahmad'.tr(),
                   textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
-                    color: AppColors.getTextTitle(context),
-                    fontSize: 24,
+                    color: Colors.white,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -242,21 +249,19 @@ class _MainShellState extends State<MainShell> {
                   '+964 750 123 4567',
                   textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
-                    color: AppColors.getTextSubtitle(context),
-                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 13,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 // DrRoom Plus Badge
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                    horizontal: 14,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                    ),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -265,20 +270,20 @@ class _MainShellState extends State<MainShell> {
                       Text(
                         'DrRoom Plus Member',
                         style: GoogleFonts.poppins(
-                          color: Colors.white,
+                          color: AppColors.primary,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Icon(Iconsax.star_1, color: Colors.white, size: 16),
+                      const SizedBox(width: 6),
+                      Icon(Iconsax.star_1, color: AppColors.primary, size: 14),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -287,7 +292,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     icon: Iconsax.health,
                     title: 'DrRoom AI Assistant',
-                    color: const Color(0xFF8B5CF6),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -302,7 +306,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     icon: Icons.accessibility_new_rounded,
                     title: 'Interactive Body Map',
-                    color: const Color(0xFF3B82F6),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -317,7 +320,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     icon: Iconsax.hospital,
                     title: 'Surgery Timeline',
-                    color: const Color(0xFFEF4444),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -332,7 +334,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     icon: Icons.favorite,
                     title: 'Favorite Doctors',
-                    color: const Color(0xFFEF4444),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -347,7 +348,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     imagePath: 'assets/images/drawer_orders.png',
                     title: 'My Orders',
-                    color: const Color(0xFF3B82F6),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -362,7 +362,6 @@ class _MainShellState extends State<MainShell> {
                     context,
                     imagePath: 'assets/images/medicine.png',
                     title: 'My Prescriptions',
-                    color: const Color(0xFF8B5CF6),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -373,7 +372,7 @@ class _MainShellState extends State<MainShell> {
                       );
                     },
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -389,53 +388,49 @@ class _MainShellState extends State<MainShell> {
     String? imagePath,
     required String title,
     required VoidCallback onTap,
-    required Color color,
-    bool isLogout = false,
   }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        child: Container(
+          margin: const EdgeInsetsDirectional.only(start: 16, end: 16, bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.getSurfaceSecondary(context),
+            borderRadius: BorderRadius.circular(18),
+          ),
           child: Row(
             children: [
               Icon(
                 Icons.chevron_left_rounded,
-                color: isLogout ? Colors.transparent : const Color(0xFFCBD5E1),
-                size: 22,
+                color: AppColors.getTextSubtitle(context),
+                size: 20,
               ),
               Expanded(
                 child: Text(
                   title,
                   textAlign: TextAlign.right,
                   style: GoogleFonts.poppins(
-                    color: color,
-                    fontSize: 16,
+                    color: AppColors.getTextTitle(context),
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
-                  border: (isLogout || imagePath != null)
-                      ? null
-                      : Border.all(color: AppColors.getBorder(context)),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
                   child: imagePath != null
                       ? Image.asset(imagePath, fit: BoxFit.cover)
-                      : Container(
-                          color: isLogout
-                              ? color.withValues(alpha: 0.1)
-                              : AppColors.getSurface(context),
-                          child: Icon(icon, color: color, size: 22),
-                        ),
+                      : Icon(icon, color: AppColors.primary, size: 22),
                 ),
               ),
             ],
