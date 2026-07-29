@@ -86,7 +86,7 @@ class _MainShellState extends State<MainShell> {
                     ],
                   ),
                   PositionedDirectional(
-                    top: -22,
+                    top: 0,
                     child: _buildScanNavItem(),
                   ),
                 ],
@@ -100,7 +100,7 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildNavItem(int index, IconData icon) {
     final isActive = _currentIndex == index;
-    final color = isActive ? const Color(0xFF2563EB) : const Color(0xFF94A3B8);
+    final color = isActive ? const Color(0xFF3B82F6) : const Color(0xFF94A3B8);
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
@@ -133,11 +133,11 @@ class _MainShellState extends State<MainShell> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: const Color(0xFF2563EB),
+            color: const Color(0xFF3B82F6),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.35),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -145,7 +145,7 @@ class _MainShellState extends State<MainShell> {
           ),
           child: Transform.rotate(
             angle: -math.pi / 4,
-            child: const Icon(Iconsax.scan, color: Colors.white, size: 26),
+            child: const Icon(Iconsax.scan, color: Colors.white, size: 32),
           ),
         ),
       ),
