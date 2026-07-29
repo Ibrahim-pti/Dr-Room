@@ -190,7 +190,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
 
   Widget _buildRatingChips() {
     const options = <double?>[null, 3, 4, 4.5];
-
+     
     return _ChipRow(
       children: [
         for (final rating in options)
