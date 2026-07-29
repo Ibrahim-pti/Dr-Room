@@ -29,7 +29,7 @@ class _MainShellState extends State<MainShell> {
 
   final List<Widget> _screens = const [
     HomeScreen(),
-    MedicalRecordsScreen(),
+    BodyMapScreen(),
     DiscoverScreen(),
     SettingsScreen(),
   ];
@@ -79,7 +79,7 @@ class _MainShellState extends State<MainShell> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildNavItem(0, Iconsax.home_2),
-                      _buildNavItem(1, Iconsax.folder_2),
+                      _buildNavItem(1, Icons.accessibility_new_rounded),
                       const SizedBox(width: 56),
                       _buildNavItem(2, Iconsax.book),
                       _buildNavItem(3, Iconsax.user),
@@ -157,7 +157,7 @@ class _MainShellState extends State<MainShell> {
       case 0:
         return 'home_tab'.tr();
       case 1:
-        return 'records_tab'.tr();
+        return 'body_map'.tr();
       case 2:
         return 'discover_tab'.tr();
       case 3:
@@ -304,14 +304,14 @@ class _MainShellState extends State<MainShell> {
                   ),
                   _buildDrawerItem(
                     context,
-                    icon: Icons.accessibility_new_rounded,
-                    title: 'Interactive Body Map',
+                    icon: Iconsax.folder_2,
+                    title: 'medical_records'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const BodyMapScreen(),
+                          builder: (context) => const MedicalRecordsScreen(),
                         ),
                       );
                     },
