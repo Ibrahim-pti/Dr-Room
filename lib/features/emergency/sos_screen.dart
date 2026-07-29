@@ -3,7 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_colors.dart';
+import '../locator/clinic_locator_screen.dart';
+
+/// Iraq's national ambulance / emergency line.
+const String _emergencyNumber = '122';
 
 class SosScreen extends StatefulWidget {
   const SosScreen({super.key});
@@ -17,10 +25,16 @@ class _SosScreenState extends State<SosScreen> {
   int _countdown = 5;
   Timer? _timer;
 
+  bool _isLoadingLocation = true;
+  Position? _position;
+  String? _locationError;
+  GoogleMapController? _mapController;
+
   @override
   void initState() {
     super.initState();
     _startCountdown();
+    _fetchLocation();
   }
 
   void _startCountdown() {
@@ -31,11 +45,111 @@ class _SosScreenState extends State<SosScreen> {
         });
       } else {
         _timer?.cancel();
-        setState(() {
-          _isTracking = true;
-        });
+        _triggerEmergencyCall();
       }
     });
+  }
+
+  Future<void> _fetchLocation() async {
+    setState(() {
+      _isLoadingLocation = true;
+      _locationError = null;
+    });
+
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('Location permission denied.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception('Location permission permanently denied.');
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+
+      if (mounted) {
+        setState(() {
+          _position = position;
+        });
+        _mapController?.animateCamera(
+          CameraUpdate.newLatLngZoom(
+            LatLng(position.latitude, position.longitude),
+            16,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _locationError = e.toString().replaceAll('Exception: ', '');
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingLocation = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _triggerEmergencyCall() async {
+    setState(() {
+      _isTracking = true;
+    });
+    await _callEmergency();
+  }
+
+  Future<void> _callEmergency() async {
+    final uri = Uri(scheme: 'tel', path: _emergencyNumber);
+    try {
+      await launchUrl(uri);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open dialer. Call $_emergencyNumber directly.'),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _shareLocation() async {
+    if (_position == null) {
+      await _fetchLocation();
+    }
+    if (_position == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location is not available yet.')),
+        );
+      }
+      return;
+    }
+    final lat = _position!.latitude;
+    final lng = _position!.longitude;
+    final mapsUrl = 'https://maps.google.com/?q=$lat,$lng';
+    await SharePlus.instance.share(
+      ShareParams(
+        text: 'I need help. This is my current location: $mapsUrl',
+        subject: 'Emergency location',
+      ),
+    );
   }
 
   void _cancelSos() {
@@ -70,10 +184,11 @@ class _SosScreenState extends State<SosScreen> {
                 .fade(duration: 500.ms, begin: 1, end: 0.3),
             const SizedBox(height: 32),
             Text(
-              'Calling Ambulance in',
+              'Calling Emergency ($_emergencyNumber) in',
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 color: Colors.white,
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -123,65 +238,37 @@ class _SosScreenState extends State<SosScreen> {
   }
 
   Widget _buildTrackingView() {
+    final hasLocation = _position != null;
+    final target = hasLocation
+        ? LatLng(_position!.latitude, _position!.longitude)
+        : const LatLng(36.1911, 44.0092);
+
     return Stack(
       children: [
-        // Map Background Mockup
         Positioned.fill(
-          child: Container(
-            color: const Color(0xFFE2E8F0), // Map background color
-            child: Stack(
-              children: [
-                // Grid lines to look like a map
-                Positioned.fill(
-                  child: GridPaper(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    divisions: 1,
-                    subdivisions: 1,
-                    interval: 100,
-                  ),
+          child: _isLoadingLocation
+              ? Container(
+                  color: const Color(0xFFE2E8F0),
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              : GoogleMap(
+                  onMapCreated: (controller) => _mapController = controller,
+                  initialCameraPosition: CameraPosition(target: target, zoom: 16),
+                  markers: hasLocation
+                      ? {
+                          Marker(
+                            markerId: const MarkerId('me'),
+                            position: target,
+                            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                          ),
+                        }
+                      : {},
+                  myLocationEnabled: hasLocation,
+                  myLocationButtonEnabled: false,
+                  zoomControlsEnabled: false,
                 ),
-                // Route line
-                Center(
-                  child: Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      border: BorderDirectional(
-                        start: BorderSide(color: const Color(0xFF3B82F6), width: 4),
-                        top: BorderSide(color: const Color(0xFF3B82F6), width: 4),
-                      ),
-                    ),
-                  ),
-                ),
-                // Ambulance marker
-                Center(
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.local_hospital, color: Color(0xFFEF4444), size: 30),
-                  ).animate(onPlay: (c) => c.repeat()).shimmer(duration: 1000.ms),
-                ),
-                // Patient Marker
-                PositionedDirectional(
-                  bottom: MediaQuery.of(context).size.height / 2 - 100,
-                  end: MediaQuery.of(context).size.width / 2 - 100,
-                  child: const Icon(Icons.person_pin_circle, color: Color(0xFF3B82F6), size: 40),
-                ),
-              ],
-            ),
-          ),
         ),
-        
+
         // Back button
         PositionedDirectional(
           top: 50,
@@ -194,6 +281,37 @@ class _SosScreenState extends State<SosScreen> {
             ),
           ),
         ),
+
+        if (_locationError != null)
+          PositionedDirectional(
+            top: 50,
+            start: 76,
+            end: 20,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8)],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_off, color: Color(0xFFEF4444), size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _locationError!,
+                      style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF334155)),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _fetchLocation,
+                    child: Text('Retry', style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ),
+          ),
 
         // Bottom Sheet Info
         PositionedDirectional(
@@ -234,26 +352,30 @@ class _SosScreenState extends State<SosScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Ambulance Dispatched',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.getTextTitle(context),
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Emergency call placed',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Unit #402 is on the way',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.getTextSubtitle(context),
-                            fontSize: 14,
+                          const SizedBox(height: 4),
+                          Text(
+                            hasLocation
+                                ? 'Your live location is shown above'
+                                : 'Enable location to share your position',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextSubtitle(context),
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -262,7 +384,7 @@ class _SosScreenState extends State<SosScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        '5 MIN',
+                        _emergencyNumber,
                         style: GoogleFonts.poppins(
                           color: const Color(0xFFEF4444),
                           fontSize: 16,
@@ -272,55 +394,51 @@ class _SosScreenState extends State<SosScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Color(0xFFE2E8F0),
-                      child: Icon(Icons.person, color: Colors.grey),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Paramedic: Ahmed Ali',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextTitle(context),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.star, color: Color(0xFFFBBF24), size: 14),
-                              const SizedBox(width: 4),
-                              Text(
-                                '4.9',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getTextSubtitle(context),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                      child: ElevatedButton.icon(
+                        onPressed: _callEmergency,
+                        icon: const Icon(Icons.call, size: 18),
+                        label: Text('Call $_emergencyNumber', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEF4444),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
                       ),
                     ),
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF3B82F6),
-                        shape: BoxShape.circle,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _shareLocation,
+                        icon: const Icon(Icons.share_location, size: 18),
+                        label: Text('Share', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF3B82F6),
+                          side: const BorderSide(color: Color(0xFF3B82F6)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
                       ),
-                      child: const Icon(Icons.call, color: Colors.white),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ClinicLocatorScreen()),
+                    ),
+                    icon: const Icon(Iconsax.location, size: 18),
+                    label: Text('Find Nearest Hospital', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+                  ),
+                ),
               ],
             ),
           ).animate().slideY(begin: 1, end: 0, duration: 400.ms, curve: Curves.easeOut),

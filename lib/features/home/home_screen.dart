@@ -19,7 +19,6 @@ import '../lab/all_labs_screen.dart';
 import 'promo_carousel.dart';
 import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
-import '../locator/clinic_locator_screen.dart';
 import '../lab/lab_details_screen.dart';
 import '../search/global_search_screen.dart';
 
@@ -1512,7 +1511,7 @@ class _HomeScreenState extends State<HomeScreen> {
               imagePath: 'assets/images/add.png',
               titleKey: 'cat_ambulance',
               id: 'ambulance',
-              isActive: false,
+              isActive: true,
             ),
           ),
           const SizedBox(width: 16),
@@ -1683,6 +1682,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AllDoctorsScreen()),
+            );
+          } else if (id == 'ambulance') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SosScreen()),
             );
           }
         }
