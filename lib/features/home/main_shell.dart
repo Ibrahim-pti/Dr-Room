@@ -1,7 +1,6 @@
 import 'package:dr_room/features/orders/orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'package:flutter_animate/flutter_animate.dart';
 import '../doctors/favorite_doctors_screen.dart';
 import '../ai_assistant/ai_symptom_checker_screen.dart';
 import '../body_map/body_map_screen.dart';
@@ -12,7 +11,7 @@ import 'home_screen.dart';
 import '../records/medical_records_screen.dart';
 import '../discover/discover_screen.dart';
 import '../settings/settings_screen.dart';
-import '../appointments/all_schedules_screen.dart';
+import '../pharmacy/pill_scanner_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -30,10 +29,16 @@ class _MainShellState extends State<MainShell> {
   final List<Widget> _screens = const [
     HomeScreen(),
     MedicalRecordsScreen(),
-    AllSchedulesScreen(),
     DiscoverScreen(),
     SettingsScreen(),
   ];
+
+  Future<void> _openScanner() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PillScannerScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,33 +57,73 @@ class _MainShellState extends State<MainShell> {
             start: 20,
             end: 20,
             bottom: 30, // Floats above the bottom
-            child: Container(
-              height: 70,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(35),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(35),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        width: 1.0,
+            child: SizedBox(
+              height: 92,
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.bottomCenter,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(35),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(35),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            width: 1.0,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildNavItem(0, Iconsax.home_2),
+                            _buildNavItem(1, Iconsax.folder_2),
+                            const SizedBox(width: 64),
+                            _buildNavItem(2, Iconsax.book),
+                            _buildNavItem(3, Iconsax.user),
+                          ],
+                        ),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildNavItem(0, Iconsax.home_2),
-                        _buildNavItem(1, Iconsax.folder_2),
-                        _buildNavItem(2, Iconsax.calendar_1),
-                        _buildNavItem(3, Iconsax.book),
-                        _buildNavItem(4, Iconsax.user),
-                      ],
+                  ),
+
+                  // Centered, raised Scanner button
+                  PositionedDirectional(
+                    bottom: 22,
+                    child: GestureDetector(
+                      onTap: _openScanner,
+                      child: Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.12),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Iconsax.scan,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -118,7 +163,7 @@ class _MainShellState extends State<MainShell> {
                 style: const TextStyle(
                   color: Color(0xFF2563EB),
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 15,
                 ),
               ),
             ],
@@ -135,10 +180,8 @@ class _MainShellState extends State<MainShell> {
       case 1:
         return 'records_tab'.tr();
       case 2:
-        return 'my_appointments'.tr();
-      case 3:
         return 'discover_tab'.tr();
-      case 4:
+      case 3:
         return 'profile'.tr();
       default:
         return '';

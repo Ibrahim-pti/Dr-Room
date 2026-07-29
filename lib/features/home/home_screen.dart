@@ -1,10 +1,14 @@
 import 'package:dr_room/features/nursing/nursing_services_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart' hide Consumer;
 import 'dart:ui';
 import '../../core/theme/app_colors.dart';
+import '../../core/models/appointment_model.dart';
+import '../../core/providers/appointment_provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../categories/all_categories_screen.dart';
 import '../appointments/all_schedules_screen.dart';
+import '../discover/article_details_screen.dart';
 import '../doctors/all_doctors_screen.dart';
 import '../pharmacy/screens/pharmacies_screen.dart';
 import '../pharmacy/screens/pharmacy_detail_screen.dart';
@@ -28,7 +32,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../pharmacy/providers/cart_provider.dart';
 import '../pharmacy/screens/cart_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,10 +47,32 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> _topPharmacies = [];
   String _userName = '';
 
+  bool _isLoadingArticles = true;
+  List<dynamic> _articles = [];
+
   @override
   void initState() {
     super.initState();
     _fetchHomeData();
+    _fetchArticles();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AppointmentProvider>().fetchAppointments();
+    });
+  }
+
+  Future<void> _fetchArticles() async {
+    try {
+      final response = await ApiClient.get('/articles');
+      if (response.statusCode == 200 && mounted) {
+        setState(() {
+          _articles = jsonDecode(response.body);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching articles: $e');
+    } finally {
+      if (mounted) setState(() => _isLoadingArticles = false);
+    }
   }
 
   Future<void> _fetchHomeData() async {
@@ -63,40 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (mounted) {
           setState(() {
             _banners = data['banners'] ?? [];
-            _topDoctors = [
-              {
-                'id': 1,
-                'user': {'name': 'Dr. Sara Ahmed'},
-                'specialty': 'Cardiologist',
-                'rating': '4.9',
-                'reviews': '120+ Reviews',
-                'image_path': null,
-              },
-              {
-                'id': 2,
-                'user': {'name': 'Dr. Hekmat Jalal'},
-                'specialty': 'Dermatologist',
-                'rating': '4.8',
-                'reviews': '98+ Reviews',
-                'image_path': null,
-              },
-              {
-                'id': 3,
-                'user': {'name': 'Dr. Ava Karim'},
-                'specialty': 'General Physician',
-                'rating': '4.8',
-                'reviews': '76+ Reviews',
-                'image_path': null,
-              },
-              {
-                'id': 4,
-                'user': {'name': 'Dr. Roni Yousif'},
-                'specialty': 'Pediatrician',
-                'rating': '4.7',
-                'reviews': '60+ Reviews',
-                'image_path': null,
-              },
-            ];
+            _topDoctors = data['top_doctors'] ?? [];
             _topPharmacies = data['top_pharmacies'] ?? [];
             _userName = userName;
           });
@@ -480,6 +472,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       .fadeIn(duration: 600.ms, delay: 200.ms)
                       .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
 
+                // ── Upcoming Appointment ──
+                _buildUpcomingAppointmentCard(context),
+
                 const SizedBox(height: 32),
 
                 // ── Categories (Grid) ──
@@ -586,8 +581,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             : 'Doctor';
                         final specialty = doc['specialty'] ?? 'Specialist';
                         final rating = doc['rating']?.toString() ?? '4.8';
-                        final reviews =
-                            doc['reviews']?.toString() ?? '120+ Reviews';
+                        final totalReviews = doc['total_reviews'] ?? 0;
+                        final reviews = '$totalReviews Reviews';
                             
                         final fallbackImages = [
                           'assets/images/doctor1.png',
@@ -1423,11 +1418,244 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                 ),
+
+                const SizedBox(height: 32),
+                _buildHealthArticlesSection(context),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildUpcomingAppointmentCard(BuildContext context) {
+    final appointmentProvider = context.watch<AppointmentProvider>();
+    final upcoming = appointmentProvider.appointments
+        .where((a) =>
+            a.isUpcoming && a.status != AppointmentStatus.cancelled)
+        .toList()
+      ..sort((a, b) => a.appointmentDate.compareTo(b.appointmentDate));
+
+    if (upcoming.isEmpty) return const SizedBox.shrink();
+    final next = upcoming.first;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AllSchedulesScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.getSurface(context),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                  image: next.doctorImageUrl != null
+                      ? DecorationImage(
+                          image: NetworkImage(next.doctorImageUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                ),
+                child: next.doctorImageUrl == null
+                    ? const Icon(Iconsax.user, color: Color(0xFF3B82F6))
+                    : null,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'upcoming_appointments'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextSubtitle(context),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: next.status.color.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            next.status.displayName,
+                            style: GoogleFonts.poppins(
+                              color: next.status.color,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      next.doctorName.isNotEmpty ? next.doctorName : 'Doctor',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.getTextTitle(context),
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      next.formattedDateTime,
+                      style: GoogleFonts.poppins(
+                        color: AppColors.getTextSubtitle(context),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).animate().fadeIn(delay: 250.ms).slideY(begin: 0.1, end: 0);
+  }
+
+  Widget _buildHealthArticlesSection(BuildContext context) {
+    final langCode = context.locale.languageCode;
+    String translated(dynamic article, String field) {
+      if (langCode == 'en' && article['${field}_en'] != null) return article['${field}_en'];
+      if (langCode == 'ar' && article['${field}_ar'] != null) return article['${field}_ar'];
+      return article[field]?.toString() ?? '';
+    }
+
+    if (_isLoadingArticles) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_articles.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            'articles'.tr(),
+            style: GoogleFonts.poppins(
+              color: AppColors.getTextTitle(context),
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 190,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            itemCount: _articles.length,
+            itemBuilder: (context, index) {
+              final article = _articles[index];
+              final imagePath = article['image_path'];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ArticleDetailsScreen(article: article),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 200,
+                  margin: const EdgeInsetsDirectional.only(end: 14, bottom: 12, top: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.getSurface(context),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.getBorder(context)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                        child: Container(
+                          height: 90,
+                          width: double.infinity,
+                          color: const Color(0xFFEFF6FF),
+                          child: imagePath != null
+                              ? Image.network(
+                                  '${ApiClient.storageUrl}/$imagePath',
+                                  fit: BoxFit.cover,
+                                )
+                              : const Icon(Iconsax.document_text, color: Color(0xFF3B82F6), size: 32),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (article['category'] ?? 'ARTICLE').toString().toUpperCase(),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF3B82F6),
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              translated(article, 'title'),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.poppins(
+                                color: AppColors.getTextTitle(context),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ).animate().fadeIn(delay: (100 * index).ms).slideX(begin: 0.1, end: 0);
+            },
+          ),
+        ),
+      ],
     );
   }
 

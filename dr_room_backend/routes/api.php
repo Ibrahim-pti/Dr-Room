@@ -54,6 +54,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
     Route::get('/orders', [OrderController::class, 'index']);
 
+    // ─── Patient: AI Pill Scanner ───────────────────────────────────────────
+    Route::post('/pills/identify', [\App\Http\Controllers\Api\PillIdentifierController::class, 'identify']);
+
     // ─── Doctor: Dashboard API ─────────────────────────────────────────────
     Route::middleware([\App\Http\Middleware\IsDoctor::class])->prefix('doctor')->group(function () {
         Route::get('/profile', [DoctorController::class, 'profile']);

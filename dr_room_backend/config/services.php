@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Google Gemini Vision — used by PillIdentifierController to identify
+    // medicine from a photo. Get a free key at https://aistudio.google.com
+    // and set GEMINI_API_KEY in .env; the endpoint returns 503 without it.
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];
