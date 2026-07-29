@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:dr_room/features/orders/orders_screen.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import '../doctors/favorite_doctors_screen.dart';
 import '../ai_assistant/ai_symptom_checker_screen.dart';
 import '../body_map/body_map_screen.dart';
@@ -59,31 +60,36 @@ class _MainShellState extends State<MainShell> {
             bottom: 30, // Floats above the bottom
             child: Container(
               height: 70,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(35),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(35),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildNavItem(0, Iconsax.home_2),
-                        _buildNavItem(1, Iconsax.folder_2),
-                        _buildScanNavItem(),
-                        _buildNavItem(2, Iconsax.book),
-                        _buildNavItem(3, Iconsax.user),
-                      ],
-                    ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
-                ),
+                ],
+              ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(0, Iconsax.home_2),
+                      _buildNavItem(1, Iconsax.folder_2),
+                      const SizedBox(width: 56),
+                      _buildNavItem(2, Iconsax.book),
+                      _buildNavItem(3, Iconsax.user),
+                    ],
+                  ),
+                  PositionedDirectional(
+                    top: -22,
+                    child: _buildScanNavItem(),
+                  ),
+                ],
               ),
             ),
           ),
@@ -94,41 +100,25 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildNavItem(int index, IconData icon) {
     final isActive = _currentIndex == index;
+    final color = isActive ? const Color(0xFF2563EB) : const Color(0xFF94A3B8);
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: isActive
-            ? const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
-            : const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFE0EEFF) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isActive
-                  ? const Color(0xFF2563EB)
-                  : const Color(0xFF94A3B8),
-              size: 24,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: 4),
+          Text(
+            _getLabelForIndex(index),
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
             ),
-            if (isActive) ...[
-              const SizedBox(width: 8),
-              Text(
-                _getLabelForIndex(index),
-                style: const TextStyle(
-                  color: Color(0xFF2563EB),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -137,12 +127,26 @@ class _MainShellState extends State<MainShell> {
     return GestureDetector(
       onTap: _openScanner,
       behavior: HitTestBehavior.opaque,
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Icon(
-          Iconsax.scan,
-          color: Color(0xFF2563EB),
-          size: 54,
+      child: Transform.rotate(
+        angle: math.pi / 4,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: const Color(0xFF2563EB),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Transform.rotate(
+            angle: -math.pi / 4,
+            child: const Icon(Iconsax.scan, color: Colors.white, size: 26),
+          ),
         ),
       ),
     );
