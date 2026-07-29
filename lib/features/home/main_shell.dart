@@ -138,11 +138,11 @@ class _MainShellState extends State<MainShell> {
       onTap: _openScanner,
       behavior: HitTestBehavior.opaque,
       child: const Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         child: Icon(
           Iconsax.scan,
-          color: Color(0xFF94A3B8),
-          size: 28,
+          color: Color(0xFF2563EB),
+          size: 54,
         ),
       ),
     );
