@@ -57,73 +57,33 @@ class _MainShellState extends State<MainShell> {
             start: 20,
             end: 20,
             bottom: 30, // Floats above the bottom
-            child: SizedBox(
-              height: 92,
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(35),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        height: 70,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(35),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            _buildNavItem(0, Iconsax.home_2),
-                            _buildNavItem(1, Iconsax.folder_2),
-                            const SizedBox(width: 64),
-                            _buildNavItem(2, Iconsax.book),
-                            _buildNavItem(3, Iconsax.user),
-                          ],
-                        ),
+            child: Container(
+              height: 70,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(35),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(35),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        width: 1.0,
                       ),
                     ),
-                  ),
-
-                  // Centered, raised Scanner button
-                  PositionedDirectional(
-                    bottom: 22,
-                    child: GestureDetector(
-                      onTap: _openScanner,
-                      child: Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          border: Border.all(color: Colors.white, width: 2),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.12),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Iconsax.scan,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildNavItem(0, Iconsax.home_2),
+                        _buildNavItem(1, Iconsax.folder_2),
+                        _buildScanNavItem(),
+                        _buildNavItem(2, Iconsax.book),
+                        _buildNavItem(3, Iconsax.user),
+                      ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -168,6 +128,21 @@ class _MainShellState extends State<MainShell> {
               ),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScanNavItem() {
+    return GestureDetector(
+      onTap: _openScanner,
+      behavior: HitTestBehavior.opaque,
+      child: const Padding(
+        padding: EdgeInsets.all(10),
+        child: Icon(
+          Iconsax.scan,
+          color: Color(0xFF94A3B8),
+          size: 28,
         ),
       ),
     );
