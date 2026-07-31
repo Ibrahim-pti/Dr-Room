@@ -25,16 +25,6 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
   final List<Map<String, dynamic>> systems = [
     {'name': 'All', 'icon': Icons.apps, 'color': const Color(0xFF6C4DFF)},
     {
-      'name': 'Muscular',
-      'icon': Icons.fitness_center,
-      'color': const Color(0xFF6366F1),
-    },
-    {
-      'name': 'Skeletal',
-      'icon': Icons.accessibility_new,
-      'color': const Color(0xFF64748B),
-    },
-    {
       'name': 'Nervous',
       'icon': Icons.psychology,
       'color': const Color(0xFFF59E0B),
@@ -55,35 +45,36 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
       'color': const Color(0xFFF97316),
     },
     {
-      'name': 'Urinary',
+      'name': 'Hepatic',
+      'icon': Icons.opacity,
+      'color': const Color(0xFFD97706),
+    },
+    {
+      'name': 'Renal/Urinary',
       'icon': Icons.water_drop,
       'color': const Color(0xFF3B82F6),
     },
     {'name': 'Endocrine', 'icon': Icons.hub, 'color': const Color(0xFFA855F7)},
     {
-      'name': 'Lymphatic',
-      'icon': Icons.account_tree,
-      'color': const Color(0xFF10B981),
+      'name': 'Muscular',
+      'icon': Icons.fitness_center,
+      'color': const Color(0xFF6366F1),
     },
     {
-      'name': 'Reproductive',
-      'icon': Icons.transgender,
-      'color': const Color(0xFF8B5CF6),
-    },
-    {
-      'name': 'Integumentary',
-      'icon': Icons.layers,
-      'color': const Color(0xFF8D6E63),
+      'name': 'Skeletal',
+      'icon': Icons.accessibility_new,
+      'color': const Color(0xFF64748B),
     },
   ];
 
+  // Complete Doctor-Grade Anatomical Organs & Systems Data
   final Map<String, Map<String, dynamic>> organQuickData = {
     'head': {
-      'title': 'Brain & Nervous System',
+      'title': 'Brain & Central Nervous System',
       'imageUrl': 'https://pngimg.com/d/brain_PNG20.png',
       'description':
-          'The brain regulates cognition, memory, sensory interpretation, and involuntary physiological controls.',
-      'latin': 'Encephalon & Systema Nervosum',
+          'The master control organ regulating cognition, sensory interpretation, memory storage, and involuntary autonomic controls.',
+      'latin': 'Encephalon & Systema Nervosum Centralis',
       'stats': [
         {
           'value': '1.4 kg',
@@ -91,23 +82,152 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
           'icon': Icons.scale_outlined,
         },
         {'value': '86 Billion', 'label': 'Neurons', 'icon': Icons.psychology},
-        {'value': '20%', 'label': 'Energy', 'icon': Icons.bolt},
-        {'value': 'Central', 'label': 'Nervous', 'icon': Icons.hub},
+        {'value': '20%', 'label': 'Body Energy', 'icon': Icons.bolt},
+        {'value': 'Central', 'label': 'Command', 'icon': Icons.hub},
       ],
       'functions': [
-        'Regulates cognitive processing & memory storage',
-        'Controls sensory perception & motor movements',
+        'Regulates cognitive processing & memory retention',
+        'Controls sensory perception & motor nerve output',
         'Manages involuntary autonomic nervous functions',
-        'Coordinates balance & neuromuscular feedback',
+        'Coordinates body balance & neuromuscular feedback',
       ],
       'fact':
           'Your brain generates about 20 watts of electrical power—enough to power a small LED light bulb!',
+      'specialist': 'Neurologist / Neurosurgeon',
+    },
+    'eyes': {
+      'title': 'Ocular & Sensory Visual Pathway',
+      'imageUrl': 'https://pngimg.com/d/eye_PNG35661.png',
+      'description':
+          'Focuses light through cornea and lens onto 107 million photoreceptors, transmitting high-speed optic signals.',
+      'latin': 'Organum Visum & Nervus Opticus',
+      'stats': [
+        {
+          'value': '576 MP',
+          'label': 'Resolution',
+          'icon': Icons.remove_red_eye,
+        },
+        {
+          'value': '107 Million',
+          'label': 'Photoreceptors',
+          'icon': Icons.grain,
+        },
+        {'value': '2 Million', 'label': 'Working Parts', 'icon': Icons.build},
+        {
+          'value': 'Retina',
+          'label': 'Neural Tissue',
+          'icon': Icons.center_focus_strong,
+        },
+      ],
+      'functions': [
+        'Converts photons into high-resolution neural impulses',
+        'Regulates pupil dilation for ambient light control',
+        'Provides stereoscopic 3D depth perception',
+        'Maintains ocular fluid pressure & corneal hydration',
+      ],
+      'fact':
+          'The eye muscles are the most active muscles in your body, moving over 100,000 times a day!',
+      'specialist': 'Ophthalmologist',
+    },
+    'neck': {
+      'title': 'Cervical Spine & Pharyngeal Pathway',
+      'imageUrl': 'https://pngimg.com/d/skeleton_PNG18.png',
+      'description':
+          'Houses 7 cervical vertebrae (C1-C7), carotid arteries, jugular veins, and the respiratory larynx assembly.',
+      'latin': 'Vertebrae Cervicales & Larynx',
+      'stats': [
+        {
+          'value': '7 Vertebrae',
+          'label': 'C1 to C7',
+          'icon': Icons.view_headline,
+        },
+        {'value': 'Carotid', 'label': 'Arterial Blood', 'icon': Icons.favorite},
+        {
+          'value': 'Larynx',
+          'label': 'Vocal Cords',
+          'icon': Icons.record_voice_over,
+        },
+        {
+          'value': 'Spinal Cord',
+          'label': 'Nerve Trunk',
+          'icon': Icons.alt_route,
+        },
+      ],
+      'functions': [
+        'Supports head weight & multidirectional cervical rotation',
+        'Protects upper spinal cord nerve pathways',
+        'Facilitates arterial blood flow to the brain',
+        'Enables vocal phonation via larynx & vocal cords',
+      ],
+      'fact':
+          'The first cervical vertebra (C1) is named "Atlas" after the Greek titan who held up the sky!',
+      'specialist': 'ENT Specialist / Orthopedic Spine Surgeon',
+    },
+    'thyroid': {
+      'title': 'Thyroid & Endocrine System',
+      'imageUrl': 'https://pngimg.com/d/throat_PNG14.png',
+      'description':
+          'Butterfly-shaped gland producing T3/T4 hormones regulating systemic basal metabolic rate and calcium balance.',
+      'latin': 'Glandula Thyroidea & Systema Endocrinum',
+      'stats': [
+        {'value': 'T3 & T4', 'label': 'Hormones', 'icon': Icons.science},
+        {
+          'value': '20 grams',
+          'label': 'Gland Weight',
+          'icon': Icons.scale_outlined,
+        },
+        {'value': 'Metabolic', 'label': 'Regulation', 'icon': Icons.speed},
+        {
+          'value': 'Calcitonin',
+          'label': 'Calcium Control',
+          'icon': Icons.shield_outlined,
+        },
+      ],
+      'functions': [
+        'Secretes Thyroxine (T4) & Triiodothyronine (T3)',
+        'Controls systemic oxygen consumption & heat production',
+        'Regulates heart rate & gastrointestinal motility',
+        'Balances bone calcium via calcitonin secretion',
+      ],
+      'fact':
+          'Every single cell in the human body depends upon thyroid hormones for metabolic regulation!',
+      'specialist': 'Endocrinologist',
+    },
+    'lungs': {
+      'title': 'Lungs & Alveolar Respiratory Tree',
+      'imageUrl': 'https://pngimg.com/d/lungs_PNG10.png',
+      'description':
+          'Facilitates continuous gas exchange across 300 million alveoli, oxygenating blood and removing carbon dioxide.',
+      'latin': 'Pulmones & Systema Respiratorium',
+      'stats': [
+        {
+          'value': '300 Million',
+          'label': 'Alveoli',
+          'icon': Icons.bubble_chart,
+        },
+        {'value': '11,000 L', 'label': 'Air / Day', 'icon': Icons.air},
+        {'value': '70 m²', 'label': 'Surface Area', 'icon': Icons.aspect_ratio},
+        {
+          'value': 'O₂ & CO₂',
+          'label': 'Gas Exchange',
+          'icon': Icons.swap_horiz,
+        },
+      ],
+      'functions': [
+        'Absorbs atmospheric oxygen into pulmonary capillaries',
+        'Excretes carbon dioxide gas produced by metabolism',
+        'Regulates systemic arterial blood pH balance',
+        'Filters micro-emboli from venous circulation',
+      ],
+      'fact':
+          'Your lungs contain roughly 2,400 kilometers of airways and a surface area equal to a tennis court!',
+      'specialist': 'Pulmonologist / Chest Physician',
     },
     'chest': {
-      'title': 'Heart & Circulatory',
+      'title': 'Heart & Cardiovascular Circulatory System',
       'imageUrl': 'https://pngimg.com/d/heart_PNG51334.png',
       'description':
-          'Pumps oxygenated blood through a 100,000 km network of blood vessels throughout the body.',
+          'Four-chambered muscular pump circulating 7,500 liters of blood daily through a 100,000 km vascular network.',
       'latin': 'Cor & Systema Cardiovasculare',
       'stats': [
         {
@@ -115,107 +235,162 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
           'label': 'Beats / Min',
           'icon': Icons.favorite_border,
         },
+        {'value': '7,500 L', 'label': 'Pumped / Day', 'icon': Icons.water_drop},
         {
-          'value': '250-350',
-          'label': 'grams Weight',
+          'value': '4 Chambers',
+          'label': 'Atria & Ventricles',
+          'icon': Icons.grid_view,
+        },
+        {'value': '100k km', 'label': 'Vessels', 'icon': Icons.alt_route},
+      ],
+      'functions': [
+        'Propels oxygenated blood to systemic body tissues',
+        'Drives deoxygenated blood to pulmonary capillaries',
+        'Maintains arterial blood pressure & tissue perfusion',
+        'Delivers nutrients, hormones & immune antibodies',
+      ],
+      'fact':
+          'Your heart beats over 2.5 billion times in an average human lifetime without a single rest!',
+      'specialist': 'Cardiologist / Cardiothoracic Surgeon',
+    },
+    'liver': {
+      'title': 'Liver & Hepato-Biliary Filtration System',
+      'imageUrl': 'https://pngimg.com/d/liver_PNG16.png',
+      'description':
+          'Primary metabolic power-factory performing 500 vital biological functions including detoxification, bile production, and glycogen storage.',
+      'latin': 'Hepar & Vesica Biliaris',
+      'stats': [
+        {'value': '500+', 'label': 'Functions', 'icon': Icons.auto_awesome},
+        {
+          'value': '1.5 kg',
+          'label': 'Organ Weight',
           'icon': Icons.scale_outlined,
         },
         {
-          'value': 'Left Side',
-          'label': 'of Chest',
-          'icon': Icons.location_on_outlined,
-        },
-        {
-          'value': 'Life Long',
-          'label': 'Duration',
-          'icon': Icons.access_time_rounded,
-        },
-      ],
-      'functions': [
-        'Pumps oxygenated blood to body tissues',
-        'Pumps deoxygenated blood to the lungs',
-        'Maintains blood pressure and vascular flow',
-        'Supports overall cardiovascular circulation',
-      ],
-      'fact':
-          'Your heart beats about 100,000 times a day and pumps over 7,500 liters of blood through your body!',
-    },
-    'abdomen': {
-      'title': 'Digestive Organs',
-      'imageUrl': 'https://pngimg.com/d/stomach_PNG34.png',
-      'description':
-          'Houses the stomach and intestines responsible for nutrient breakdown, metabolism, and filtration.',
-      'latin': 'Systema Digestorium',
-      'stats': [
-        {
-          'value': '1.5 Liters',
-          'label': 'Capacity',
+          'value': 'Bile',
+          'label': 'Fat Digestion',
           'icon': Icons.water_drop_outlined,
         },
         {
-          'value': 'pH 1.5 - 3.5',
-          'label': 'Acidity',
-          'icon': Icons.science_outlined,
-        },
-        {
-          'value': 'Abdominal',
-          'label': 'Cavity',
-          'icon': Icons.location_on_outlined,
-        },
-        {
-          'value': '24-72 hrs',
-          'label': 'Transit',
-          'icon': Icons.timer_outlined,
+          'value': 'Glycogen',
+          'label': 'Energy Bank',
+          'icon': Icons.battery_charging_full,
         },
       ],
       'functions': [
-        'Breaks down complex nutrients into absorbable compounds',
-        'Secretes gastric acid & digestive enzymes',
-        'Filters metabolic waste via hepatic pathways',
-        'Maintains gut microbiome & immune defense',
+        'Detoxifies pharmaceutical drugs & metabolic toxins',
+        'Synthesizes essential plasma proteins & clotting factors',
+        'Produces bile for intestinal lipid emulsification',
+        'Stores glucose as glycogen for emergency energy',
       ],
       'fact':
-          'The lining of your stomach replaces itself every few days to prevent digestive acids from dissolving it!',
+          'The liver is the only organ in the human body that can fully regenerate itself from just 25% of remaining tissue!',
+      'specialist': 'Hepatologist / Gastroenterologist',
+    },
+    'abdomen': {
+      'title': 'Stomach & Gastrointestinal Digestive Tract',
+      'imageUrl': 'https://pngimg.com/d/stomach_PNG34.png',
+      'description':
+          'Breaks down complex nutrients via gastric acids and digestive enzymes while absorbing essential vitamins and minerals.',
+      'latin': 'Gaster & Intestinum Tenue / Crassum',
+      'stats': [
+        {
+          'value': 'pH 1.5 - 3.5',
+          'label': 'Gastric Acid',
+          'icon': Icons.science_outlined,
+        },
+        {
+          'value': '9 Meters',
+          'label': 'Tract Length',
+          'icon': Icons.straighten,
+        },
+        {
+          'value': '100 Trillion',
+          'label': 'Gut Microbiome',
+          'icon': Icons.bug_report_outlined,
+        },
+        {'value': 'Peristalsis', 'label': 'Motility', 'icon': Icons.sync},
+      ],
+      'functions': [
+        'Digests proteins & food matrices via Hydrochloric Acid (HCl)',
+        'Absorbs amino acids, fatty acids, and glucose',
+        'Hosts 70% of the systemic mucosal immune system',
+        'Eliminates unabsorbed metabolic digestive waste',
+      ],
+      'fact':
+          'The digestive tract contains its own nervous system with over 500 million neurons—often called the second brain!',
+      'specialist': 'Gastroenterologist',
+    },
+    'kidneys': {
+      'title': 'Kidneys & Renal Excretory System',
+      'imageUrl': 'https://pngimg.com/d/kidney_PNG28.png',
+      'description':
+          'Filters 180 liters of blood daily through 2 million microscopic nephrons to regulate fluid, electrolyte, and blood pressure equilibrium.',
+      'latin': 'Renes & Systema Uropoeticum',
+      'stats': [
+        {
+          'value': '2 Million',
+          'label': 'Nephrons',
+          'icon': Icons.filter_alt_outlined,
+        },
+        {
+          'value': '180 Liters',
+          'label': 'Filtered / Day',
+          'icon': Icons.water_drop,
+        },
+        {'value': 'Renin', 'label': 'BP Control', 'icon': Icons.speed},
+        {
+          'value': 'Erythropoietin',
+          'label': 'RBC Booster',
+          'icon': Icons.invert_colors,
+        },
+      ],
+      'functions': [
+        'Filters metabolic urea & creatinine from blood',
+        'Balances systemic sodium, potassium, and pH levels',
+        'Secretes Renin enzyme to regulate blood pressure',
+        'Produces Erythropoietin to stimulate red blood cell production',
+      ],
+      'fact':
+          'Your kidneys filter your entire blood volume over 40 times every single day!',
+      'specialist': 'Nephrologist / Urologist',
     },
     'arms': {
-      'title': 'Upper Extremity Musculature',
+      'title': 'Upper Extremity Musculoskeletal Assembly',
       'imageUrl': 'https://pngimg.com/d/muscle_PNG35.png',
       'description':
-          'Composed of biceps, triceps, and humerus assemblies enabling motor articulation and upper body strength.',
-      'latin': 'Musculi Membri Superioris',
+          'Composed of humerus, radius, ulna, and 30+ rotator cuff and forearm muscles supporting high precision grip and lifting force.',
+      'latin': 'Humerus, Radius, Ulna & Musculi',
       'stats': [
         {
           'value': '30+ Muscles',
-          'label': 'Upper Arm',
+          'label': 'Arm & Forearm',
           'icon': Icons.fitness_center,
         },
-        {'value': 'Humerus', 'label': 'Main Bone', 'icon': Icons.accessibility},
+        {'value': 'Humerus', 'label': 'Long Bone', 'icon': Icons.accessibility},
         {
           'value': 'Full 360°',
           'label': 'Rotator Cuff',
           'icon': Icons.rotate_right,
         },
-        {
-          'value': 'Motor Power',
-          'label': 'Articulation',
-          'icon': Icons.pan_tool,
-        },
+        {'value': 'Motor Power', 'label': 'Dexterity', 'icon': Icons.pan_tool},
       ],
       'functions': [
-        'Enables upper extremity motor extension & flexion',
-        'Supports precise manual dexterity & grip strength',
-        'Provides structural stability to the shoulder girdle',
-        'Facilitates heavy lifting & kinetic movement',
+        'Drives upper extremity flexion, extension & rotation',
+        'Enables fine motor finger dexterity & grip strength',
+        'Stabilizes shoulder girdle articulation',
+        'Facilitates kinetic force transmission in upper limbs',
       ],
       'fact':
-          'The muscles in your forearm control the complex movements of your fingers through a network of tendons!',
+          'The forearm contains 20 separate muscles that control every subtle articulation of your fingers!',
+      'specialist': 'Orthopedic Surgeon / Physical Therapist',
     },
     'legs': {
-      'title': 'Lower Extremity & Knee Joint',
+      'title': 'Lower Extremity Femur & Knee Joint Complex',
       'imageUrl': 'https://pngimg.com/d/skeleton_PNG18.png',
       'description':
-          'Femur, tibia, and knee cartilage provide primary locomotion power, weight balance, and shock absorption.',
-      'latin': 'Membrum Inferium & Articulatio Genus',
+          'Femur, tibia, patella, and cruciate cartilage providing primary bipedal locomotion, body weight bearing, and ground impact absorption.',
+      'latin': 'Femur, Tibia, Patella & Articulatio Genus',
       'stats': [
         {'value': 'Femur', 'label': 'Longest Bone', 'icon': Icons.straighten},
         {
@@ -231,13 +406,40 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         },
       ],
       'functions': [
-        'Bears overall body weight during standing & running',
-        'Absorbs ground kinetic impact through cartilage',
-        'Enables bipedal stride & posture equilibrium',
-        'Facilitates explosive lower extremity propulsion',
+        'Bears complete body mass during standing, walking & running',
+        'Absorbs ground kinetic shock forces through knee cartilage',
+        'Maintains bipedal balance & posture equilibrium',
+        'Drives explosive lower body stride propulsion',
       ],
       'fact':
-          'The femur bone in your leg is stronger than concrete and can support up to 30 times your body weight!',
+          'The femur bone in your thigh is stronger than concrete and can support up to 30 times your total body weight!',
+      'specialist': 'Rheumatologist / Orthopedic Surgeon',
+    },
+    'feet': {
+      'title': 'Lower Leg, Ankle & Foot Skeleton',
+      'imageUrl': 'https://pngimg.com/d/skeleton_PNG18.png',
+      'description':
+          'Composed of tibia, fibula, tarsals, metatarsals, and plantaris muscles forming dynamic arch spring mechanics.',
+      'latin': 'Tibia, Fibula, Tarsus & Musculi Pedis',
+      'stats': [
+        {'value': '26 Bones', 'label': 'Per Foot', 'icon': Icons.grid_view},
+        {'value': '33 Joints', 'label': 'Articulation', 'icon': Icons.grain},
+        {
+          'value': '100+ Tendons',
+          'label': 'Ligaments',
+          'icon': Icons.linear_scale,
+        },
+        {'value': 'Plantaris', 'label': 'Arch Spring', 'icon': Icons.speed},
+      ],
+      'functions': [
+        'Acts as dynamic lever arm for standing stride propulsion',
+        'Absorbs kinetic impact forces upon heel strike',
+        'Adapts to uneven ground surfaces via subtalar articulation',
+        'Maintains upright posture balance feedback loop',
+      ],
+      'fact':
+          'One quarter of all bones in the human body are located in your feet!',
+      'specialist': 'Podiatrist / Orthopedic Foot Specialist',
     },
   };
 
@@ -271,13 +473,22 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
           selectedOrgan = 'head';
           break;
         case 'Circulatory':
-        case 'Respiratory':
           selectedOrgan = 'chest';
           break;
+        case 'Respiratory':
+          selectedOrgan = 'lungs';
+          break;
         case 'Digestive':
-        case 'Urinary':
-        case 'Endocrine':
           selectedOrgan = 'abdomen';
+          break;
+        case 'Hepatic':
+          selectedOrgan = 'liver';
+          break;
+        case 'Renal/Urinary':
+          selectedOrgan = 'kidneys';
+          break;
+        case 'Endocrine':
+          selectedOrgan = 'thyroid';
           break;
         case 'Muscular':
           selectedOrgan = 'arms';
@@ -303,6 +514,8 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     final activeOrganData = selectedOrgan != null
         ? organQuickData[selectedOrgan]
         : null;
+
+    final isAllSelected = selectedSystem == 'All';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -355,90 +568,223 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                                   ),
                                 ),
 
-                                // Interactive Touch Regions over Body Organs
-                                Positioned(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.02,
-                                  width: 70,
-                                  height: 70,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () =>
-                                        setState(() => selectedOrgan = 'head'),
-                                    child: Center(
-                                      child: selectedOrgan == 'head'
-                                          ? _buildPlusHotspot('head')
-                                          : const SizedBox(),
+                                // Doctor Diagram Style Anatomical Pointer Lines (12 Medical Callouts)
+
+                                // LEFT CALLOUT 1: Brain & Nervous
+                                if (isAllSelected || selectedOrgan == 'head')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.01,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'head',
+                                      label: 'Brain & Nervous',
+                                      icon: Icons.psychology,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'head',
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.13,
-                                  width: 90,
-                                  height: 80,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () =>
-                                        setState(() => selectedOrgan = 'chest'),
-                                    child: Center(
-                                      child: selectedOrgan == 'chest'
-                                          ? _buildPlusHotspot('chest')
-                                          : const SizedBox(),
+
+                                // RIGHT CALLOUT 1: Eyes & Vision
+                                if (isAllSelected || selectedOrgan == 'eyes')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.05,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'eyes',
+                                      label: 'Eyes & Vision',
+                                      icon: Icons.remove_red_eye,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'eyes',
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.25,
-                                  width: 90,
-                                  height: 80,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () => setState(
-                                      () => selectedOrgan = 'abdomen',
-                                    ),
-                                    child: Center(
-                                      child: selectedOrgan == 'abdomen'
-                                          ? _buildPlusHotspot('abdomen')
-                                          : const SizedBox(),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.27,
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.22,
-                                  width: 80,
-                                  height: 90,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () =>
-                                        setState(() => selectedOrgan = 'arms'),
-                                    child: Center(
-                                      child: selectedOrgan == 'arms'
-                                          ? _buildPlusHotspot('arms')
-                                          : const SizedBox(),
+
+                                // LEFT CALLOUT 2: Neck & Spine
+                                if (isAllSelected || selectedOrgan == 'neck')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.09,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'neck',
+                                      label: 'Neck & Spine',
+                                      icon: Icons.view_headline,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'neck',
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Positioned(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.42,
-                                  width: 90,
-                                  height: 110,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () =>
-                                        setState(() => selectedOrgan = 'legs'),
-                                    child: Center(
-                                      child: selectedOrgan == 'legs'
-                                          ? _buildPlusHotspot('legs')
-                                          : const SizedBox(),
+
+                                // RIGHT CALLOUT 2: Thyroid Gland
+                                if (isAllSelected || selectedOrgan == 'thyroid')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.13,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'thyroid',
+                                      label: 'Thyroid Gland',
+                                      icon: Icons.hub,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'thyroid',
+                                      ),
                                     ),
                                   ),
-                                ),
+
+                                // LEFT CALLOUT 3: Lungs & Airways
+                                if (isAllSelected || selectedOrgan == 'lungs')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.17,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'lungs',
+                                      label: 'Lungs & Airways',
+                                      icon: Icons.air,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'lungs',
+                                      ),
+                                    ),
+                                  ),
+
+                                // RIGHT CALLOUT 3: Heart & Circulation
+                                if (isAllSelected || selectedOrgan == 'chest')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.21,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'chest',
+                                      label: 'Heart & Circulation',
+                                      icon: Icons.favorite,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'chest',
+                                      ),
+                                    ),
+                                  ),
+
+                                // LEFT CALLOUT 4: Liver & Biliary
+                                if (isAllSelected || selectedOrgan == 'liver')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.25,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'liver',
+                                      label: 'Liver & Biliary',
+                                      icon: Icons.opacity,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'liver',
+                                      ),
+                                    ),
+                                  ),
+
+                                // RIGHT CALLOUT 4: Stomach & Digestive
+                                if (isAllSelected || selectedOrgan == 'abdomen')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.29,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'abdomen',
+                                      label: 'Stomach & Digestive',
+                                      icon: Icons.restaurant,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'abdomen',
+                                      ),
+                                    ),
+                                  ),
+
+                                // LEFT CALLOUT 5: Kidneys & Renal
+                                if (isAllSelected || selectedOrgan == 'kidneys')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.33,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'kidneys',
+                                      label: 'Kidneys & Renal',
+                                      icon: Icons.water_drop,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'kidneys',
+                                      ),
+                                    ),
+                                  ),
+
+                                // RIGHT CALLOUT 5: Arm Musculature
+                                if (isAllSelected || selectedOrgan == 'arms')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.37,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'arms',
+                                      label: 'Arm Musculature',
+                                      icon: Icons.fitness_center,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'arms',
+                                      ),
+                                    ),
+                                  ),
+
+                                // LEFT CALLOUT 6: Knee & Femur Joint
+                                if (isAllSelected || selectedOrgan == 'legs')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.44,
+                                    left: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'legs',
+                                      label: 'Knee & Femur',
+                                      icon: Icons.accessibility_new,
+                                      isRightSide: false,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'legs',
+                                      ),
+                                    ),
+                                  ),
+
+                                // RIGHT CALLOUT 6: Leg & Ankle
+                                if (isAllSelected || selectedOrgan == 'feet')
+                                  Positioned(
+                                    top:
+                                        MediaQuery.of(context).size.height *
+                                        0.50,
+                                    right: 10,
+                                    child: _buildPointerLineLabel(
+                                      organKey: 'feet',
+                                      label: 'Leg & Ankle',
+                                      icon: Icons.directions_walk,
+                                      isRightSide: true,
+                                      onTap: () => setState(
+                                        () => selectedOrgan = 'feet',
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
@@ -569,7 +915,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                     style: GoogleFonts.poppins(
                       color: isSelected ? Colors.white : Colors.black87,
                       fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w500,
                     ),
                   ),
                 ],
@@ -581,24 +929,113 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     );
   }
 
-  Widget _buildPlusHotspot(String key) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: primaryColor,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withValues(alpha: 0.45),
-            blurRadius: 12,
-            spreadRadius: 3,
+  // Doctor Diagram Style Anatomical Pointer Line & Label Chip
+  Widget _buildPointerLineLabel({
+    required String organKey,
+    required String label,
+    required IconData icon,
+    required bool isRightSide,
+    required VoidCallback onTap,
+  }) {
+    final isSelected = selectedOrgan == organKey;
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (isRightSide) ...[
+            // Glowing Target Dot on Body Part
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.6),
+                    blurRadius: 6,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+            // Precise Horizontal Pointer Line
+            Container(
+              width: 20,
+              height: 1.2,
+              color: primaryColor.withValues(alpha: 0.5),
+            ),
+          ],
+
+          // Compact Doctor Callout Chip
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: isSelected ? primaryColor : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected ? primaryColor : Colors.grey.shade200,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: isSelected
+                      ? primaryColor.withValues(alpha: 0.35)
+                      : Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 11,
+                  color: isSelected ? Colors.white : primaryColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.bold,
+                    color: isSelected ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
           ),
+
+          if (!isRightSide) ...[
+            // Precise Horizontal Pointer Line
+            Container(
+              width: 20,
+              height: 1.2,
+              color: primaryColor.withValues(alpha: 0.5),
+            ),
+            // Glowing Target Dot on Body Part
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.6),
+                    blurRadius: 6,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
-        border: Border.all(color: Colors.white, width: 2),
       ),
-      child: const Icon(Icons.add, color: Colors.white, size: 16),
     );
   }
 
@@ -656,30 +1093,30 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                       child: Text(
                         organData['title'],
                         style: GoogleFonts.poppins(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: primaryColor,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       organData['description'],
                       style: GoogleFonts.poppins(
-                        fontSize: 11,
+                        fontSize: 10.5,
                         color: Colors.grey.shade700,
-                        height: 1.4,
+                        height: 1.35,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () => _openOrganDetails(organData),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 8,
+                          horizontal: 16,
+                          vertical: 7,
                         ),
                         decoration: BoxDecoration(
                           color: primaryColor,
@@ -700,10 +1137,10 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                fontSize: 11.5,
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 5),
                             const Icon(
                               Icons.arrow_forward_ios,
                               size: 10,

@@ -33,6 +33,10 @@ Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
 Route::get('/global-search', [GlobalSearchController::class, 'search']);
 
+// ─── GetBodySmart Medical Anatomy & Muscular System API ───────────
+Route::get('/anatomy/systems', [\App\Http\Controllers\Api\AnatomyController::class, 'systems']);
+Route::get('/anatomy/organs', [\App\Http\Controllers\Api\AnatomyController::class, 'organs']);
+
 // ─── Pharmacy Mobile App API ──────────────────────────────────────────────
 Route::get('/pharmacies', [\App\Http\Controllers\Api\PharmacyApiController::class, 'index']);
 Route::get('/pharmacies/{id}/medications', [\App\Http\Controllers\Api\PharmacyApiController::class, 'medications']);

@@ -18,13 +18,15 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.organData['title'] ?? 'Heart';
+    final title = widget.organData['title'] ?? 'Heart & Circulation';
     final imageUrl = widget.organData['imageUrl'] ??
         'https://pngimg.com/d/heart_PNG51334.png';
     final description = widget.organData['description'] ??
-        'The heart is a muscular organ in most animals, which pumps blood through the blood vessels of the circulatory system.';
+        'Pumps oxygenated blood through a 100,000 km vascular network throughout the body.';
+    final latin = widget.organData['latin'] ?? 'Cor & Systema Cardiovasculare';
+    final specialist = widget.organData['specialist'] ?? 'Cardiologist / Specialist';
 
-    final stats = widget.organData['stats'] as List<Map<String, dynamic>>? ??
+    final stats = widget.organData['stats'] as List<dynamic>? ??
         [
           {
             'value': '70-100',
@@ -48,16 +50,24 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
           },
         ];
 
-    final functions = widget.organData['functions'] as List<String>? ??
+    final functions = widget.organData['functions'] as List<dynamic>? ??
         [
-          'Pumps oxygenated blood to the body',
+          'Pumps oxygenated blood to body tissues',
           'Pumps deoxygenated blood to the lungs',
-          'Maintains blood pressure and flow',
-          'Supports overall circulation',
+          'Maintains blood pressure and vascular flow',
+          'Supports overall cardiovascular circulation',
         ];
 
     final fact = widget.organData['fact'] as String? ??
-        'Your heart beats about 100,000 times a day and pumps over 7,500 liters of blood through your body.';
+        'Your heart beats about 100,000 times a day and pumps over 7,500 liters of blood through your body!';
+
+    final anatomyDetails = widget.organData['anatomy_details'] as Map<String, dynamic>? ??
+        {
+          'Origin/Structure': 'Left & Right Atria, Ventricles, Myocardium, Aortic Valves',
+          'Innervation': 'SA Node & Vagus Nerve (Autonomic Nervous Control)',
+          'Blood Supply': 'Right Coronary & Left Anterior Descending (LAD) Arteries',
+          'Clinical Note': 'Coronary artery occlusion causes myocardial infarction.',
+        };
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -85,7 +95,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
           style: GoogleFonts.poppins(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 17,
           ),
         ),
         centerTitle: true,
@@ -121,12 +131,12 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
-                              vertical: 10,
+                              vertical: 9,
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? primaryColor
-                                  : Colors.transparent,
+                                  : Colors.grey.shade100,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -134,10 +144,10 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                               style: GoogleFonts.poppins(
                                 color: isSelected
                                     ? Colors.white
-                                    : Colors.grey.shade600,
+                                    : Colors.grey.shade700,
                                 fontSize: 13,
                                 fontWeight: isSelected
-                                    ? FontWeight.w600
+                                    ? FontWeight.bold
                                     : FontWeight.w500,
                               ),
                             ),
@@ -146,189 +156,220 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                       }).toList(),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-                    // 3D Organ Illustration with Pointer Labels
+                    // 3D Organ Illustration Header
                     Center(
-                      child: SizedBox(
-                        height: 260,
-                        child: Stack(
-                          alignment: Alignment.center,
+                      child: Container(
+                        height: 220,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withValues(alpha: 0.04),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: primaryColor.withValues(alpha: 0.1),
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.network(
                               imageUrl,
-                              height: 220,
+                              height: 140,
                               fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) =>
-                                  Icon(
-                                Icons.favorite,
-                                size: 160,
+                                  Icon(Icons.favorite, size: 80, color: primaryColor),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              latin,
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
                                 color: primaryColor,
+                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-
-                            // Pointers / Labels (e.g. Aorta, Left Atrium, etc.)
-                            Positioned(
-                              top: 20,
-                              right: 20,
-                              child: _buildPointerLabel('Aorta'),
-                            ),
-                            Positioned(
-                              top: 80,
-                              right: 10,
-                              child: _buildPointerLabel('Left Atrium'),
-                            ),
-                            Positioned(
-                              bottom: 50,
-                              right: 15,
-                              child: _buildPointerLabel('Left Ventricle'),
-                            ),
-                            Positioned(
-                              top: 60,
-                              left: 10,
-                              child: _buildPointerLabel('Superior Vena Cava'),
-                            ),
-                            Positioned(
-                              top: 120,
-                              left: 15,
-                              child: _buildPointerLabel('Right Atrium'),
-                            ),
-                            Positioned(
-                              bottom: 60,
-                              left: 20,
-                              child: _buildPointerLabel('Right Ventricle'),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
-                    // "About" Section Card
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
+                    // Tab Content Switcher
+                    if (selectedTab == 'Overview') ...[
+                      // Description Card
+                      _buildSectionCard(
+                        title: 'Medical Overview',
+                        icon: Icons.medical_information_outlined,
+                        child: Text(
+                          description,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: Colors.grey.shade800,
+                            height: 1.5,
                           ),
-                        ],
-                        border: Border.all(color: Colors.grey.shade100),
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'About the $title',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            description,
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.grey.shade700,
-                              height: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
 
-                          // 4 Stat Cards Row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: stats.map((stat) {
-                              return Expanded(
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 4),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(18),
-                                    border:
-                                        Border.all(color: Colors.grey.shade200),
+                      const SizedBox(height: 16),
+
+                      // Medical Specialist Tag
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.badge_outlined,
+                                color: primaryColor, size: 20),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Specialist Doctor: ',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                specialist,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Physiological Stats Grid
+                      Row(
+                        children: stats.map((stat) {
+                          return Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    stat['icon'] is IconData
+                                        ? stat['icon']
+                                        : Icons.bubble_chart,
+                                    size: 18,
+                                    color: primaryColor,
                                   ),
-                                  child: Column(
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    stat['value'].toString(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    stat['label'].toString(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 9,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ] else if (selectedTab == 'Anatomy') ...[
+                      // GetBodySmart Style Detailed Anatomy Card
+                      _buildSectionCard(
+                        title: 'GetBodySmart Anatomical Structure & Innervation',
+                        icon: Icons.menu_book,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: anatomyDetails.entries.map((entry) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      Icon(
-                                        stat['icon'] as IconData,
-                                        size: 20,
-                                        color: primaryColor,
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          color: primaryColor,
+                                          shape: BoxShape.circle,
+                                        ),
                                       ),
-                                      const SizedBox(height: 8),
+                                      const SizedBox(width: 8),
                                       Text(
-                                        stat['value'] as String,
+                                        entry.key,
                                         style: GoogleFonts.poppins(
-                                          fontSize: 11,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
+                                          color: primaryColor,
                                         ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        stat['label'] as String,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 9,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ],
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                                  const SizedBox(height: 4),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 14),
+                                    child: Text(
+                                      entry.value.toString(),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade800,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // "Main Functions" Card
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(color: Colors.grey.shade100),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Main Functions',
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          ...functions.map((func) {
+                    ] else if (selectedTab == 'Function') ...[
+                      // Functions Card
+                      _buildSectionCard(
+                        title: 'Physiological Functions',
+                        icon: Icons.bolt,
+                        child: Column(
+                          children: functions.map((func) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
+                                    margin: const EdgeInsets.only(top: 2),
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
                                       color: primaryColor.withValues(alpha: 0.12),
@@ -336,89 +377,63 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                                     ),
                                     child: Icon(
                                       Icons.check,
-                                      size: 14,
+                                      size: 12,
                                       color: primaryColor,
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
-                                      func,
+                                      func.toString(),
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Colors.grey.shade800,
                                         fontWeight: FontWeight.w500,
+                                        height: 1.4,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             );
-                          }),
-                        ],
+                          }).toList(),
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // "Did You Know?" Lightbulb Card
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                            color: primaryColor.withValues(alpha: 0.15)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Did You Know?',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
+                    ] else ...[
+                      // Facts Card
+                      _buildSectionCard(
+                        title: 'Medical Did You Know?',
+                        icon: Icons.lightbulb_outline,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: primaryColor.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.lightbulb,
+                                size: 22,
+                                color: primaryColor,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: primaryColor.withValues(alpha: 0.15),
-                                      blurRadius: 8,
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.lightbulb_outline,
-                                  size: 20,
-                                  color: primaryColor,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                fact,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade800,
+                                  height: 1.5,
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  fact,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade800,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -429,7 +444,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
               padding: const EdgeInsets.all(20),
               child: SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: ElevatedButton.icon(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
@@ -439,10 +454,10 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  icon: const Icon(Icons.view_in_ar,
-                      color: Colors.white, size: 22),
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 20),
                   label: Text(
-                    'Explore in 3D',
+                    'Back to Body Map',
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -458,42 +473,47 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
     );
   }
 
-  Widget _buildPointerLabel(String text) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: primaryColor,
-            shape: BoxShape.circle,
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
           ),
-        ),
-        Container(width: 12, height: 1, color: primaryColor.withValues(alpha: 0.5)),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 6,
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: primaryColor),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
               ),
             ],
-            border: Border.all(color: Colors.grey.shade200),
           ),
-          child: Text(
-            text,
-            style: GoogleFonts.poppins(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-      ],
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
     );
   }
 }
