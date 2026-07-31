@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -690,13 +690,19 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                                       organInfo?['title']?.toString() ??
                                       callout.title;
 
+                                  final screenWidth = MediaQuery.of(context).size.width;
+                                  
+                                  double lineLength;
+                                  if (callout.isRightSide) {
+                                    lineLength = (0.70 - callout.dotX) * screenWidth;
+                                  } else {
+                                    lineLength = (callout.dotX - 0.30) * screenWidth;
+                                  }
+                                  if (lineLength < 15) lineLength = 15;
+
                                   return Positioned(
-                                    top:
-                                        MediaQuery.of(context).size.height *
-                                        callout.dotY,
-                                    left:
-                                        MediaQuery.of(context).size.width *
-                                        callout.dotX,
+                                    top: MediaQuery.of(context).size.height * callout.dotY,
+                                    left: MediaQuery.of(context).size.width * callout.dotX,
                                     child: FractionalTranslation(
                                       translation: callout.isRightSide
                                           ? const Offset(0.0, -0.5)
@@ -706,6 +712,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                                         label: labelTitle,
                                         icon: callout.icon,
                                         isRightSide: callout.isRightSide,
+                                        lineLength: lineLength,
                                         onTap: () => _selectOrgan(key),
                                       ),
                                     ),
@@ -837,6 +844,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     required String label,
     required IconData icon,
     required bool isRightSide,
+    required double lineLength,
     required VoidCallback onTap,
   }) {
     final isSelected = selectedOrgan == organKey;
@@ -863,7 +871,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               ),
             ),
             Container(
-              width: 45,
+              width: lineLength,
               height: 1.2,
               color: primaryColor.withValues(alpha: 0.5),
             ),
@@ -896,12 +904,18 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                   color: isSelected ? Colors.white : primaryColor,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.white : Colors.black87,
+                Container(
+                  constraints: const BoxConstraints(maxWidth: 80),
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(
+                      fontSize: 9.0,
+                      height: 1.1,
+                      fontWeight: FontWeight.bold,
+                      color: isSelected ? Colors.white : Colors.black87,
+                    ),
                   ),
                 ),
               ],
@@ -909,7 +923,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
           ),
           if (!isRightSide) ...[
             Container(
-              width: 45,
+              width: lineLength,
               height: 1.2,
               color: primaryColor.withValues(alpha: 0.5),
             ),
