@@ -556,19 +556,6 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     }
   }
 
-  void _resetCamera() {
-    setState(() {
-      _rotationY = 0.0;
-      _transformationController.value = Matrix4.identity();
-    });
-  }
-
-  void _rotate360Step() {
-    setState(() {
-      _rotationY += math.pi / 2;
-    });
-  }
-
   void _openOrganDetails(Map<String, dynamic> organData) {
     Navigator.push(
       context,
@@ -737,17 +724,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                     Positioned(
                       left: 14,
                       right: 14,
-                      bottom: 75,
+                      bottom: 115,
                       child: _buildOrganQuickCard(activeOrganData),
                     ),
-
-                  // Bottom Floating Navigation Toolbar
-                  Positioned(
-                    left: 14,
-                    right: 14,
-                    bottom: 12,
-                    child: _buildBottomToolbar(),
-                  ),
                 ],
               ),
             ),
@@ -762,27 +741,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
       backgroundColor: Colors.white,
       elevation: 0,
       scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: const Icon(
-            Icons.arrow_back_ios_new,
-            size: 16,
-            color: Colors.black87,
-          ),
-        ),
-        onPressed: () {
-          if (widget.onBack != null) {
-            widget.onBack!();
-          } else if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          }
-        },
-      ),
+      automaticallyImplyLeading: false,
       title: Text(
         'Anatomy Arts Medical Map',
         style: GoogleFonts.poppins(
@@ -1112,79 +1071,4 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     );
   }
 
-  Widget _buildBottomToolbar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildCircularNavButton(
-            Iconsax.rotate_left_copy,
-            'Rotate',
-            true,
-            onTap: _rotate360Step,
-          ),
-          _buildCircularNavButton(Iconsax.search_zoom_in_copy, 'Zoom', false),
-          _buildCircularNavButton(Icons.label_outline, 'Labels', false),
-          _buildCircularNavButton(
-            Iconsax.refresh_copy,
-            'Reset',
-            false,
-            onTap: _resetCamera,
-          ),
-          _buildCircularNavButton(Icons.fullscreen, 'Fullscreen', false),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCircularNavButton(
-    IconData icon,
-    String label,
-    bool isActive, {
-    VoidCallback? onTap,
-  }) {
-    final color = isActive ? primaryColor : Colors.grey.shade600;
-    return InkWell(
-      onTap: onTap ?? () {},
-      borderRadius: BorderRadius.circular(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? primaryColor.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              color: color,
-              fontSize: 10,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

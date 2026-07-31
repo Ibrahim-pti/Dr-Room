@@ -56,8 +56,7 @@ class _MainShellState extends State<MainShell> {
           IndexedStack(index: _currentIndex, children: screens),
 
           // Floating Bottom Navigation Bar
-          if (_currentIndex != 1)
-            PositionedDirectional(
+          PositionedDirectional(
               start: 20,
               end: 20,
               bottom: 30, // Floats above the bottom
