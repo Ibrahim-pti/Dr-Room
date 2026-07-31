@@ -37,6 +37,9 @@ Route::get('/global-search', [GlobalSearchController::class, 'search']);
 Route::get('/anatomy/systems', [\App\Http\Controllers\Api\AnatomyController::class, 'systems']);
 Route::get('/anatomy/organs', [\App\Http\Controllers\Api\AnatomyController::class, 'organs']);
 
+// ─── Emergency Reels API ──────────────────────────────────────────────
+Route::get('/emergency-reels', [\App\Http\Controllers\Api\EmergencyReelController::class, 'index']);
+
 // ─── Pharmacy Mobile App API ──────────────────────────────────────────────
 Route::get('/pharmacies', [\App\Http\Controllers\Api\PharmacyApiController::class, 'index']);
 Route::get('/pharmacies/{id}/medications', [\App\Http\Controllers\Api\PharmacyApiController::class, 'medications']);

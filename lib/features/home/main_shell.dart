@@ -10,7 +10,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import 'home_screen.dart';
 import '../records/medical_records_screen.dart';
-import '../discover/discover_screen.dart';
+import '../emergency_reels/emergency_reels_screen.dart';
 import '../settings/settings_screen.dart';
 import '../pharmacy/pill_scanner_screen.dart';
 import '../prescriptions/pill_reminder_screen.dart';
@@ -41,7 +41,7 @@ class _MainShellState extends State<MainShell> {
       BodyMapScreen(
         onBack: () => setState(() => _currentIndex = 0),
       ),
-      const DiscoverScreen(),
+      const EmergencyReelsScreen(),
       const SettingsScreen(),
     ];
 
@@ -83,7 +83,7 @@ class _MainShellState extends State<MainShell> {
                       _buildNavItem(0, Iconsax.home_2),
                       _buildNavItem(1, Icons.accessibility_new_rounded),
                       const SizedBox(width: 56),
-                      _buildNavItem(2, Iconsax.book),
+                      _buildNavItem(2, Iconsax.video_play),
                       _buildNavItem(3, Iconsax.user),
                     ],
                   ),
@@ -161,7 +161,7 @@ class _MainShellState extends State<MainShell> {
       case 1:
         return 'body_map'.tr();
       case 2:
-        return 'discover_tab'.tr();
+        return 'Reels'; // Or tr() if available
       case 3:
         return 'profile'.tr();
       default:
