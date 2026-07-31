@@ -14,23 +14,56 @@ class BodyMapScreen extends StatefulWidget {
 class _BodyMapScreenState extends State<BodyMapScreen> {
   String selectedSystem = 'Muscular';
   String selectedView = 'Front';
-  
-  final TransformationController _transformationController = TransformationController();
+
+  final TransformationController _transformationController =
+      TransformationController();
 
   final Color primaryColor = const Color(0xFF6C4DFF);
 
   final List<Map<String, dynamic>> systems = [
-    {'name': 'Muscular', 'icon': Icons.fitness_center, 'color': Colors.redAccent},
-    {'name': 'Skeletal', 'icon': Icons.accessibility_new, 'color': Colors.grey.shade600},
-    {'name': 'Nervous', 'icon': Icons.psychology, 'color': Colors.orange.shade400},
+    {
+      'name': 'Muscular',
+      'icon': Icons.fitness_center,
+      'color': Colors.redAccent,
+    },
+    {
+      'name': 'Skeletal',
+      'icon': Icons.accessibility_new,
+      'color': Colors.grey.shade600,
+    },
+    {
+      'name': 'Nervous',
+      'icon': Icons.psychology,
+      'color': Colors.orange.shade400,
+    },
     {'name': 'Circulatory', 'icon': Icons.favorite, 'color': Colors.red},
     {'name': 'Respiratory', 'icon': Icons.air, 'color': Colors.pink.shade300},
-    {'name': 'Digestive', 'icon': Icons.restaurant, 'color': Colors.orange.shade300},
-    {'name': 'Urinary', 'icon': Icons.water_drop, 'color': Colors.blue.shade300},
+    {
+      'name': 'Digestive',
+      'icon': Icons.restaurant,
+      'color': Colors.orange.shade300,
+    },
+    {
+      'name': 'Urinary',
+      'icon': Icons.water_drop,
+      'color': Colors.blue.shade300,
+    },
     {'name': 'Endocrine', 'icon': Icons.hub, 'color': Colors.purple.shade300},
-    {'name': 'Lymphatic', 'icon': Icons.account_tree, 'color': Colors.green.shade400},
-    {'name': 'Reproductive', 'icon': Icons.transgender, 'color': Colors.indigo.shade300},
-    {'name': 'Integumentary', 'icon': Icons.layers, 'color': Colors.brown.shade300},
+    {
+      'name': 'Lymphatic',
+      'icon': Icons.account_tree,
+      'color': Colors.green.shade400,
+    },
+    {
+      'name': 'Reproductive',
+      'icon': Icons.transgender,
+      'color': Colors.indigo.shade300,
+    },
+    {
+      'name': 'Integumentary',
+      'icon': Icons.layers,
+      'color': Colors.brown.shade300,
+    },
   ];
 
   final List<Map<String, dynamic>> views = [
@@ -86,18 +119,10 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
             ),
 
             // Top Right (Views)
-            Positioned(
-              right: 16,
-              top: 16,
-              child: _buildViewsSwitcher(),
-            ),
+            Positioned(right: 16, top: 16, child: _buildViewsSwitcher()),
 
             // Right side center (Controls)
-            Positioned(
-              right: 16,
-              top: 180,
-              child: _buildZoomControls(),
-            ),
+            Positioned(right: 16, top: 180, child: _buildZoomControls()),
 
             // Bottom Right (Info Card with Glassmorphism)
             Positioned(
@@ -131,7 +156,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
             shape: BoxShape.circle,
             border: Border.all(color: Colors.grey.shade200),
           ),
-          child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Colors.black87),
+          child: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 16,
+            color: Colors.black87,
+          ),
         ),
         onPressed: () {
           if (Navigator.canPop(context)) {
@@ -140,13 +169,23 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         },
       ),
       title: Text(
-        'Human Body', 
-        style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)
+        'Human Body',
+        style: GoogleFonts.poppins(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
       centerTitle: true,
       actions: [
-        IconButton(icon: const Icon(Iconsax.search_normal_copy, color: Colors.black87), onPressed: () {}),
-        IconButton(icon: const Icon(Icons.more_vert, color: Colors.black87), onPressed: () {}),
+        IconButton(
+          icon: const Icon(Iconsax.search_normal_copy, color: Colors.black87),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: const Icon(Icons.more_vert, color: Colors.black87),
+          onPressed: () {},
+        ),
       ],
     );
   }
@@ -158,7 +197,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
         border: Border.all(color: Colors.grey.shade100),
       ),
@@ -167,7 +210,13 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 20, top: 20, bottom: 12),
-            child: Text('Systems', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15)),
+            child: Text(
+              'Systems',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
           ),
           Expanded(
             child: ListView.builder(
@@ -181,8 +230,14 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
-                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected ? primaryColor : Colors.transparent,
                       borderRadius: BorderRadius.circular(16),
@@ -201,7 +256,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                             style: GoogleFonts.poppins(
                               color: isSelected ? Colors.white : Colors.black87,
                               fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -226,7 +283,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
         border: Border.all(color: Colors.grey.shade100),
       ),
@@ -237,7 +298,13 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 8, top: 4, bottom: 8),
-            child: Text('View', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13)),
+            child: Text(
+              'View',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
           ),
           ...views.map((view) {
             final isSelected = selectedView == view['name'];
@@ -246,7 +313,10 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.only(bottom: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? primaryColor : Colors.transparent,
                   borderRadius: BorderRadius.circular(14),
@@ -264,7 +334,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                       style: GoogleFonts.poppins(
                         color: isSelected ? Colors.white : Colors.grey.shade800,
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                       ),
                     ),
                   ],
@@ -283,7 +355,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
         border: Border.all(color: Colors.grey.shade100),
       ),
@@ -291,22 +367,34 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.black87, size: 20), 
+            icon: const Icon(Icons.add, color: Colors.black87, size: 20),
             onPressed: () {
-              _transformationController.value *= Matrix4.diagonal3Values(1.2, 1.2, 1.0);
-            }
+              _transformationController.value *= Matrix4.diagonal3Values(
+                1.2,
+                1.2,
+                1.0,
+              );
+            },
           ),
           Container(height: 1, width: 24, color: Colors.grey.shade200),
           IconButton(
-            icon: const Icon(Icons.remove, color: Colors.black87, size: 20), 
+            icon: const Icon(Icons.remove, color: Colors.black87, size: 20),
             onPressed: () {
-              _transformationController.value *= Matrix4.diagonal3Values(0.8, 0.8, 1.0);
-            }
+              _transformationController.value *= Matrix4.diagonal3Values(
+                0.8,
+                0.8,
+                1.0,
+              );
+            },
           ),
           Container(height: 1, width: 24, color: Colors.grey.shade200),
           IconButton(
-            icon: const Icon(Iconsax.refresh_copy, color: Colors.black87, size: 20), 
-            onPressed: _resetCamera
+            icon: const Icon(
+              Iconsax.refresh_copy,
+              color: Colors.black87,
+              size: 20,
+            ),
+            onPressed: _resetCamera,
           ),
         ],
       ),
@@ -350,7 +438,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'The ${selectedSystem.toLowerCase()} system consists of vital components that enable the body to function properly, maintain balance and support life.',
-                  style: GoogleFonts.poppins(color: Colors.grey.shade800, fontSize: 11, height: 1.5),
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey.shade800,
+                    fontSize: 11,
+                    height: 1.5,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 InkWell(
@@ -376,7 +468,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Icon(Icons.arrow_forward_ios, size: 10, color: primaryColor),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 10,
+                          color: primaryColor,
+                        ),
                       ],
                     ),
                   ),
@@ -396,7 +492,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
         border: Border.all(color: Colors.grey.shade100),
       ),
@@ -425,7 +525,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isActive ? primaryColor.withOpacity(0.1) : Colors.transparent,
+              color: isActive
+                  ? primaryColor.withOpacity(0.1)
+                  : Colors.transparent,
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 22),
@@ -444,4 +546,3 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     );
   }
 }
-
