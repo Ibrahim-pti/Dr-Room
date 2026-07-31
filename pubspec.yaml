@@ -62,4 +62,6 @@ flutter:
         - asset: fonts/Rabar-Bold.ttf
           weight: 700
 
-  
+  assets:
+    - assets/images/
+    - assets/translations/
