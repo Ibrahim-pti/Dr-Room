@@ -574,7 +574,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                             fit: BoxFit.cover,
                                           )
                                         : Image.asset(
-                                            'assets/images/article${(index % 3) + 1}.jpg',
+                                            'assets/images/article${(index % 2) + 1}.jpg',
                                             fit: BoxFit.cover,
                                           ),
                                   ),
