@@ -14,6 +14,7 @@ class BodyMapScreen extends StatefulWidget {
 class _BodyMapScreenState extends State<BodyMapScreen> {
   String selectedSystem = 'Muscular';
   String selectedView = 'Front';
+  bool _isSidebarExpanded = false;
 
   final TransformationController _transformationController =
       TransformationController();
@@ -24,7 +25,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     {
       'name': 'Muscular',
       'icon': Icons.fitness_center,
-      'color': Colors.white,
+      'color': Colors.redAccent,
     },
     {
       'name': 'Skeletal',
@@ -111,7 +112,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                 boundaryMargin: const EdgeInsets.all(double.infinity),
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 65, bottom: 60, top: 10),
+                    padding: const EdgeInsets.only(bottom: 60, top: 10),
                     child: Hero(
                       tag: 'anatomy_model',
                       child: Image.asset(
@@ -125,7 +126,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               ),
             ),
 
-            // Left Sidebar (Systems)
+            // Left Sidebar (Systems) - Collapsible
             Positioned(
               left: 14,
               top: 12,
@@ -202,8 +203,11 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
   }
 
   Widget _buildSystemsSidebar() {
-    return Container(
-      width: 152,
+    final double sidebarWidth = _isSidebarExpanded ? 152 : 56;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      width: sidebarWidth,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
@@ -217,17 +221,47 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
         border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16, top: 16, bottom: 10),
-            child: Text(
-              'Systems',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Colors.black87,
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: Row(
+              mainAxisAlignment: _isSidebarExpanded
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.center,
+              children: [
+                if (_isSidebarExpanded)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(
+                      'Systems',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                InkWell(
+                  onTap: () =>
+                      setState(() => _isSidebarExpanded = !_isSidebarExpanded),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      _isSidebarExpanded
+                          ? Icons.chevron_left
+                          : Icons.tune_rounded,
+                      size: 18,
+                      color: primaryColor,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -237,48 +271,59 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               itemBuilder: (context, index) {
                 final system = systems[index];
                 final isSelected = selectedSystem == system['name'];
-                return GestureDetector(
-                  onTap: () => setState(() => selectedSystem = system['name']),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    curve: Curves.easeInOut,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected ? primaryColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          system['icon'],
-                          size: 18,
-                          color: isSelected ? Colors.white : system['color'],
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              system['name'],
-                              style: GoogleFonts.poppins(
-                                color: isSelected ? Colors.white : Colors.black87,
-                                fontSize: 12,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
+                return Tooltip(
+                  message: system['name'],
+                  child: GestureDetector(
+                    onTap: () =>
+                        setState(() => selectedSystem = system['name']),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeInOut,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _isSidebarExpanded ? 10 : 8,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryColor : Colors.transparent,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: _isSidebarExpanded
+                            ? MainAxisAlignment.start
+                            : MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            system['icon'],
+                            size: 20,
+                            color: isSelected ? Colors.white : system['color'],
+                          ),
+                          if (_isSidebarExpanded) ...[
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  system['name'],
+                                  style: GoogleFonts.poppins(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black87,
+                                    fontSize: 12,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w500,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ],
+                          ],
+                        ],
+                      ),
                     ),
                   ),
                 );
