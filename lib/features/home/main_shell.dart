@@ -27,13 +27,6 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    BodyMapScreen(),
-    DiscoverScreen(),
-    SettingsScreen(),
-  ];
-
   Future<void> _openScanner() async {
     await Navigator.push(
       context,
@@ -43,6 +36,15 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const HomeScreen(),
+      BodyMapScreen(
+        onBack: () => setState(() => _currentIndex = 0),
+      ),
+      const DiscoverScreen(),
+      const SettingsScreen(),
+    ];
+
     return Scaffold(
       backgroundColor: const Color(
         0xFFF1F5F9,
@@ -51,14 +53,15 @@ class _MainShellState extends State<MainShell> {
       body: Stack(
         children: [
           // Main Content
-          IndexedStack(index: _currentIndex, children: _screens),
+          IndexedStack(index: _currentIndex, children: screens),
 
           // Floating Bottom Navigation Bar
-          PositionedDirectional(
-            start: 20,
-            end: 20,
-            bottom: 30, // Floats above the bottom
-            child: Container(
+          if (_currentIndex != 1)
+            PositionedDirectional(
+              start: 20,
+              end: 20,
+              bottom: 30, // Floats above the bottom
+              child: Container(
               height: 70,
               decoration: BoxDecoration(
                 color: Colors.white,
