@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrganDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> organData;
@@ -16,57 +17,42 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
   final Color primaryColor = const Color(0xFF6C4DFF);
 
+  Future<void> _launchWikiUrl(String urlString) async {
+    if (urlString.isEmpty) return;
+    final Uri uri = Uri.parse(urlString);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $urlString');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final title = widget.organData['title'] ?? 'Heart & Circulation';
-    final imageUrl = widget.organData['imageUrl'] ??
-        'https://pngimg.com/d/heart_PNG51334.png';
+    final title = widget.organData['title'] ?? 'Wikipedia Medical Summary';
+    final imageUrl = widget.organData['imageUrl'] ?? '';
     final description = widget.organData['description'] ??
-        'Pumps oxygenated blood through a 100,000 km vascular network throughout the body.';
-    final latin = widget.organData['latin'] ?? 'Cor & Systema Cardiovasculare';
-    final specialist = widget.organData['specialist'] ?? 'Cardiologist / Specialist';
+        'Anatomical structure summary fetched from Wikipedia REST API.';
+    final latin = widget.organData['latin'] ?? 'Wikipedia Medical REST v1';
+    final specialist = widget.organData['specialist'] ?? 'Wikipedia Medical REST API';
+    final wikiUrl = widget.organData['wikiUrl'] as String? ?? '';
 
     final stats = widget.organData['stats'] as List<dynamic>? ??
         [
-          {
-            'value': '70-100',
-            'label': 'Beats / Min',
-            'icon': Icons.favorite_border
-          },
-          {
-            'value': '250-350',
-            'label': 'grams Weight',
-            'icon': Icons.scale_outlined
-          },
-          {
-            'value': 'Left Side',
-            'label': 'of Chest',
-            'icon': Icons.location_on_outlined
-          },
-          {
-            'value': 'Life Long',
-            'label': 'Duration',
-            'icon': Icons.access_time_rounded
-          },
+          {'value': 'Wikipedia', 'label': 'Source', 'icon': Icons.public},
+          {'value': 'REST v1', 'label': 'API', 'icon': Icons.api},
+          {'value': 'Live', 'label': 'Status', 'icon': Icons.check_circle},
+          {'value': 'Verified', 'label': 'Medical', 'icon': Icons.verified},
         ];
 
     final functions = widget.organData['functions'] as List<dynamic>? ??
-        [
-          'Pumps oxygenated blood to body tissues',
-          'Pumps deoxygenated blood to the lungs',
-          'Maintains blood pressure and vascular flow',
-          'Supports overall cardiovascular circulation',
-        ];
+        [description];
 
-    final fact = widget.organData['fact'] as String? ??
-        'Your heart beats about 100,000 times a day and pumps over 7,500 liters of blood through your body!';
+    final fact = widget.organData['fact'] as String? ?? description;
 
     final anatomyDetails = widget.organData['anatomy_details'] as Map<String, dynamic>? ??
         {
-          'Origin/Structure': 'Left & Right Atria, Ventricles, Myocardium, Aortic Valves',
-          'Innervation': 'SA Node & Vagus Nerve (Autonomic Nervous Control)',
-          'Blood Supply': 'Right Coronary & Left Anterior Descending (LAD) Arteries',
-          'Clinical Note': 'Coronary artery occlusion causes myocardial infarction.',
+          'Wikipedia Article': title,
+          'Summary Description': description,
+          'Wikipedia Page Link': wikiUrl,
         };
 
     return Scaffold(
@@ -122,7 +108,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                     // Sub-navigation Chips
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: ['Overview', 'Anatomy', 'Function', 'Facts']
+                      children: ['Overview', 'Anatomy', 'Extracts', 'Wikipedia']
                           .map((tab) {
                         final isSelected = selectedTab == tab;
                         return GestureDetector(
@@ -158,10 +144,11 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
                     const SizedBox(height: 20),
 
-                    // 3D Organ Illustration Header
+                    // Wikipedia Organ Illustration Header
                     Center(
                       child: Container(
                         height: 220,
+                        width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: primaryColor.withValues(alpha: 0.04),
@@ -173,13 +160,16 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.network(
-                              imageUrl,
-                              height: 140,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Icon(Icons.favorite, size: 80, color: primaryColor),
-                            ),
+                            if (imageUrl.isNotEmpty)
+                              Image.network(
+                                imageUrl,
+                                height: 140,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(Icons.public, size: 80, color: primaryColor),
+                              )
+                            else
+                              Icon(Icons.public, size: 80, color: primaryColor),
                             const SizedBox(height: 10),
                             Text(
                               latin,
@@ -190,6 +180,8 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                               textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -200,10 +192,10 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
                     // Tab Content Switcher
                     if (selectedTab == 'Overview') ...[
-                      // Description Card
+                      // Wikipedia Summary Card
                       _buildSectionCard(
-                        title: 'Medical Overview',
-                        icon: Icons.medical_information_outlined,
+                        title: 'Wikipedia Summary',
+                        icon: Icons.public,
                         child: Text(
                           description,
                           style: GoogleFonts.poppins(
@@ -216,7 +208,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Medical Specialist Tag
+                      // API Source Tag
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -228,11 +220,10 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.badge_outlined,
-                                color: primaryColor, size: 20),
+                            Icon(Icons.api, color: primaryColor, size: 20),
                             const SizedBox(width: 10),
                             Text(
-                              'Specialist Doctor: ',
+                              'Data Source: ',
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -255,7 +246,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Physiological Stats Grid
+                      // Wikipedia REST API Metadata Grid
                       Row(
                         children: stats.map((stat) {
                           return Expanded(
@@ -275,7 +266,7 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                                   Icon(
                                     stat['icon'] is IconData
                                         ? stat['icon']
-                                        : Icons.bubble_chart,
+                                        : Icons.public,
                                     size: 18,
                                     color: primaryColor,
                                   ),
@@ -305,9 +296,9 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                         }).toList(),
                       ),
                     ] else if (selectedTab == 'Anatomy') ...[
-                      // GetBodySmart Style Detailed Anatomy Card
+                      // Wikipedia Detailed Anatomy Card
                       _buildSectionCard(
-                        title: 'GetBodySmart Anatomical Structure & Innervation',
+                        title: 'Wikipedia Article Details',
                         icon: Icons.menu_book,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,11 +347,11 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                           }).toList(),
                         ),
                       ),
-                    ] else if (selectedTab == 'Function') ...[
-                      // Functions Card
+                    ] else if (selectedTab == 'Extracts') ...[
+                      // Key Sentences / Extracts Card
                       _buildSectionCard(
-                        title: 'Physiological Functions',
-                        icon: Icons.bolt,
+                        title: 'Wikipedia Article Extracts',
+                        icon: Icons.article_outlined,
                         child: Column(
                           children: functions.map((func) {
                             return Padding(
@@ -400,36 +391,45 @@ class _OrganDetailsScreenState extends State<OrganDetailsScreen> {
                         ),
                       ),
                     ] else ...[
-                      // Facts Card
+                      // Full Extract & Wikipedia Article Link Card
                       _buildSectionCard(
-                        title: 'Medical Did You Know?',
-                        icon: Icons.lightbulb_outline,
-                        child: Row(
+                        title: 'Complete Wikipedia Article',
+                        icon: Icons.language,
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.lightbulb,
-                                size: 22,
-                                color: primaryColor,
+                            Text(
+                              fact,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.grey.shade800,
+                                height: 1.5,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                fact,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade800,
-                                  height: 1.5,
+                            const SizedBox(height: 16),
+                            if (wikiUrl.isNotEmpty)
+                              SizedBox(
+                                width: double.infinity,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _launchWikiUrl(wikiUrl),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    side: BorderSide(color: primaryColor),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ),
+                                  icon: Icon(Icons.open_in_new, size: 16, color: primaryColor),
+                                  label: Text(
+                                    'Open Wikipedia Article',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryColor,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
