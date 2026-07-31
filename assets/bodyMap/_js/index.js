@@ -7,11 +7,11 @@ $(document).ready(function () {
 
     image.mapster(
     {
-         fillOpacity: 0.4,
-         fillColor: "d42e16",
-         strokeColor: "3320FF",
-         strokeOpacity: 0.8,
-         strokeWidth: 4,
+         fillOpacity: 0.35,
+         fillColor: "2E86DE",
+         strokeColor: "54A0FF",
+         strokeOpacity: 0.9,
+         strokeWidth: 3,
          stroke: true,
          isSelectable: true,
          singleSelect: false,
@@ -134,4 +134,30 @@ $(document).ready(function () {
              ]
 
      });
+
+     // Subtle pointer-driven 3D tilt so the diagram feels like a model
+     // sitting in space rather than a flat printout.
+     var wrap = document.getElementById('bodyImgWrap');
+     var maxTilt = 10;
+     var resetTimer = null;
+
+     function applyTilt(clientX, clientY) {
+         var w = window.innerWidth;
+         var h = window.innerHeight;
+         var rotateY = ((clientX / w) - 0.5) * maxTilt * 2;
+         var rotateX = (0.5 - (clientY / h)) * maxTilt * 2;
+         wrap.style.transform = 'rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg)';
+     }
+
+     function resetTilt() {
+         wrap.style.transform = 'rotateX(0deg) rotateY(0deg)';
+     }
+
+     document.addEventListener('pointermove', function (e) {
+         clearTimeout(resetTimer);
+         applyTilt(e.clientX, e.clientY);
+         resetTimer = setTimeout(resetTilt, 1500);
+     });
+
+     document.addEventListener('pointerleave', resetTilt);
    });

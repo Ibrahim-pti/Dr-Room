@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import '../doctors/all_doctors_screen.dart';
@@ -12,9 +11,8 @@ class BodyMapScreen extends StatefulWidget {
   State<BodyMapScreen> createState() => _BodyMapScreenState();
 }
 
-class _BodyMapScreenState extends State<BodyMapScreen> {
-  late final WebViewController _controller;
-  bool _isLoading = true;
+class _BodyMapScreenState extends State<BodyMapScreen> with TickerProviderStateMixin {
+  late AnimationController _pulseController;
 
   final Map<String, Map<String, dynamic>> _organData = {
     'Brain & Head': {
@@ -68,89 +66,19 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     },
   };
 
-  String _mapIdToBodyPart(String id) {
-    switch (id) {
-      case '1':
-      case '2':
-      case '3':
-      case '19': return 'Brain & Head';
-      case '4': return 'Chest & Heart';
-      case '10':
-      case '9': return 'Stomach & Intestines';
-      case '20':
-      case '26':
-      case '32':
-      case '40':
-      case '22':
-      case '29':
-      case '23':
-      case '28':
-      case '24':
-      case '31':
-      case '25':
-      case '30':
-      case '8':
-      case '11':
-      case '17':
-      case '18': return 'Arms';
-      case '7':
-      case '12':
-      case '14':
-      case '15':
-      case '27':
-      case '21':
-      case '39':
-      case '33':
-      case '34':
-      case '38':
-      case '42':
-      case '35':
-      case '36':
-      case '37': return 'Legs';
-      case '41':
-      case '5': return 'Spine';
-      default: return 'Joints & Bones';
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.white)
-      ..addJavaScriptChannel(
-        'FlutterChannel',
-        onMessageReceived: (JavaScriptMessage message) {
-          final regionId = message.message;
-          final organName = _mapIdToBodyPart(regionId);
-          _showMedicalWikiSheet(organName);
-        },
-      )
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            setState(() {
-              _isLoading = false;
-            });
-            // Center the body map and make it fit the screen
-            _controller.runJavaScript('''
-              document.body.style.zoom = "0.6";
-              document.body.style.display = "flex";
-              document.body.style.justifyContent = "center";
-              document.body.style.alignItems = "center";
-              document.body.style.height = "100vh";
-              document.body.style.overflow = "hidden";
-            ''');
-          },
-        ),
-      )
-      ..loadFlutterAsset('assets/bodyMap/index.html');
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   void _showMedicalWikiSheet(String organ) {
@@ -170,14 +98,21 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               topStart: Radius.circular(32),
               topEnd: Radius.circular(32),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                spreadRadius: 5,
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
-                  width: 40,
-                  height: 5,
+                  width: 48,
+                  height: 6,
                   decoration: BoxDecoration(
                     color: AppColors.getBorder(context),
                     borderRadius: BorderRadius.circular(10),
@@ -191,18 +126,18 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                      gradient: LinearGradient(
+                        colors: [AppColors.primary, AppColors.primaryLight],
                         begin: AlignmentDirectional.topStart,
                         end: AlignmentDirectional.bottomEnd,
                       ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
-                          blurRadius: 10,
+                          color: AppColors.primary.withValues(alpha: 0.4),
+                          blurRadius: 12,
                           offset: const Offset(0, 4),
-                        )
+                        ),
                       ],
                     ),
                     child: Icon(data['icon'], color: Colors.white, size: 32),
@@ -215,16 +150,17 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                         Text(
                           'System Area',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
+                            color: AppColors.primary,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
+                            letterSpacing: 1.2,
                           ),
                         ),
                         Text(
                           organ,
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextTitle(context),
-                            fontSize: 24,
+                            fontSize: 26,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -238,33 +174,34 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
               
               Expanded(
                 child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildWikiSection(context, 'Biological Function', data['function'], Icons.science),
+                      _buildWikiSection(context, 'Biological Function', data['function'], Icons.science_rounded),
                       const SizedBox(height: 24),
-                      _buildWikiSection(context, 'Common Diseases', data['diseases'], Icons.coronavirus),
+                      _buildWikiSection(context, 'Common Diseases', data['diseases'], Icons.coronavirus_rounded),
                       const SizedBox(height: 24),
-                      _buildWikiSection(context, 'Warning Symptoms', data['symptoms'], Icons.warning_amber_rounded, color: const Color(0xFFEF4444)),
+                      _buildWikiSection(context, 'Warning Symptoms', data['symptoms'], Icons.warning_amber_rounded, color: Colors.orange),
                       const SizedBox(height: 32),
-                      
+
                       // Specialist Box
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.2)),
+                          color: AppColors.success.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                                color: AppColors.success.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Iconsax.verify, color: Color(0xFF10B981), size: 24),
+                              child: Icon(Iconsax.verify, color: AppColors.success, size: 24),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -274,7 +211,7 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                                   Text(
                                     'Required Specialist',
                                     style: GoogleFonts.poppins(
-                                      color: const Color(0xFF10B981),
+                                      color: AppColors.success,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -311,11 +248,12 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B82F6),
+                            backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(28),
                             ),
-                            elevation: 0,
+                            elevation: 8,
+                            shadowColor: AppColors.primary.withValues(alpha: 0.4),
                           ),
                           child: Text(
                             'Find ${data['specialist']} Now',
@@ -340,14 +278,21 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
   }
 
   Widget _buildWikiSection(BuildContext context, String title, String content, IconData icon, {Color? color}) {
-    final themeColor = color ?? const Color(0xFF8B5CF6);
+    final themeColor = color ?? AppColors.primary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: themeColor),
-            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: themeColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 20, color: themeColor),
+            ),
+            const SizedBox(width: 12),
             Text(
               title,
               style: GoogleFonts.poppins(
@@ -358,9 +303,9 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Padding(
-          padding: const EdgeInsetsDirectional.only(start: 28),
+          padding: const EdgeInsetsDirectional.only(start: 48),
           child: Text(
             content,
             style: GoogleFonts.poppins(
@@ -374,36 +319,188 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
     );
   }
 
+  Widget _buildMarker(String title, Alignment alignment) {
+    return Align(
+      alignment: alignment,
+      child: GestureDetector(
+        onTap: () => _showMedicalWikiSheet(title),
+        child: AnimatedBuilder(
+          animation: _pulseController,
+          builder: (context, child) {
+            return Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.cyanAccent.withValues(alpha: 0.3 + (_pulseController.value * 0.4)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.cyanAccent.withValues(alpha: 0.5 * _pulseController.value),
+                    blurRadius: 15,
+                    spreadRadius: 5 * _pulseController.value,
+                  ),
+                ],
+              ),
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: Colors.cyanAccent,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // We create a premium dark background for the 3D map
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF0F172A), // Dark slate background for premium feel
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         title: Text(
           'Interactive Body Map',
           style: GoogleFonts.poppins(
-            color: Colors.black87,
+            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
+            letterSpacing: 1.0,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          WebViewWidget(controller: _controller),
-          if (_isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
+          // Background ambient glows
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
             ),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.cyanAccent.withValues(alpha: 0.15),
+              ),
+            ),
+          ),
+          
+          // 3D Body Image
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // The generated 3D image
+                      Center(
+                        child: Image.asset(
+                          'assets/images/3d_body.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      
+                      // Markers
+                      _buildMarker('Brain & Head', const Alignment(0.0, -0.75)),
+                      _buildMarker('Chest & Heart', const Alignment(0.0, -0.45)),
+                      _buildMarker('Stomach & Intestines', const Alignment(0.0, -0.15)),
+                      _buildMarker('Arms', const Alignment(-0.5, -0.1)),
+                      _buildMarker('Arms', const Alignment(0.5, -0.1)),
+                      _buildMarker('Joints & Bones', const Alignment(-0.4, 0.4)),
+                      _buildMarker('Joints & Bones', const Alignment(0.4, 0.4)),
+                      _buildMarker('Legs', const Alignment(-0.2, 0.7)),
+                      _buildMarker('Legs', const Alignment(0.2, 0.7)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Instruction Text
+          PositionedDirectional(
+            bottom: 40,
+            start: 0,
+            end: 0,
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.touch_app_rounded, size: 20, color: Colors.cyanAccent),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Tap a glowing point to learn more',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
+
