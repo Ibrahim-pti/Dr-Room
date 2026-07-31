@@ -67,13 +67,8 @@ class _BodyMapScreenState extends State<BodyMapScreen> {
                 child: Center(
                   child: Hero(
                     tag: 'anatomy_model',
-                    child: CachedNetworkImage(
-                      imageUrl: 'https://www.pngmart.com/files/7/Anatomy-PNG-Transparent.png',
-                      errorWidget: (context, url, error) => Image.network(
-                        'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Human_anatomy.svg/800px-Human_anatomy.svg.png',
-                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.accessibility_new, size: 200, color: Colors.grey),
-                        fit: BoxFit.contain,
-                      ),
+                    child: Image.asset(
+                      'assets/images/anatomy.png',
                       fit: BoxFit.contain,
                       height: MediaQuery.of(context).size.height * 0.75,
                     ),
