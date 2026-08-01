@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 class AppointmentSlotService
 {
     /** How many days ahead patients may book. */
-    public const HORIZON_DAYS = 30;
+    public const HORIZON_DAYS = 14;
 
     /** Statuses that still occupy a slot. */
     private const BLOCKING_STATUSES = ['pending', 'confirmed'];
@@ -28,7 +28,12 @@ class AppointmentSlotService
      */
     public function availability(Doctor $doctor): array
     {
-        $schedules = $doctor->schedules()->get()->groupBy('day_of_week');
+        // When the caller eager-loads schedules (->with('schedules')), the
+        // property already holds them. Using the property instead of
+        // ->schedules()->get() avoids an extra query in that case.
+        $schedules = $doctor->relationLoaded('schedules')
+            ? $doctor->schedules->groupBy('day_of_week')
+            : $doctor->schedules()->get()->groupBy('day_of_week');
         if ($schedules->isEmpty()) {
             return [];
         }

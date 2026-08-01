@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -168,9 +169,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       _selectedServiceId = _services.isNotEmpty
           ? _asInt(_services.first['id'])
           : null;
+      _startVideo();
     }
 
-    _fetchDoctor();
+    // Only fetch the doctor record from the server when we don't already
+    // have it. The list endpoints return the full row, so re-fetching when
+    // the caller handed it over just wastes a round-trip.
+    if (handedOver == null) {
+      _fetchDoctor();
+    }
     _fetchAvailability();
   }
 
@@ -346,8 +353,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   ImageProvider _imageProvider(String path) {
     if (path.isEmpty) return const AssetImage('assets/images/doctor.png');
     if (path.startsWith('assets/')) return AssetImage(path);
-    if (path.startsWith('http')) return NetworkImage(path);
-    return NetworkImage(ApiClient.getImageUrl(path));
+    final url = path.startsWith('http') ? path : ApiClient.getImageUrl(path);
+    return CachedNetworkImageProvider(url);
   }
 
   // intl ships no date symbols for Kurdish, so day and month names come from

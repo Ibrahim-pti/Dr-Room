@@ -38,8 +38,16 @@ class ApiClient {
   /// and send the user back to login. Wired up in main().
   static void Function()? onUnauthorized;
 
+  /// Cached [SharedPreferences] instance — avoids the async overhead of
+  /// [SharedPreferences.getInstance] on every single API call.
+  static SharedPreferences? _prefs;
+
+  static Future<SharedPreferences> _getPrefs() async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
+
   static Future<Map<String, String>> _getHeaders() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _getPrefs();
     final token = prefs.getString('auth_token');
 
     return {
@@ -76,7 +84,7 @@ class ApiClient {
   }
 
   static Future<void> _clearSession() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _getPrefs();
     await prefs.remove('auth_token');
     await prefs.remove('user_role');
   }

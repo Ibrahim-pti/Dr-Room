@@ -60,6 +60,10 @@ class AppointmentBookingController extends Controller
             'status'           => 'pending',
         ]);
 
+        // Bust the availability cache so the just-taken slot disappears
+        // immediately for the next viewer.
+        \Illuminate\Support\Facades\Cache::forget("doctor:{$request->doctor_id}:availability");
+
         return response()->json([
             'message'     => 'Appointment booked successfully.',
             'appointment' => $appointment->load('doctor.user:id,name', 'patient:id,name'),
@@ -74,12 +78,21 @@ class AppointmentBookingController extends Controller
      */
     public function availability($id, AppointmentSlotService $slots)
     {
-        $doctor = Doctor::findOrFail($id);
+        $doctor = Doctor::with('schedules')->findOrFail($id);
 
-        return response()->json([
-            'horizon_days' => AppointmentSlotService::HORIZON_DAYS,
-            'days' => $slots->availability($doctor),
-        ]);
+        // Cache the expensive slot computation for 60 seconds per doctor.
+        // Short enough that a new booking shows up within a minute, long
+        // enough that bursts of requests (e.g. pull-to-refresh) are free.
+        $data = \Illuminate\Support\Facades\Cache::remember(
+            "doctor:{$id}:availability",
+            60,
+            fn () => [
+                'horizon_days' => AppointmentSlotService::HORIZON_DAYS,
+                'days' => $slots->availability($doctor),
+            ],
+        );
+
+        return response()->json($data);
     }
 
     /**
@@ -116,6 +129,9 @@ class AppointmentBookingController extends Controller
         }
 
         $appointment->update(['status' => 'cancelled']);
+
+        // Freed slot should appear immediately in the availability grid.
+        \Illuminate\Support\Facades\Cache::forget("doctor:{$appointment->doctor_id}:availability");
 
         return response()->json(['message' => 'Appointment cancelled successfully.']);
     }
