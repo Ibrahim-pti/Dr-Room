@@ -50,12 +50,6 @@ class Doctor extends Model
         return $this->hasMany(DoctorSchedule::class);
     }
 
-    /** Doctor Time Offs (Exceptions) */
-    public function timeOffs()
-    {
-        return $this->hasMany(DoctorTimeOff::class);
-    }
-
     /** Patient reviews left for this doctor */
     public function reviews()
     {
