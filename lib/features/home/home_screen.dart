@@ -204,51 +204,124 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: RefreshIndicator(
-        onRefresh: _fetchHomeData,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: ClampingScrollPhysics(),
+      body: Stack(
+        children: [
+          // Fixed Background Watermarks (Middle/Bottom)
+          Positioned(
+            left: -40,
+            bottom: 100,
+            child: Transform.rotate(
+              angle: -0.2,
+              child: const Icon(
+                Icons.local_hospital_outlined,
+                size: 200,
+                color: Colors.black,
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+             .fade(begin: 0.015, end: 0.025, duration: 6000.ms)
+             .moveX(begin: 0, end: 15, duration: 7000.ms, curve: Curves.easeInOut)
+             .rotate(begin: -0.03, end: 0.03, duration: 9000.ms),
           ),
-          child: Padding(
-            // Extra bottom padding for the floating navigation bar
-            padding: const EdgeInsetsDirectional.only(bottom: 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Top Section with Blue Background ──
-                Stack(
-                  clipBehavior: Clip.none,
+          Positioned(
+            right: -20,
+            bottom: 350,
+            child: Transform.rotate(
+              angle: 0.2,
+              child: const Icon(
+                Icons.healing_outlined,
+                size: 150,
+                color: Colors.black,
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+             .fade(begin: 0.01, end: 0.02, duration: 5000.ms)
+             .moveX(begin: 0, end: -15, duration: 8000.ms, curve: Curves.easeInOut)
+             .rotate(begin: -0.02, end: 0.02, duration: 10000.ms),
+          ),
+          
+          // Scrollable Content
+          RefreshIndicator(
+            onRefresh: _fetchHomeData,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: ClampingScrollPhysics(),
+              ),
+              child: Padding(
+                // Extra bottom padding for the floating navigation bar
+                padding: const EdgeInsetsDirectional.only(bottom: 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Blue Gradient Background
-                    Container(
-                      height: 280,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0xFF3B82F6), // Strong Blue
-                            Color(0xFF8BB5F8), // Lighter Blue
-                            Color(0xFFE2EAF8), // Fades to background
-                          ],
-                          stops: [0.0, 0.7, 1.0],
+                    // ── Top Section with Blue Background ──
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Blue Gradient Background
+                        Container(
+                          height: 190,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFF3B82F6), // Strong Blue
+                                Color(0xFF8BB5F8), // Lighter Blue
+                                Color(0xFFE2EAF8), // Fades to background
+                              ],
+                              stops: [0.0, 0.7, 1.0],
+                            ),
+                          ),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              // Large Medical Icon (Right)
+                              Positioned(
+                                right: -30,
+                                top: -20,
+                                child: Transform.rotate(
+                                  angle: -0.2,
+                                  child: const Icon(
+                                    Icons.medical_services_outlined,
+                                    size: 180,
+                                    color: Colors.white,
+                                  ),
+                                ).animate(onPlay: (c) => c.repeat(reverse: true))
+                                 .fade(begin: 0.03, end: 0.05, duration: 4000.ms)
+                                 .moveX(begin: 0, end: -12, duration: 5000.ms, curve: Curves.easeInOut)
+                                 .rotate(begin: -0.01, end: 0.01, duration: 7000.ms),
+                              ),
+                              
+                              // Smaller Heart/Health Icon (Left)
+                              Positioned(
+                                left: -20,
+                                top: 80,
+                                child: Transform.rotate(
+                                  angle: 0.3,
+                                  child: const Icon(
+                                    Icons.monitor_heart_outlined,
+                                    size: 120,
+                                    color: Colors.white,
+                                  ),
+                                ).animate(onPlay: (c) => c.repeat(reverse: true))
+                                 .fade(begin: 0.02, end: 0.04, duration: 5000.ms)
+                                 .moveX(begin: 0, end: 12, duration: 6000.ms, curve: Curves.easeInOut)
+                                 .rotate(begin: -0.02, end: 0.02, duration: 8000.ms),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
 
-                    // Content over background
-                    SafeArea(
-                      bottom: false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10),
-                            // ── App Bar ──
-                            Row(
+                        // Content over background
+                        SafeArea(
+                          bottom: false,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10),
+                                // ── App Bar ──
+                                Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
@@ -449,253 +522,243 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ],
                                     ),
                                   ],
-                                )
-                                .animate()
-                                .fadeIn(duration: 400.ms)
-                                .slideY(begin: -0.2, end: 0),
+                                ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.2, end: 0),
 
-                            const SizedBox(height: 32),
+                                const SizedBox(height: 24),
 
-                            // ── Hero Text ──
-                            Text(
-                                  'Your Health Starts With\nThe Right Doctor',
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors.getSurface(context),
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.3,
-                                  ),
-                                )
-                                .animate()
-                                .fadeIn(delay: 100.ms, duration: 400.ms)
-                                .slideX(begin: -0.1, end: 0),
-
-                            const SizedBox(height: 24),
-
-                            // ── Search Bar ──
-                            GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const GlobalSearchScreen(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 60,
-                                    padding: const EdgeInsetsDirectional.only(
-                                      start: 20,
-                                      end: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.getSurface(context),
-                                      borderRadius: BorderRadius.circular(30),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.08,
+                                // ── Search Bar ──
+                                GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const GlobalSearchScreen(),
                                           ),
-                                          blurRadius: 24,
-                                          offset: const Offset(0, 12),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Iconsax.search_normal_1,
-                                          color: Color(0xFF94A3B8),
-                                          size: 22,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          'search_doctors'.tr(),
-                                          style: GoogleFonts.poppins(
-                                            color: const Color(0xFF94A3B8),
-                                            fontSize: 15,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 60,
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                              start: 20,
+                                              end: 8,
+                                            ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.getSurface(context),
+                                          borderRadius: BorderRadius.circular(
+                                            30,
                                           ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.08,
+                                              ),
+                                              blurRadius: 24,
+                                              offset: const Offset(0, 12),
+                                            ),
+                                          ],
                                         ),
-                                        const Spacer(),
-                                        Container(
-                                              width: 44,
-                                              height: 44,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xFF3B82F6),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Iconsax.microphone,
-                                                color: AppColors.getSurface(
-                                                  context,
-                                                ),
-                                                size: 20,
-                                              ),
-                                            )
-                                            .animate(
-                                              onPlay: (controller) =>
-                                                  controller.repeat(),
-                                            )
-                                            .shimmer(
-                                              duration: 2000.ms,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.5,
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Iconsax.search_normal_1,
+                                              color: Color(0xFF94A3B8),
+                                              size: 22,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'search_doctors'.tr(),
+                                              style: GoogleFonts.poppins(
+                                                color: const Color(0xFF94A3B8),
+                                                fontSize: 15,
                                               ),
                                             ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                                .animate()
-                                .fadeIn(delay: 200.ms, duration: 400.ms)
-                                .slideY(begin: 0.2, end: 0),
+                                            const Spacer(),
+                                            Container(
+                                                  width: 44,
+                                                  height: 44,
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: Color(
+                                                          0xFF3B82F6,
+                                                        ),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                  child: Icon(
+                                                    Iconsax.microphone,
+                                                    color: AppColors.getSurface(
+                                                      context,
+                                                    ),
+                                                    size: 20,
+                                                  ),
+                                                )
+                                                .animate(
+                                                  onPlay: (controller) =>
+                                                      controller.repeat(),
+                                                )
+                                                .shimmer(
+                                                  duration: 2000.ms,
+                                                  color: Colors.white
+                                                      .withValues(alpha: 0.5),
+                                                ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .animate()
+                                    .fadeIn(delay: 200.ms, duration: 400.ms)
+                                    .slideY(begin: 0.2, end: 0),
 
-                            const SizedBox(height: 28),
-                          ],
+                                const SizedBox(height: 28),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
 
-                // ── Banners / Promo Carousel ──
-                if (_isLoading)
-                  const SizedBox(
-                    height: 130,
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else
-                  PromoCarousel(banners: _banners)
-                      .animate()
-                      .fadeIn(duration: 600.ms, delay: 200.ms)
-                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+                    // ── Banners / Promo Carousel ──
+                    if (_isLoading)
+                      const SizedBox(
+                        height: 130,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else
+                      PromoCarousel(banners: _banners)
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
 
-                // ── Upcoming Appointment ──
-                _buildUpcomingAppointmentCard(context),
-
-                const SizedBox(height: 32),
-
-                // ── Categories (Grid) ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'categories'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllCategoriesScreen(),
+                    // ── Categories (Grid) ──
+                    const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'categories'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
                             ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 350.ms),
-
-                const SizedBox(height: 16),
-
-                _buildCategoryGrid(
-                  context,
-                ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
-
-                const SizedBox(height: 32),
-
-                // ── Top Doctors Header ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'top_doctors'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllDoctorsScreen(),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AllCategoriesScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'see_all'.tr(),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF3B82F6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 450.ms),
+                    ).animate().fadeIn(delay: 350.ms),
 
-                const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                // ── Doctor List Card ──
-                Builder(
-                  builder: (context) {
-                    final doctorsList = _topDoctors.isNotEmpty
-                        ? _topDoctors
-                        : _fallbackDoctors;
+                    _buildCategoryGrid(context)
+                        .animate()
+                        .fadeIn(delay: 400.ms)
+                        .slideY(begin: 0.2, end: 0),
 
-                    return SizedBox(
-                      height: 220, // Smaller height
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        itemCount: doctorsList.length,
-                        itemBuilder: (context, index) {
-                          final doc = doctorsList[index];
-                          final name = doc['user'] != null
-                              ? doc['user']['name']
-                              : (doc['name'] ?? 'د. ئارام عوسمان');
-                          final specialty = doc['specialty'] ?? 'پسپۆڕی پزیشکی';
-                          final rating = doc['rating']?.toString() ?? '4.8';
-                          final totalReviews = doc['total_reviews'] ?? 45;
-                          final reviews = '$totalReviews هەڵسەنگاندن';
+                    // ── Upcoming Appointment ──
+                    const SizedBox(height: 24),
+                    _buildUpcomingAppointmentCard(context),
 
-                          final fallbackImages = [
-                            'assets/images/doctor1.png',
-                            'assets/images/doctor2.png',
-                            'assets/images/doctor3.png',
-                            'assets/images/doctor.png',
-                          ];
-                          final fallbackImage =
-                              fallbackImages[index % fallbackImages.length];
+                    const SizedBox(height: 32),
 
-                          final image = (doc['image_path'] != null)
-                              ? ApiClient.getImageUrl(doc['image_path'])
-                              : fallbackImage;
-                          final doctorId = doc['id'];
+                    // ── Top Doctors Header ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'top_doctors'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AllDoctorsScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'see_all'.tr(),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF3B82F6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: 450.ms),
 
-                          return GestureDetector(
+                    const SizedBox(height: 16),
+
+                    // ── Doctor List Card ──
+                    Builder(
+                      builder: (context) {
+                        final doctorsList = _topDoctors.isNotEmpty
+                            ? _topDoctors
+                            : _fallbackDoctors;
+
+                        return SizedBox(
+                          height: 220, // Smaller height
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            itemCount: doctorsList.length,
+                            itemBuilder: (context, index) {
+                              final doc = doctorsList[index];
+                              final name = doc['user'] != null
+                                  ? doc['user']['name']
+                                  : (doc['name'] ?? 'د. ئارام عوسمان');
+                              final specialty =
+                                  doc['specialty'] ?? 'پسپۆڕی پزیشکی';
+                              final rating = doc['rating']?.toString() ?? '4.8';
+                              final totalReviews = doc['total_reviews'] ?? 45;
+                              final reviews = '$totalReviews هەڵسەنگاندن';
+
+                              final fallbackImages = [
+                                'assets/images/doctor1.png',
+                                'assets/images/doctor2.png',
+                                'assets/images/doctor3.png',
+                                'assets/images/doctor.png',
+                              ];
+                              final fallbackImage =
+                                  fallbackImages[index % fallbackImages.length];
+
+                              final image = (doc['image_path'] != null)
+                                  ? ApiClient.getImageUrl(doc['image_path'])
+                                  : fallbackImage;
+                              final doctorId = doc['id'];
+
+                              return GestureDetector(
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -927,193 +990,531 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                 ),
+                              ).animate().fadeIn(delay: (500 + (index * 100)).ms).slideX(begin: 0.1, end: 0);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // ── Top Labs Header ──
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'top_labs'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AllLabsScreen(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'see_all'.tr(),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF3B82F6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: 550.ms),
+
+                    const SizedBox(height: 16),
+
+                    // ── Top Labs Horizontal List ──
+                    SizedBox(
+                      height: 180, // Even smaller height
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        itemCount: 4,
+                        itemBuilder: (context, index) {
+                          final labs = [
+                            {
+                              'name': 'تاقیگەی ناوەندی هەولێر',
+                              'city': 'Erbil',
+                              'time': '25-35 min',
+                              'image': 'assets/images/lab1.jpg',
+                            },
+                            {
+                              'name': 'تاقیگەی سلێمانی نموونەیی',
+                              'city': 'Sulaymaniyah',
+                              'time': '30-40 min',
+                              'image': 'assets/images/lab2.jpg',
+                            },
+                            {
+                              'name': 'تاقیگەی دهۆک',
+                              'city': 'Duhok',
+                              'time': '20-30 min',
+                              'image': 'assets/images/lab3.jpg',
+                            },
+                            {
+                              'name': 'تاقیگەی کەرکوک مێدیکا',
+                              'city': 'Kirkuk',
+                              'time': '15-25 min',
+                              'image': 'assets/images/lab4.jpg',
+                            },
+                          ];
+                          final lab = labs[index];
+                          return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          LabDetailsScreen(lab: lab),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 170, // Even smaller width
+                                  margin: const EdgeInsetsDirectional.only(
+                                    end: 14,
+                                    bottom: 12,
+                                    top: 4,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 10,
+                                        sigmaY: 10,
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Top Image Section
+                                            Container(
+                                              height:
+                                                  80, // Even smaller image height
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.vertical(
+                                                      top: Radius.circular(15),
+                                                    ),
+                                                color: const Color(0xFFF8FAFC),
+                                                image: DecorationImage(
+                                                  image: AssetImage(
+                                                    lab['image']!,
+                                                  ),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              child: Stack(
+                                                children: [
+                                                  // Rating Badge
+                                                  Positioned(
+                                                    bottom: 6,
+                                                    right: 6,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
+                                                            ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withValues(
+                                                                  alpha: 0.1,
+                                                                ),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                const Offset(
+                                                                  0,
+                                                                  2,
+                                                                ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(
+                                                            Icons.star_rounded,
+                                                            color: Color(
+                                                              0xFFF59E0B,
+                                                            ),
+                                                            size: 12,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 4,
+                                                          ),
+                                                          Text(
+                                                            '4.8',
+                                                            style: GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF1E293B,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // Details Section
+                                            Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    lab['name']!,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Rabar',
+                                                      fontSize:
+                                                          12, // Even smaller font
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          AppColors.getTextTitle(
+                                                            context,
+                                                          ),
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Iconsax.location,
+                                                        color: Color(
+                                                          0xFF3B82F6,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Expanded(
+                                                        child: Text(
+                                                          lab['city']!,
+                                                          style:
+                                                              GoogleFonts.poppins(
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF64748B,
+                                                                    ),
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Iconsax.clock,
+                                                        color: Color(
+                                                          0xFF94A3B8,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        lab['time']!,
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF94A3B8,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                            ),
+                                                      ),
+                                                      const Spacer(),
+                                                      const Icon(
+                                                        Iconsax.shield_tick,
+                                                        color: Color(
+                                                          0xFF10B981,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        'Open',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF10B981,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               )
                               .animate()
                               .fadeIn(delay: (500 + (index * 100)).ms)
-                              .slideX(begin: 0.1, end: 0);
+                              .slideY(begin: 0.1, end: 0);
                         },
                       ),
-                    );
-                  },
-                ),
+                    ),
 
-                const SizedBox(height: 32),
-
-                // ── Top Labs Header ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'top_labs'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllLabsScreen(),
+                    // ── Top Pharmacies ──
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'top_pharmacies'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.getTextTitle(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
                             ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 550.ms),
-
-                const SizedBox(height: 16),
-
-                // ── Top Labs Horizontal List ──
-                SizedBox(
-                  height: 180, // Even smaller height
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: 4,
-                    itemBuilder: (context, index) {
-                      final labs = [
-                        {
-                          'name': 'تاقیگەی ناوەندی هەولێر',
-                          'city': 'Erbil',
-                          'time': '25-35 min',
-                          'image': 'assets/images/lab1.jpg',
-                        },
-                        {
-                          'name': 'تاقیگەی سلێمانی نموونەیی',
-                          'city': 'Sulaymaniyah',
-                          'time': '30-40 min',
-                          'image': 'assets/images/lab2.jpg',
-                        },
-                        {
-                          'name': 'تاقیگەی دهۆک',
-                          'city': 'Duhok',
-                          'time': '20-30 min',
-                          'image': 'assets/images/lab3.jpg',
-                        },
-                        {
-                          'name': 'تاقیگەی کەرکوک مێدیکا',
-                          'city': 'Kirkuk',
-                          'time': '15-25 min',
-                          'image': 'assets/images/lab4.jpg',
-                        },
-                      ];
-                      final lab = labs[index];
-                      return GestureDetector(
+                          GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      LabDetailsScreen(lab: lab),
+                                  builder: (context) => PharmaciesScreen(),
                                 ),
                               );
                             },
-                            child: Container(
-                              width: 170, // Even smaller width
-                              margin: const EdgeInsetsDirectional.only(
-                                end: 14,
-                                bottom: 12,
-                                top: 4,
+                            child: Text(
+                              'see_all'.tr(),
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF3B82F6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 10,
-                                    sigmaY: 10,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Top Image Section
-                                        Container(
-                                          height:
-                                              80, // Even smaller image height
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(15),
-                                                ),
-                                            color: const Color(0xFFF8FAFC),
-                                            image: DecorationImage(
-                                              image: AssetImage(lab['image']!),
-                                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: 600.ms),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 180,
+                      child: Builder(
+                        builder: (context) {
+                          final pharmaciesList = _topPharmacies.isNotEmpty
+                              ? _topPharmacies
+                              : _fallbackPharmacies;
+
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            itemCount: pharmaciesList.length,
+                            itemBuilder: (context, index) {
+                              final pharm = pharmaciesList[index];
+                              final name = pharm['name'] ?? 'دەرمانخانەی سۆران';
+                              final city = pharm['city'] ?? 'هەولێر';
+                              final time = pharm['time'] ?? '٢٤ کاتژمێر';
+                              final profileImage = pharm['profile_image'];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          PharmacyDetailScreen(
+                                            pharmacy: Pharmacy(
+                                              id: pharm['id'] ?? 1,
+                                              name:
+                                                  pharm['name'] ?? 'دەرمانخانە',
+                                              rating:
+                                                  double.tryParse(
+                                                    pharm['rating']
+                                                            ?.toString() ??
+                                                        '4.8',
+                                                  ) ??
+                                                  4.8,
+                                              deliveryFee:
+                                                  double.tryParse(
+                                                    pharm['delivery_fee']
+                                                            ?.toString() ??
+                                                        '1500.0',
+                                                  ) ??
+                                                  1500.0,
+                                              profileImage:
+                                                  pharm['profile_image'],
                                             ),
                                           ),
-                                          child: Stack(
-                                            children: [
-                                              // Rating Badge
-                                              Positioned(
-                                                bottom: 6,
-                                                right: 6,
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 170,
+                                  margin: const EdgeInsetsDirectional.only(
+                                    end: 14,
+                                    bottom: 12,
+                                    top: 4,
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                        sigmaX: 10,
+                                        sigmaY: 10,
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Top Image Section
+                                            Container(
+                                              height: 80,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    const BorderRadius.vertical(
+                                                      top: Radius.circular(15),
+                                                    ),
+                                                color: const Color(0xFFF8FAFC),
+                                                image: profileImage != null
+                                                    ? DecorationImage(
+                                                        image: CachedNetworkImageProvider(
+                                                          ApiClient.getImageUrl(
+                                                            profileImage,
+                                                          ),
                                                         ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                              alpha: 0.1,
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : DecorationImage(
+                                                        image: AssetImage(
+                                                          'assets/images/pharmacy1.jpg',
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                              ),
+                                              child: Stack(
+                                                children: [
+                                                  // Rating Badge
+                                                  Positioned(
+                                                    bottom: 6,
+                                                    right: 6,
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
                                                             ),
-                                                        blurRadius: 4,
-                                                        offset: const Offset(
-                                                          0,
-                                                          2,
-                                                        ),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black
+                                                                .withValues(
+                                                                  alpha: 0.1,
+                                                                ),
+                                                            blurRadius: 4,
+                                                            offset:
+                                                                const Offset(
+                                                                  0,
+                                                                  2,
+                                                                ),
+                                                          ),
+                                                        ],
                                                       ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.star_rounded,
-                                                        color: Color(
-                                                          0xFFF59E0B,
-                                                        ),
-                                                        size: 12,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        '4.8',
-                                                        style:
-                                                            GoogleFonts.poppins(
+                                                      child: Row(
+                                                        children: [
+                                                          const Icon(
+                                                            Icons.star_rounded,
+                                                            color: Color(
+                                                              0xFFF59E0B,
+                                                            ),
+                                                            size: 12,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 4,
+                                                          ),
+                                                          Text(
+                                                            '4.9',
+                                                            style: GoogleFonts.poppins(
                                                               color:
                                                                   const Color(
                                                                     0xFF1E293B,
@@ -1123,429 +1524,141 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   FontWeight
                                                                       .w700,
                                                             ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // Details Section
+                                            Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    name,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Rabar',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color:
+                                                          AppColors.getTextTitle(
+                                                            context,
+                                                          ),
+                                                    ),
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Iconsax.location,
+                                                        color: Color(
+                                                          0xFF3B82F6,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Expanded(
+                                                        child: Text(
+                                                          city,
+                                                          style:
+                                                              GoogleFonts.poppins(
+                                                                color:
+                                                                    const Color(
+                                                                      0xFF64748B,
+                                                                    ),
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        // Details Section
-                                        Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                lab['name']!,
-                                                style: TextStyle(
-                                                  fontFamily: 'Rabar',
-                                                  fontSize:
-                                                      12, // Even smaller font
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.getTextTitle(
-                                                    context,
-                                                  ),
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Iconsax.location,
-                                                    color: Color(0xFF3B82F6),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  Expanded(
-                                                    child: Text(
-                                                      lab['city']!,
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            color: const Color(
-                                                              0xFF64748B,
+                                                  const SizedBox(height: 4),
+                                                  Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Iconsax.clock,
+                                                        color: Color(
+                                                          0xFF94A3B8,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        time,
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF94A3B8,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
                                                             ),
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                          ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
+                                                      ),
+                                                      const Spacer(),
+                                                      const Icon(
+                                                        Iconsax.verify,
+                                                        color: Color(
+                                                          0xFF10B981,
+                                                        ),
+                                                        size: 10,
+                                                      ),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        'Verified',
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF10B981,
+                                                                  ),
+                                                              fontSize: 10,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ],
                                               ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Iconsax.clock,
-                                                    color: Color(0xFF94A3B8),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 2),
-                                                  Text(
-                                                    lab['time']!,
-                                                    style: GoogleFonts.poppins(
-                                                      color: const Color(
-                                                        0xFF94A3B8,
-                                                      ),
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                  const Spacer(),
-                                                  const Icon(
-                                                    Iconsax.shield_tick,
-                                                    color: Color(0xFF10B981),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 2),
-                                                  Text(
-                                                    'Open',
-                                                    style: GoogleFonts.poppins(
-                                                      color: const Color(
-                                                        0xFF10B981,
-                                                      ),
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          )
-                          .animate()
-                          .fadeIn(delay: (500 + (index * 100)).ms)
-                          .slideY(begin: 0.1, end: 0);
-                    },
-                  ),
-                ),
-
-                // ── Top Pharmacies ──
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'top_pharmacies'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PharmaciesScreen(),
-                            ),
+                              ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
+                            },
                           );
                         },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                       ),
-                    ],
-                  ),
-                ).animate().fadeIn(delay: 600.ms),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 180,
-                  child: Builder(
-                    builder: (context) {
-                      final pharmaciesList = _topPharmacies.isNotEmpty
-                          ? _topPharmacies
-                          : _fallbackPharmacies;
-
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        itemCount: pharmaciesList.length,
-                        itemBuilder: (context, index) {
-                          final pharm = pharmaciesList[index];
-                          final name = pharm['name'] ?? 'دەرمانخانەی سۆران';
-                          final city = pharm['city'] ?? 'هەولێر';
-                          final time = pharm['time'] ?? '٢٤ کاتژمێر';
-                          final profileImage = pharm['profile_image'];
-
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PharmacyDetailScreen(
-                                    pharmacy: Pharmacy(
-                                      id: pharm['id'] ?? 1,
-                                      name: pharm['name'] ?? 'دەرمانخانە',
-                                      rating:
-                                          double.tryParse(
-                                            pharm['rating']?.toString() ??
-                                                '4.8',
-                                          ) ??
-                                          4.8,
-                                      deliveryFee:
-                                          double.tryParse(
-                                            pharm['delivery_fee']?.toString() ??
-                                                '1500.0',
-                                          ) ??
-                                          1500.0,
-                                      profileImage: pharm['profile_image'],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width: 170,
-                              margin: const EdgeInsetsDirectional.only(
-                                end: 14,
-                                bottom: 12,
-                                top: 4,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 10,
-                                    sigmaY: 10,
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.4,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Top Image Section
-                                        Container(
-                                          height: 80,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                  top: Radius.circular(15),
-                                                ),
-                                            color: const Color(0xFFF8FAFC),
-                                            image: profileImage != null
-                                                ? DecorationImage(
-                                                    image: CachedNetworkImageProvider(
-                                                      ApiClient.getImageUrl(profileImage),
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/images/pharmacy1.jpg',
-                                                    ),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              // Rating Badge
-                                              Positioned(
-                                                bottom: 6,
-                                                right: 6,
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          10,
-                                                        ),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withValues(
-                                                              alpha: 0.1,
-                                                            ),
-                                                        blurRadius: 4,
-                                                        offset: const Offset(
-                                                          0,
-                                                          2,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.star_rounded,
-                                                        color: Color(
-                                                          0xFFF59E0B,
-                                                        ),
-                                                        size: 12,
-                                                      ),
-                                                      const SizedBox(width: 4),
-                                                      Text(
-                                                        '4.9',
-                                                        style:
-                                                            GoogleFonts.poppins(
-                                                              color:
-                                                                  const Color(
-                                                                    0xFF1E293B,
-                                                                  ),
-                                                              fontSize: 10,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                            ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        // Details Section
-                                        Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                name,
-                                                style: TextStyle(
-                                                  fontFamily: 'Rabar',
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: AppColors.getTextTitle(
-                                                    context,
-                                                  ),
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Iconsax.location,
-                                                    color: Color(0xFF3B82F6),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  Expanded(
-                                                    child: Text(
-                                                      city,
-                                                      style:
-                                                          GoogleFonts.poppins(
-                                                            color: const Color(
-                                                              0xFF64748B,
-                                                            ),
-                                                            fontSize: 10,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                          ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Row(
-                                                children: [
-                                                  const Icon(
-                                                    Iconsax.clock,
-                                                    color: Color(0xFF94A3B8),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 2),
-                                                  Text(
-                                                    time,
-                                                    style: GoogleFonts.poppins(
-                                                      color: const Color(
-                                                        0xFF94A3B8,
-                                                      ),
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                  const Spacer(),
-                                                  const Icon(
-                                                    Iconsax.verify,
-                                                    color: Color(0xFF10B981),
-                                                    size: 10,
-                                                  ),
-                                                  const SizedBox(width: 2),
-                                                  Text(
-                                                    'Verified',
-                                                    style: GoogleFonts.poppins(
-                                                      color: const Color(
-                                                        0xFF10B981,
-                                                      ),
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
-                        },
-                      );
-                    },
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -1564,7 +1677,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final next = upcoming.first;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -1623,7 +1736,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               // ── Doctor Info ──
               Row(
                 children: [
@@ -1652,7 +1765,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          next.doctorName.isNotEmpty ? next.doctorName : 'Doctor',
+                          next.doctorName.isNotEmpty
+                              ? next.doctorName
+                              : 'Doctor',
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextTitle(context),
                             fontSize: 16,
@@ -1663,8 +1778,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          next.doctorSpecialty.isNotEmpty 
-                              ? next.doctorSpecialty 
+                          next.doctorSpecialty.isNotEmpty
+                              ? next.doctorSpecialty
                               : 'پزیشکی گشتی',
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextSubtitle(context),
@@ -1692,11 +1807,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
               const Divider(color: Color(0xFFF1F5F9), height: 1),
               const SizedBox(height: 16),
-              
+
               // ── Date & Time (Moved down nicely) ──
               Row(
                 children: [
@@ -1704,8 +1819,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         const Icon(
-                          Iconsax.calendar_1, 
-                          color: Color(0xFF64748B), 
+                          Iconsax.calendar_1,
+                          color: Color(0xFF64748B),
                           size: 18,
                         ),
                         const SizedBox(width: 8),
@@ -1724,8 +1839,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         const Icon(
-                          Iconsax.clock, 
-                          color: Color(0xFF64748B), 
+                          Iconsax.clock,
+                          color: Color(0xFF64748B),
                           size: 18,
                         ),
                         const SizedBox(width: 8),
