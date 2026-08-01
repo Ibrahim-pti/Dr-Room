@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,6 +17,32 @@ import '../../core/theme/dr_room_fonts.dart';
 import '../../core/utils/api_client.dart';
 import '../../main.dart';
 import 'doctor_reviews_screen.dart';
+
+/// Sweeps the bottom edge of the hero photo into a soft arc that dips lower in
+/// the middle than at the sides.
+class _HeroCurveClipper extends CustomClipper<Path> {
+  const _HeroCurveClipper();
+
+  static const double _sideInset = 46;
+  static const double _dip = 40;
+
+  @override
+  Path getClip(Size size) {
+    return Path()
+      ..lineTo(0, size.height - _sideInset)
+      ..quadraticBezierTo(
+        size.width / 2,
+        size.height + _dip,
+        size.width,
+        size.height - _sideInset,
+      )
+      ..lineTo(size.width, 0)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
 
 /// One bookable day, expanded from the doctor's weekly schedule.
 class _DaySlot {
@@ -51,7 +76,9 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  static const double _heroHeight = 296;
+  static const double _carouselHeight = 250;
+  // Carousel (which absorbs the status bar) + name + specialty pills.
+  static const double _heroHeight = _carouselHeight + 102;
   static const int _slotMinutes = 30;
 
   Map<String, dynamic>? _doctor;
@@ -72,7 +99,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   final _scrollController = ScrollController();
   final _scheduleKey = GlobalKey();
-  final _heroPageController = PageController(viewportFraction: 0.34);
+  final _heroPageController = PageController();
 
   VideoPlayerController? _videoController;
   YoutubePlayerController? _youtubeController;
@@ -489,8 +516,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   List<Widget> _buildSections(bool isDark) {
     final sections = <Widget>[
       _buildStatsCard(isDark),
-      const SizedBox(height: 16),
-      _buildQuickActions(isDark),
       const SizedBox(height: 28),
       _buildAbout(isDark),
     ];
@@ -499,6 +524,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       sections
         ..add(const SizedBox(height: 28))
         ..add(_buildVideo(isDark));
+    }
+
+    if ((_doctor?['phone']?.toString() ?? '').isNotEmpty) {
+      sections
+        ..add(const SizedBox(height: 20))
+        ..add(_buildCallButton(isDark));
     }
 
     sections
@@ -517,14 +548,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   Widget _buildHero(bool isDark) {
     final topPadding = MediaQuery.of(context).padding.top;
-    final surface = AppColors.getSurface(context);
+    final background = AppColors.getBackground(context);
 
     return SliverAppBar(
       pinned: true,
       stretch: true,
       elevation: 0,
       expandedHeight: _heroHeight,
-      backgroundColor: surface,
+      backgroundColor: background,
       automaticallyImplyLeading: false,
       systemOverlayStyle: null,
       flexibleSpace: LayoutBuilder(
@@ -538,26 +569,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF1B4C8A),
-                      AppColors.primary,
-                      AppColors.primaryLight,
-                      surface,
-                    ],
-                    stops: const [0.0, 0.45, 0.8, 1.0],
-                  ),
-                ),
-              ),
+              ColoredBox(color: background),
               // Expanded content fades out as the bar collapses.
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 20,
+                top: 0,
                 child: Opacity(
                   opacity: (1 - t * 1.6).clamp(0.0, 1.0),
                   child: _buildHeroContent(),
@@ -605,7 +622,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeroCarousel(),
-        const SizedBox(height: 12),
+        const SizedBox(height: 18),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
@@ -614,8 +631,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontSize: 20,
+              color: AppColors.getTextTitle(context),
+              fontSize: 21,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -639,57 +656,72 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
-  /// Swipeable strip of the doctor's photos — plain rounded images, no
-  /// shadow, border or fade on the neighbouring cards.
+  /// Full-bleed swipeable strip of the doctor's photos. It reaches every screen
+  /// edge and runs under the status bar, with only the bottom corners rounded.
   Widget _buildHeroCarousel() {
     final images = _heroImages;
+    final topPadding = MediaQuery.of(context).padding.top;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: 130,
-          child: PageView.builder(
-            controller: _heroPageController,
-            itemCount: images.length,
-            padEnds: true,
-            onPageChanged: (index) => setState(() => _heroPage = index),
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Image(
-                  image: _imageProvider(images[index]),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    color: Colors.white24,
-                    child: const Icon(
-                      Iconsax.user,
-                      color: Colors.white,
-                      size: 36,
-                    ),
+    return ClipPath(
+      clipper: const _HeroCurveClipper(),
+      child: SizedBox(
+        height: topPadding + _carouselHeight,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            PageView.builder(
+              controller: _heroPageController,
+              itemCount: images.length,
+              onPageChanged: (index) => setState(() => _heroPage = index),
+              itemBuilder: (context, index) => Image(
+                image: _imageProvider(images[index]),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
+                  color: AppColors.primary,
+                  child: const Icon(Iconsax.user, color: Colors.white, size: 44),
+                ),
+              ),
+            ),
+            // Keeps the floating back / favourite buttons legible on light photos.
+            IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.28),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.35],
                   ),
                 ),
               ),
             ),
-          ),
+            if (images.length > 1)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 26,
+                child: Center(
+                  child: AnimatedSmoothIndicator(
+                    activeIndex: _heroPage,
+                    count: images.length,
+                    effect: ExpandingDotsEffect(
+                      dotHeight: 6,
+                      dotWidth: 6,
+                      expansionFactor: 3.5,
+                      spacing: 5,
+                      dotColor: Colors.white.withValues(alpha: 0.5),
+                      activeDotColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
-        if (images.length > 1) ...[
-          const SizedBox(height: 10),
-          AnimatedSmoothIndicator(
-            activeIndex: _heroPage,
-            count: images.length,
-            effect: ExpandingDotsEffect(
-              dotHeight: 6,
-              dotWidth: 6,
-              expansionFactor: 3.5,
-              spacing: 5,
-              dotColor: Colors.white.withValues(alpha: 0.4),
-              activeDotColor: Colors.white,
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 
@@ -697,14 +729,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.22),
+        color: AppColors.getSurface(context),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+        border: Border.all(color: AppColors.getBorder(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: iconColor ?? Colors.white),
+          Icon(icon, size: 15, color: iconColor ?? AppColors.primary),
           const SizedBox(width: 6),
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 180),
@@ -713,7 +745,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: AppColors.getTextTitle(context),
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
               ),
@@ -725,13 +757,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   }
 
   Widget _buildHeroActions(double t, bool isDark) {
-    // Icons start white over the photo and darken as the surface takes over.
-    final iconColor = Color.lerp(
-      Colors.white,
-      AppColors.getTextTitle(context),
-      ((t - 0.5) / 0.5).clamp(0.0, 1.0),
+    // White over the photo, switching to the normal text colour once the
+    // photo has scrolled away.
+    final fade = ((t - 0.5) / 0.5).clamp(0.0, 1.0);
+    final iconColor =
+        Color.lerp(Colors.white, AppColors.getTextTitle(context), fade)!;
+    final chipColor = Color.lerp(
+      Colors.black.withValues(alpha: 0.3),
+      AppColors.getSurface(context),
+      fade,
     )!;
-    final chipColor = Colors.white.withValues(alpha: 0.18 * (1 - t));
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -791,27 +826,29 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     final years = _asInt(_doctor?['experience_years']) ?? 0;
     final fee = _asDouble(_doctor?['consultation_fee']);
 
+    // Always three columns — a card with a single centred stat reads as broken
+    // when the doctor hasn't filled in their profile yet.
     final stats = <Widget>[
+      // The rating column doubles as the entry point to the reviews screen.
       _stat(
         icon: Icons.star_rounded,
         color: const Color(0xFFF59E0B),
         value: rating > 0 ? rating.toStringAsFixed(1) : '—',
         label: '$reviews ${'dd_reviews'.tr()}',
+        onTap: _openReviews,
       ),
-      if (years > 0)
-        _stat(
-          icon: Iconsax.medal_star,
-          color: AppColors.primary,
-          value: '$years',
-          label: 'dd_years_exp'.tr(),
-        ),
-      if (fee > 0)
-        _stat(
-          icon: Iconsax.wallet_3,
-          color: AppColors.success,
-          value: NumberFormat('#,###').format(fee),
-          label: 'consultation_price'.tr(),
-        ),
+      _stat(
+        icon: Iconsax.medal_star,
+        color: AppColors.primary,
+        value: years > 0 ? '$years' : '—',
+        label: 'dd_years_exp'.tr(),
+      ),
+      _stat(
+        icon: Iconsax.wallet_3,
+        color: AppColors.success,
+        value: fee > 0 ? NumberFormat('#,###').format(fee) : '—',
+        label: 'consultation_price'.tr(),
+      ),
     ];
 
     return _card(
@@ -838,8 +875,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     required Color color,
     required String value,
     required String label,
+    VoidCallback? onTap,
   }) {
-    return Column(
+    final column = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 20, color: color),
@@ -853,102 +891,90 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.poppins(
-            fontSize: 11,
-            color: AppColors.getTextSubtitle(context),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  color: onTap != null
+                      ? AppColors.primary
+                      : AppColors.getTextSubtitle(context),
+                  fontWeight: onTap != null ? FontWeight.w600 : null,
+                ),
+              ),
+            ),
+            if (onTap != null)
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 14,
+                color: AppColors.primary,
+              ),
+          ],
         ),
       ],
+    );
+
+    if (onTap == null) return column;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: column,
+      ),
     );
   }
 
   // ── quick actions ──
 
-  Widget _buildQuickActions(bool isDark) {
-    final phone = _doctor?['phone']?.toString() ?? '';
-
-    return Row(
-      children: [
-        if (phone.isNotEmpty) ...[
-          Expanded(
-            child: _actionButton(
-              isDark: isDark,
-              icon: Iconsax.call,
-              label: 'call'.tr(),
-              onTap: _callDoctor,
-            ),
-          ),
-          const SizedBox(width: 12),
-        ],
-        Expanded(
-          child: _actionButton(
-            isDark: isDark,
-            icon: Iconsax.message_text,
-            label: 'reviews'.tr(),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DoctorReviewsScreen(
-                  doctorName: _doctorName,
-                  rating: _asDouble(_doctor?['rating']).toStringAsFixed(1),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _actionButton(
-            isDark: isDark,
-            icon: Iconsax.share,
-            label: 'share'.tr(),
-            onTap: () => SharePlus.instance.share(
-              ShareParams(text: '$_doctorName — $_doctorSpecialty'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _actionButton({
-    required bool isDark,
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
+  /// Only rendered when the doctor published a phone number.
+  Widget _buildCallButton(bool isDark) {
     return Material(
       color: AppColors.getSurface(context),
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
-        onTap: onTap,
+        onTap: _callDoctor,
         borderRadius: BorderRadius.circular(18),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.getBorder(context)),
           ),
-          child: Column(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 20, color: AppColors.primary),
-              const SizedBox(height: 6),
+              Icon(Iconsax.call, size: 19, color: AppColors.primary),
+              const SizedBox(width: 10),
               Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                'call'.tr(),
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.getTextTitle(context),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _openReviews() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DoctorReviewsScreen(
+          doctorName: _doctorName,
+          rating: _asDouble(_doctor?['rating']).toStringAsFixed(1),
         ),
       ),
     );
