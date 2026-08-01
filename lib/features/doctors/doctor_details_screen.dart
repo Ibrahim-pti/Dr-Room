@@ -1,18 +1,36 @@
-import 'package:dr_room/main.dart';
-import 'package:flutter/material.dart';
-import 'package:dr_room/core/theme/dr_room_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:ui';
-import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart' hide TextDirection;
-import 'package:video_player/video_player.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+
 import '../../core/providers/favorite_provider.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/dr_room_fonts.dart';
 import '../../core/utils/api_client.dart';
+import '../../main.dart';
+import 'doctor_reviews_screen.dart';
+
+/// One bookable day, expanded from the doctor's weekly schedule.
+class _DaySlot {
+  final DateTime date;
+  final String startTime; // "HH:mm:ss"
+  final String endTime;
+
+  const _DaySlot({
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+  });
+}
 
 class DoctorDetailsScreen extends StatefulWidget {
   final int doctorId;
@@ -33,322 +51,672 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  int _selectedDateIndex = 0;
-  int _selectedTimeIndex = -1;
-  int _selectedServiceIndex = 0;
-  bool _isBooking = false;
-  final List<Map<String, dynamic>> _dynamicDates = [];
-  final List<String> _dynamicTimes = [];
-  List<dynamic> _services = [];
+  static const double _heroHeight = 296;
+  static const int _slotMinutes = 30;
 
-  Map<String, dynamic>? _doctorDetails;
-  VideoPlayerController? _videoPlayerController;
+  Map<String, dynamic>? _doctor;
+  List<dynamic> _services = [];
+  List<_DaySlot> _days = [];
+  List<DateTime> _times = [];
+
+  bool _loading = true;
+  bool _loadFailed = false;
+  bool _isBooking = false;
+  bool _bioExpanded = false;
+  bool _videoStarted = false;
+
+  int? _selectedServiceId;
+  int _dayIndex = 0;
+  int _timeIndex = -1;
+  int _heroPage = 0;
+
+  final _scrollController = ScrollController();
+  final _scheduleKey = GlobalKey();
+  final _heroPageController = PageController(viewportFraction: 0.34);
+
+  VideoPlayerController? _videoController;
   YoutubePlayerController? _youtubeController;
-  String? _initializedVideoUrl;
 
   @override
   void initState() {
     super.initState();
-    _loadCachedDoctorDetails();
-    _fetchDoctorDetails();
-  }
-
-  Future<void> _loadCachedDoctorDetails() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cachedStr = prefs.getString('cached_doctor_details_${widget.doctorId}');
-      if (cachedStr != null && cachedStr.isNotEmpty && mounted) {
-        final data = jsonDecode(cachedStr);
-        setState(() {
-          _doctorDetails = data;
-          if (data['services'] != null && (data['services'] as List).isNotEmpty) {
-            _services = data['services'];
-          }
-          _generateDynamicSchedules(data['schedules']);
-        });
-        _initializeVideoPlayer();
-      }
-    } catch (_) {}
-  }
-
-  Future<void> _fetchDoctorDetails() async {
-    try {
-      final response = await ApiClient.get('/doctors/${widget.doctorId}');
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('cached_doctor_details_${widget.doctorId}', response.body);
-
-        if (mounted) {
-          setState(() {
-            _doctorDetails = data;
-            if (data['services'] != null && (data['services'] as List).isNotEmpty) {
-              _services = data['services'];
-            }
-            _generateDynamicSchedules(data['schedules']);
-          });
-          _initializeVideoPlayer();
-        }
-      }
-    } catch (e) {
-      // Intentionally left empty if it fails we have cache
-    }
-  }
-
-  void _generateDynamicSchedules(List<dynamic>? schedules) {
-    if (schedules == null || schedules.isEmpty) return;
-    
-    _dynamicDates.clear();
-    final now = DateTime.now();
-    
-    Map<String, dynamic> daysMap = {};
-    for (var s in schedules) {
-      daysMap[s['day_of_week']] = s;
-    }
-    
-    final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    
-    for (int i = 0; i < 30; i++) {
-      final date = now.add(Duration(days: i));
-      final dayName = daysOfWeek[date.weekday - 1];
-      
-      if (daysMap.containsKey(dayName)) {
-        final schedule = daysMap[dayName];
-        _dynamicDates.add({
-          'day': DateFormat('E').format(date),
-          'date': DateFormat('dd').format(date),
-          'month': DateFormat('MMM').format(date),
-          'full_date': DateFormat('yyyy-MM-dd').format(date),
-          'start_time': schedule['start_time'],
-          'end_time': schedule['end_time'],
-          'schedule_id': schedule['id'],
-        });
-      }
-    }
-    
-    if (_dynamicDates.isNotEmpty) {
-      _selectedDateIndex = 0;
-      _updateDynamicTimes();
-    }
-  }
-
-  void _updateDynamicTimes() {
-    _dynamicTimes.clear();
-    _selectedTimeIndex = -1;
-    if (_dynamicDates.isEmpty) return;
-    
-    final selectedDate = _dynamicDates[_selectedDateIndex];
-    final startStr = selectedDate['start_time'].toString();
-    final endStr = selectedDate['end_time'].toString();
-    
-    try {
-      var startParts = startStr.split(':');
-      var endParts = endStr.split(':');
-      
-      var start = TimeOfDay(hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
-      var end = TimeOfDay(hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
-      
-      var current = start;
-      while (current.hour < end.hour || (current.hour == end.hour && current.minute <= end.minute)) {
-        final period = current.hour >= 12 ? 'PM' : 'AM';
-        int h = current.hour > 12 ? current.hour - 12 : (current.hour == 0 ? 12 : current.hour);
-        final m = current.minute.toString().padLeft(2, '0');
-        _dynamicTimes.add('${h.toString().padLeft(2, '0')}:$m $period');
-        
-        int newMin = current.minute + 30;
-        int newHour = current.hour;
-        if (newMin >= 60) {
-          newHour += 1;
-          newMin -= 60;
-        }
-        current = TimeOfDay(hour: newHour, minute: newMin);
-      }
-    } catch (_) {}
-  }
-
-  void _initializeVideoPlayer() {
-    if (_doctorDetails == null) return;
-    
-    final videoType = _doctorDetails!['video_type'];
-    final videoUrl = _doctorDetails!['video_url'];
-    
-    if (videoUrl != null && videoUrl.toString().isNotEmpty) {
-      final String urlStr = videoUrl.toString();
-      if (_initializedVideoUrl == urlStr) return;
-      _initializedVideoUrl = urlStr;
-      
-      if (videoType == 'youtube' || urlStr.contains('youtube.com') || urlStr.contains('youtu.be')) {
-        String videoId = '';
-        if (urlStr.contains('v=')) {
-          videoId = urlStr.split('v=')[1].split('&')[0];
-        } else if (urlStr.contains('youtu.be/')) {
-          videoId = urlStr.split('youtu.be/')[1].split('?')[0];
-        } else {
-          videoId = urlStr;
-        }
-        
-        if (videoId.isNotEmpty) {
-          _youtubeController = YoutubePlayerController.fromVideoId(
-            videoId: videoId,
-            autoPlay: true,
-            params: const YoutubePlayerParams(
-              showControls: true,
-              showFullscreenButton: true,
-              showVideoAnnotations: false,
-              strictRelatedVideos: true,
-            ),
-          );
-          if (mounted) setState(() {});
-        }
-      } else {
-        final fullUrl = urlStr.startsWith('http') ? urlStr : ApiClient.getImageUrl(urlStr);
-        _videoPlayerController?.dispose();
-        _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(fullUrl))
-          ..initialize().then((_) {
-            _videoPlayerController!.setLooping(true);
-            _videoPlayerController!.play();
-            if (mounted) setState(() {});
-          }).catchError((_) {});
-      }
-    }
+    _loadCached();
+    _fetchDoctor();
   }
 
   @override
   void dispose() {
-    _videoPlayerController?.dispose();
+    _scrollController.dispose();
+    _heroPageController.dispose();
+    _videoController?.dispose();
     _youtubeController?.close();
     super.dispose();
   }
 
-  Future<void> _bookAppointment() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
+  // ─────────────────────────── data ───────────────────────────
 
-    if (token == null || token.isEmpty) {
-      if (!mounted) return;
-      _showLoginPrompt();
-      return;
-    }
-
-    setState(() {
-      _isBooking = true;
-    });
-
+  Future<void> _loadCached() async {
     try {
-      if (_dynamicDates.isEmpty || _selectedTimeIndex == -1) {
-        throw Exception('Please select date and time');
-      }
-      
-      final date = _dynamicDates[_selectedDateIndex]['full_date'];
-      final timeStr = _dynamicTimes[_selectedTimeIndex];
-      
-      final isPM = timeStr.contains('PM');
-      var hour = int.parse(timeStr.split(':')[0]);
-      if (isPM && hour != 12) hour += 12;
-      if (!isPM && hour == 12) hour = 0;
-
-      final minute = timeStr.split(':')[1].substring(0, 2);
-      final formattedDate = '$date ${hour.toString().padLeft(2, '0')}:$minute:00';
-
-      Map<String, dynamic> body = {
-        'doctor_id': widget.doctorId,
-        'appointment_date': formattedDate,
-        'type': 'in_person',
-      };
-      
-      if (_selectedServiceIndex != -1 && _services.isNotEmpty) {
-        body['service_id'] = _services[_selectedServiceIndex]['id'];
-      }
-
-      final response = await ApiClient.post('/appointments', body: body);
-
-      if (response.statusCode == 201) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('نۆرەکە بە سەرکەوتوویی تۆمارکرا!'),
-            backgroundColor: Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        Navigator.pop(context); // Close bottom sheet
-      } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('داواکارییەکە سەرکەوتوو نەبوو: ${response.body}'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('کێشەیەک ڕوویدا. تکایە دووبارە تاقی بکەرەوە.'),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isBooking = false;
-        });
-      }
+      final prefs = await SharedPreferences.getInstance();
+      final cached = prefs.getString('cached_doctor_details_${widget.doctorId}');
+      if (cached == null || cached.isEmpty || !mounted) return;
+      _applyDoctor(jsonDecode(cached));
+    } catch (_) {
+      // A bad cache entry is not worth surfacing — the network call follows.
     }
   }
 
-  void _showLoginPrompt() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'پێویستە چوونەژوورەوە بکەیت',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: const Color(0xFF0F172A),
-          ),
+  Future<void> _fetchDoctor() async {
+    try {
+      final response = await ApiClient.get('/doctors/${widget.doctorId}');
+      if (response.statusCode == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+          'cached_doctor_details_${widget.doctorId}',
+          response.body,
+        );
+        if (!mounted) return;
+        _applyDoctor(jsonDecode(response.body));
+        return;
+      }
+    } catch (_) {
+      // Fall through to the failure state below.
+    }
+    if (mounted && _doctor == null) {
+      setState(() {
+        _loading = false;
+        _loadFailed = true;
+      });
+    }
+  }
+
+  void _applyDoctor(Map<String, dynamic> data) {
+    setState(() {
+      _doctor = data;
+      _loading = false;
+      _loadFailed = false;
+      _services = (data['services'] as List?) ?? const [];
+      _selectedServiceId ??= _services.isNotEmpty ? _asInt(_services.first['id']) : null;
+      _days = _buildDays(data['schedules'] as List?);
+      if (_dayIndex >= _days.length) _dayIndex = 0;
+      _times = _buildTimes();
+      if (_timeIndex >= _times.length) _timeIndex = -1;
+    });
+  }
+
+  /// Projects the weekly schedule onto the next 30 calendar days, keeping only
+  /// days the doctor actually works and dropping today if it is already over.
+  List<_DaySlot> _buildDays(List? schedules) {
+    if (schedules == null || schedules.isEmpty) return const [];
+
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    final byDay = {for (final s in schedules) s['day_of_week'].toString(): s};
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final result = <_DaySlot>[];
+
+    for (var i = 0; i < 30; i++) {
+      final date = today.add(Duration(days: i));
+      final schedule = byDay[weekdays[date.weekday - 1]];
+      if (schedule == null) continue;
+
+      final day = _DaySlot(
+        date: date,
+        startTime: schedule['start_time'].toString(),
+        endTime: schedule['end_time'].toString(),
+      );
+      // Skip today when every slot has already passed.
+      if (i == 0 && _slotsFor(day).isEmpty) continue;
+      result.add(day);
+    }
+    return result;
+  }
+
+  List<DateTime> _buildTimes() {
+    if (_days.isEmpty || _dayIndex >= _days.length) return const [];
+    return _slotsFor(_days[_dayIndex]);
+  }
+
+  /// Splits a day's opening hours into bookable slots, excluding past ones.
+  List<DateTime> _slotsFor(_DaySlot day) {
+    final start = _parseTime(day.date, day.startTime);
+    final end = _parseTime(day.date, day.endTime);
+    if (start == null || end == null || !end.isAfter(start)) return const [];
+
+    final now = DateTime.now();
+    final slots = <DateTime>[];
+    var cursor = start;
+    while (cursor.isBefore(end)) {
+      if (cursor.isAfter(now)) slots.add(cursor);
+      cursor = cursor.add(const Duration(minutes: _slotMinutes));
+    }
+    return slots;
+  }
+
+  DateTime? _parseTime(DateTime date, String raw) {
+    final parts = raw.split(':');
+    if (parts.length < 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    return DateTime(date.year, date.month, date.day, hour, minute);
+  }
+
+  // ─────────────────────── value helpers ───────────────────────
+
+  static int? _asInt(dynamic v) => v == null ? null : int.tryParse(v.toString());
+
+  static double _asDouble(dynamic v) =>
+      v == null ? 0 : double.tryParse(v.toString()) ?? 0;
+
+  String get _doctorName =>
+      _doctor?['user']?['name']?.toString() ?? widget.name;
+
+  String get _doctorSpecialty {
+    final locale = context.locale.languageCode;
+    final localized = _doctor?['specialty_$locale']?.toString();
+    if (localized != null && localized.isNotEmpty) return localized;
+    final fallback = _doctor?['specialty']?.toString();
+    if (fallback != null && fallback.isNotEmpty) return fallback;
+    return widget.specialty;
+  }
+
+  String get _doctorImage {
+    final path = _doctor?['image_path']?.toString();
+    if (path != null && path.isNotEmpty) return ApiClient.getImageUrl(path);
+    return widget.image;
+  }
+
+  /// Profile photo first, then any gallery images the API sends back.
+  List<String> get _heroImages {
+    final images = <String>{};
+    if (_doctorImage.isNotEmpty) images.add(_doctorImage);
+    for (final item in (_doctor?['gallery'] as List?) ?? const []) {
+      final path = item.toString();
+      if (path.isNotEmpty) images.add(ApiClient.getImageUrl(path));
+    }
+    return images.isEmpty ? [widget.image] : images.toList();
+  }
+
+  /// Service names are stored per-language; fall back through the other
+  /// columns so a card never renders as an empty box.
+  String _serviceName(Map service) {
+    final locale = context.locale.languageCode;
+    for (final key in ['name_$locale', 'name_ckb', 'name_en', 'name_ar', 'name']) {
+      final value = service[key]?.toString();
+      if (value != null && value.trim().isNotEmpty) return value;
+    }
+    return 'dd_service'.tr();
+  }
+
+  String _money(double price) {
+    if (price <= 0) return 'free'.tr();
+    return '${NumberFormat('#,###').format(price)} ${'dd_currency'.tr()}';
+  }
+
+  Map<String, dynamic>? get _selectedService {
+    if (_selectedServiceId == null) return null;
+    for (final s in _services) {
+      if (_asInt(s['id']) == _selectedServiceId) {
+        return Map<String, dynamic>.from(s as Map);
+      }
+    }
+    return null;
+  }
+
+  double get _selectedPrice {
+    final service = _selectedService;
+    if (service != null) return _asDouble(service['price']);
+    return _asDouble(_doctor?['consultation_fee']);
+  }
+
+  DateTime? get _selectedDateTime =>
+      _timeIndex >= 0 && _timeIndex < _times.length ? _times[_timeIndex] : null;
+
+  ImageProvider _imageProvider(String path) {
+    if (path.isEmpty) return const AssetImage('assets/images/doctor.png');
+    if (path.startsWith('assets/')) return AssetImage(path);
+    if (path.startsWith('http')) return NetworkImage(path);
+    return NetworkImage(ApiClient.getImageUrl(path));
+  }
+
+  // intl ships no date symbols for Kurdish, so day and month names come from
+  // the translation files instead of DateFormat.
+  String _dayLabel(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final diff = date.difference(today).inDays;
+    if (diff == 0) return 'dd_today'.tr();
+    if (diff == 1) return 'dd_tomorrow'.tr();
+    return _weekdayName(date);
+  }
+
+  String _weekdayName(DateTime date) => 'wd_${date.weekday}'.tr();
+
+  String _monthName(DateTime date) => 'mo_${date.month}'.tr();
+
+  String _fullDate(DateTime date) =>
+      '${_weekdayName(date)} • ${date.day} ${_monthName(date)} ${date.year}';
+
+  String _clock(DateTime time) {
+    final hour = time.hour % 12 == 0 ? 12 : time.hour % 12;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.hour < 12 ? 'am'.tr() : 'pm'.tr();
+    return '$hour:$minute $period';
+  }
+
+  // ───────────────────────── booking ─────────────────────────
+
+  void _scrollToSchedule() {
+    final ctx = _scheduleKey.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.1,
+    );
+  }
+
+  Future<void> _onBookPressed() async {
+    if (_selectedDateTime == null) {
+      _scrollToSchedule();
+      _toast('dd_select_time_first'.tr(), AppColors.warning);
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (!mounted) return;
+    if (token == null || token.isEmpty) {
+      _showLoginPrompt();
+      return;
+    }
+    _showSummarySheet();
+  }
+
+  /// [refreshSheet] rebuilds the summary sheet, which lives on its own route
+  /// and therefore does not react to this screen's setState.
+  Future<void> _submitBooking(StateSetter refreshSheet) async {
+    final slot = _selectedDateTime;
+    if (slot == null) return;
+
+    _isBooking = true;
+    refreshSheet(() {});
+
+    var booked = false;
+    try {
+      final body = <String, dynamic>{
+        'doctor_id': widget.doctorId,
+        'appointment_date': DateFormat('yyyy-MM-dd HH:mm:ss').format(slot),
+        'type': 'in_person',
+        if (_selectedServiceId != null) 'service_id': _selectedServiceId,
+      };
+
+      final response = await ApiClient.post('/appointments', body: body);
+      booked = response.statusCode == 200 || response.statusCode == 201;
+    } catch (_) {
+      booked = false;
+    }
+
+    if (!mounted) return;
+    _isBooking = false;
+
+    if (booked) {
+      Navigator.pop(context); // close the summary sheet
+      _toast('dd_booked'.tr(), AppColors.success);
+      setState(() {
+        _timeIndex = -1;
+        _times = _buildTimes();
+      });
+    } else {
+      refreshSheet(() {});
+      _toast('dd_book_failed'.tr(), AppColors.error);
+    }
+  }
+
+  void _toast(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.poppins(color: Colors.white)),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    );
+  }
+
+  Future<void> _callDoctor() async {
+    final phone = _doctor?['phone']?.toString();
+    if (phone == null || phone.isEmpty) return;
+    final uri = Uri(scheme: 'tel', path: phone);
+    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  }
+
+  // ───────────────────────── video ─────────────────────────
+
+  String? get _videoUrl {
+    final url = _doctor?['video_url']?.toString();
+    return (url == null || url.isEmpty) ? null : url;
+  }
+
+  bool get _isYoutube {
+    final url = _videoUrl;
+    if (url == null) return false;
+    return _doctor?['video_type'] == 'youtube' ||
+        url.contains('youtube.com') ||
+        url.contains('youtu.be');
+  }
+
+  String _youtubeId(String url) {
+    if (url.contains('v=')) return url.split('v=')[1].split('&').first;
+    if (url.contains('youtu.be/')) return url.split('youtu.be/')[1].split('?').first;
+    if (url.contains('/embed/')) return url.split('/embed/')[1].split('?').first;
+    return url;
+  }
+
+  void _startVideo() {
+    final url = _videoUrl;
+    if (url == null || _videoStarted) return;
+
+    if (_isYoutube) {
+      final id = _youtubeId(url);
+      if (id.isEmpty) return;
+      _youtubeController = YoutubePlayerController.fromVideoId(
+        videoId: id,
+        autoPlay: true,
+        params: const YoutubePlayerParams(
+          showControls: true,
+          showFullscreenButton: true,
+          showVideoAnnotations: false,
+          strictRelatedVideos: true,
         ),
-        content: Text(
-          'بۆ وەرگرتنی کات لای دکتۆر پێویستە سەرەتا خۆت تۆمار بکەیت یان چوونەژوورەوە بکەیت.',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: const Color(0xFF475569),
-            height: 1.5,
-          ),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              'دواتر',
-              style: GoogleFonts.poppins(color: const Color(0xFF64748B)),
+      );
+    } else {
+      final full = url.startsWith('http') ? url : ApiClient.getImageUrl(url);
+      _videoController = VideoPlayerController.networkUrl(Uri.parse(full))
+        ..initialize().then((_) {
+          _videoController?.play();
+          if (mounted) setState(() {});
+        }).catchError((_) {});
+    }
+    setState(() => _videoStarted = true);
+  }
+
+  // ───────────────────────── build ─────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = AppColors.getBackground(context);
+
+    return Scaffold(
+      backgroundColor: background,
+      body: _loadFailed && _doctor == null
+          ? _buildErrorState()
+          : CustomScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                _buildHero(isDark),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate(
+                      _loading && _doctor == null
+                          ? _buildSkeleton(isDark)
+                          : _buildSections(isDark),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      bottomNavigationBar:
+          _doctor == null && _loading ? null : _buildBottomBar(isDark),
+    );
+  }
+
+  List<Widget> _buildSections(bool isDark) {
+    final sections = <Widget>[
+      _buildStatsCard(isDark),
+      const SizedBox(height: 16),
+      _buildQuickActions(isDark),
+      const SizedBox(height: 28),
+      _buildAbout(isDark),
+    ];
+
+    if (_videoUrl != null) {
+      sections
+        ..add(const SizedBox(height: 28))
+        ..add(_buildVideo(isDark));
+    }
+
+    sections
+      ..add(const SizedBox(height: 28))
+      ..add(_buildServices(isDark))
+      ..add(const SizedBox(height: 28))
+      ..add(_buildSchedule(isDark));
+
+    return sections
+        .animate(interval: 40.ms)
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.06, end: 0, curve: Curves.easeOut);
+  }
+
+  // ── hero ──
+
+  Widget _buildHero(bool isDark) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final surface = AppColors.getSurface(context);
+
+    return SliverAppBar(
+      pinned: true,
+      stretch: true,
+      elevation: 0,
+      expandedHeight: _heroHeight,
+      backgroundColor: surface,
+      automaticallyImplyLeading: false,
+      systemOverlayStyle: null,
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          final maxHeight = _heroHeight + topPadding;
+          final minHeight = kToolbarHeight + topPadding;
+          final t = ((maxHeight - constraints.maxHeight) /
+                  (maxHeight - minHeight))
+              .clamp(0.0, 1.0);
+
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFF1B4C8A),
+                      AppColors.primary,
+                      AppColors.primaryLight,
+                      surface,
+                    ],
+                    stops: const [0.0, 0.45, 0.8, 1.0],
+                  ),
+                ),
+              ),
+              // Expanded content fades out as the bar collapses.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 20,
+                child: Opacity(
+                  opacity: (1 - t * 1.6).clamp(0.0, 1.0),
+                  child: _buildHeroContent(),
+                ),
+              ),
+              // Collapsed title fades in.
+              Positioned(
+                left: 56,
+                right: 56,
+                top: topPadding,
+                height: kToolbarHeight,
+                child: Opacity(
+                  opacity: ((t - 0.6) / 0.4).clamp(0.0, 1.0),
+                  child: Center(
+                    child: Text(
+                      _doctorName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        color: AppColors.getTextTitle(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: topPadding + 4,
+                left: 12,
+                right: 12,
+                child: _buildHeroActions(t, isDark),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeroContent() {
+    final rating = _asDouble(_doctor?['rating']);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildHeroCarousel(),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            _doctorName,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AppFlow(startAtLogin: true),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _heroPill(Iconsax.health, _doctorSpecialty),
+            if (rating > 0) ...[
+              const SizedBox(width: 8),
+              _heroPill(
+                Icons.star_rounded,
+                rating.toStringAsFixed(1),
+                iconColor: const Color(0xFFFBBF24),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Swipeable strip of the doctor's photos — plain rounded images, no
+  /// shadow, border or fade on the neighbouring cards.
+  Widget _buildHeroCarousel() {
+    final images = _heroImages;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 130,
+          child: PageView.builder(
+            controller: _heroPageController,
+            itemCount: images.length,
+            padEnds: true,
+            onPageChanged: (index) => setState(() => _heroPage = index),
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image(
+                  image: _imageProvider(images[index]),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    color: Colors.white24,
+                    child: const Icon(
+                      Iconsax.user,
+                      color: Colors.white,
+                      size: 36,
+                    ),
+                  ),
                 ),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1D4ED8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
               ),
             ),
+          ),
+        ),
+        if (images.length > 1) ...[
+          const SizedBox(height: 10),
+          AnimatedSmoothIndicator(
+            activeIndex: _heroPage,
+            count: images.length,
+            effect: ExpandingDotsEffect(
+              dotHeight: 6,
+              dotWidth: 6,
+              expansionFactor: 3.5,
+              spacing: 5,
+              dotColor: Colors.white.withValues(alpha: 0.4),
+              activeDotColor: Colors.white,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _heroPill(IconData icon, String label, {Color? iconColor}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.22),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: iconColor ?? Colors.white),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 180),
             child: Text(
-              'چوونەژوورەوە',
-              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -356,951 +724,1146 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
-  List<String> _getDoctorImages() {
-    List<String> list = [];
-    if (widget.image.isNotEmpty) {
-      list.add(widget.image);
-    }
-    if (_doctorDetails != null && _doctorDetails!['gallery'] != null && (_doctorDetails!['gallery'] as List).isNotEmpty) {
-      for (var img in _doctorDetails!['gallery']) {
-        list.add(ApiClient.getImageUrl(img.toString()));
-      }
-    } else {
-      list.addAll([
-        'assets/images/doctor1.png',
-        'assets/images/doctor2.png',
-      ]);
-    }
-    return list.toSet().toList(); // Unique
+  Widget _buildHeroActions(double t, bool isDark) {
+    // Icons start white over the photo and darken as the surface takes over.
+    final iconColor = Color.lerp(
+      Colors.white,
+      AppColors.getTextTitle(context),
+      ((t - 0.5) / 0.5).clamp(0.0, 1.0),
+    )!;
+    final chipColor = Colors.white.withValues(alpha: 0.18 * (1 - t));
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _heroIconButton(
+          icon: Icons.arrow_back_ios_new_rounded,
+          color: iconColor,
+          background: chipColor,
+          onTap: () => Navigator.pop(context),
+        ),
+        Consumer<FavoriteProvider>(
+          builder: (context, favorites, _) {
+            final isFavorite = favorites.isFavorite(widget.doctorId);
+            return _heroIconButton(
+              icon: isFavorite ? Icons.favorite_rounded : Iconsax.heart,
+              color: isFavorite ? AppColors.error : iconColor,
+              background: chipColor,
+              onTap: () => favorites.toggleFavorite({
+                'id': widget.doctorId,
+                'doctor': _doctorName,
+                'specialty': _doctorSpecialty,
+                'image': _doctorImage,
+              }),
+            );
+          },
+        ),
+      ],
+    );
   }
 
-  String _getDoctorName() {
-    if (_doctorDetails != null && _doctorDetails!['user'] != null && _doctorDetails!['user']['name'] != null) {
-      return _doctorDetails!['user']['name'];
-    }
-    return widget.name;
+  Widget _heroIconButton({
+    required IconData icon,
+    required Color color,
+    required Color background,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+          child: Icon(icon, size: 19, color: color),
+        ),
+      ),
+    );
   }
 
-  String _getDoctorSpecialty() {
-    final locale = context.locale.languageCode;
-    if (_doctorDetails != null) {
-      if (locale == 'en' && _doctorDetails!['specialty_en'] != null && _doctorDetails!['specialty_en'].toString().isNotEmpty) {
-        return _doctorDetails!['specialty_en'];
-      }
-      if (locale == 'ar' && _doctorDetails!['specialty_ar'] != null && _doctorDetails!['specialty_ar'].toString().isNotEmpty) {
-        return _doctorDetails!['specialty_ar'];
-      }
-      if (_doctorDetails!['specialty'] != null && _doctorDetails!['specialty'].toString().isNotEmpty) {
-        return _doctorDetails!['specialty'];
-      }
-    }
-    return widget.specialty;
-  }
+  // ── stats ──
 
-  @override
-  Widget build(BuildContext context) {
-    final doctorName = _getDoctorName();
-    final doctorSpecialty = _getDoctorSpecialty();
-    final rating = _doctorDetails?['rating']?.toString() ?? '5.0';
-    final images = _getDoctorImages();
+  Widget _buildStatsCard(bool isDark) {
+    final rating = _asDouble(_doctor?['rating']);
+    final reviews = _asInt(_doctor?['total_reviews']) ?? 0;
+    final years = _asInt(_doctor?['experience_years']) ?? 0;
+    final fee = _asDouble(_doctor?['consultation_fee']);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: Column(
+    final stats = <Widget>[
+      _stat(
+        icon: Icons.star_rounded,
+        color: const Color(0xFFF59E0B),
+        value: rating > 0 ? rating.toStringAsFixed(1) : '—',
+        label: '$reviews ${'dd_reviews'.tr()}',
+      ),
+      if (years > 0)
+        _stat(
+          icon: Iconsax.medal_star,
+          color: AppColors.primary,
+          value: '$years',
+          label: 'dd_years_exp'.tr(),
+        ),
+      if (fee > 0)
+        _stat(
+          icon: Iconsax.wallet_3,
+          color: AppColors.success,
+          value: NumberFormat('#,###').format(fee),
+          label: 'consultation_price'.tr(),
+        ),
+    ];
+
+    return _card(
+      isDark: isDark,
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+      child: Row(
         children: [
+          for (var i = 0; i < stats.length; i++) ...[
+            if (i > 0)
+              Container(
+                width: 1,
+                height: 34,
+                color: AppColors.getDivider(context),
+              ),
+            Expanded(child: stats[i]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _stat({
+    required IconData icon,
+    required Color color,
+    required String value,
+    required String label,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 20, color: color),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.getTextTitle(context),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: AppColors.getTextSubtitle(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ── quick actions ──
+
+  Widget _buildQuickActions(bool isDark) {
+    final phone = _doctor?['phone']?.toString() ?? '';
+
+    return Row(
+      children: [
+        if (phone.isNotEmpty) ...[
           Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- HEADER SECTION ---
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      // Light Blue Curved Background with Premium Shadow
-                      Container(
-                        height: 220,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFE0F2FE), Color(0xFFF1F5F9)], // Very soft sky blue to slate
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(50),
-                            bottomRight: Radius.circular(50),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                              blurRadius: 30,
-                              offset: const Offset(0, 10),
-                            )
-                          ],
-                        ),
-                      ),
-                      
-                      // App Bar row
-                      SafeArea(
-                        bottom: false,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () => Navigator.pop(context),
-                                child: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.05),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF0F172A)),
-                                ),
-                              ),
-                              Consumer<FavoriteProvider>(
-                                builder: (context, favoriteProvider, child) {
-                                  final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
-                                  return GestureDetector(
-                                    onTap: () {
-                                      favoriteProvider.toggleFavorite({
-                                        'id': widget.doctorId,
-                                        'doctor': doctorName,
-                                        'specialty': doctorSpecialty,
-                                        'image': widget.image,
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.05),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Icon(
-                                        isFavorite ? Icons.favorite_rounded : Iconsax.heart,
-                                        size: 20,
-                                        color: isFavorite ? const Color(0xFFEF4444) : const Color(0xFF0F172A),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+            child: _actionButton(
+              isDark: isDark,
+              icon: Iconsax.call,
+              label: 'call'.tr(),
+              onTap: _callDoctor,
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: _actionButton(
+            isDark: isDark,
+            icon: Iconsax.message_text,
+            label: 'reviews'.tr(),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DoctorReviewsScreen(
+                  doctorName: _doctorName,
+                  rating: _asDouble(_doctor?['rating']).toStringAsFixed(1),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _actionButton(
+            isDark: isDark,
+            icon: Iconsax.share,
+            label: 'share'.tr(),
+            onTap: () => SharePlus.instance.share(
+              ShareParams(text: '$_doctorName — $_doctorSpecialty'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
-                      // Doctor Info & Avatar
-                      Positioned(
-                        top: 100,
-                        left: 20,
-                        right: 20,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            // Avatar on Right
-                            Container(
-                              width: 85,
-                              height: 85,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF0F172A).withValues(alpha: 0.08),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                                image: DecorationImage(
-                                  image: widget.image.startsWith('http') 
-                                    ? NetworkImage(widget.image) 
-                                    : AssetImage(widget.image) as ImageProvider,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            // Info on Left
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                textDirection: TextDirection.rtl,
-                                children: [
-                                  Text(
-                                    doctorName,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFF0F172A),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    doctorSpecialty,
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF475569),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    textDirection: TextDirection.rtl,
-                                    children: [
-                                      Text(
-                                        rating,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: const Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 18),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ).animate().fadeIn().slideY(begin: 0.2, end: 0),
-                    ],
+  Widget _actionButton({
+    required bool isDark,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: AppColors.getSurface(context),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.getBorder(context)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, size: 20, color: AppColors.primary),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.getTextTitle(context),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── about ──
+
+  Widget _buildAbout(bool isDark) {
+    final bio = _doctor?['bio']?.toString().trim() ?? '';
+    final hasBio = bio.isNotEmpty;
+    final isLong = bio.length > 160;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(Iconsax.profile_circle, 'about_doctor'.tr()),
+        const SizedBox(height: 12),
+        _card(
+          isDark: isDark,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                hasBio ? bio : 'dd_no_bio'.tr(),
+                maxLines: isLong && !_bioExpanded ? 3 : null,
+                overflow: isLong && !_bioExpanded ? TextOverflow.ellipsis : null,
+                style: GoogleFonts.poppins(
+                  fontSize: 13.5,
+                  height: 1.75,
+                  color: hasBio
+                      ? AppColors.getTextSubtitle(context)
+                      : AppColors.textLight,
+                ),
+              ),
+              if (isLong) ...[
+                const SizedBox(height: 8),
+                InkWell(
+                  onTap: () => setState(() => _bioExpanded = !_bioExpanded),
+                  child: Text(
+                    _bioExpanded ? 'dd_read_less'.tr() : 'read_more'.tr(),
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
                   ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
-                  const SizedBox(height: 10), // Reduced gap for overlap feel
+  // ── video ──
 
-                  // --- VIDEO CARD SECTION ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      height: 180,
-                      width: double.infinity,
+  Widget _buildVideo(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(
+          Iconsax.video_play,
+          'dd_intro_video'.tr(),
+          subtitle: 'dd_intro_video_sub'.tr(),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (_videoStarted && _youtubeController != null)
+                  YoutubePlayer(
+                    controller: _youtubeController!,
+                    backgroundColor: Colors.black,
+                  )
+                else if (_videoStarted &&
+                    _videoController != null &&
+                    _videoController!.value.isInitialized)
+                  FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: _videoController!.value.size.width,
+                      height: _videoController!.value.size.height,
+                      child: VideoPlayer(_videoController!),
+                    ),
+                  )
+                else
+                  _buildVideoPoster(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVideoPoster() {
+    return GestureDetector(
+      onTap: _startVideo,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image(image: _imageProvider(_doctorImage), fit: BoxFit.cover),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.25),
+                  Colors.black.withValues(alpha: 0.6),
+                ],
+              ),
+            ),
+          ),
+          Center(
+            child: Container(
+              width: 62,
+              height: 62,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.92),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.play_arrow_rounded,
+                size: 34,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+          if (_videoStarted)
+            const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ── services ──
+
+  Widget _buildServices(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(
+          Iconsax.health,
+          'dd_services'.tr(),
+          subtitle: _services.isEmpty ? null : 'dd_choose_service'.tr(),
+        ),
+        const SizedBox(height: 12),
+        if (_services.isEmpty)
+          _emptyBox('dd_no_services'.tr(), isDark)
+        else
+          ...List.generate(_services.length, (index) {
+            final service = _services[index] as Map;
+            final id = _asInt(service['id']);
+            final isSelected = id != null && id == _selectedServiceId;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _selectableTile(
+                isDark: isDark,
+                isSelected: isSelected,
+                onTap: () => setState(() => _selectedServiceId = id),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A), // Slate 900
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF0F172A).withValues(alpha: 0.15),
-                            blurRadius: 30,
-                            offset: const Offset(0, 15),
+                        color: isSelected
+                            ? AppColors.primary.withValues(alpha: 0.12)
+                            : AppColors.getSurfaceSecondary(context),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(
+                        Iconsax.activity,
+                        size: 20,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.getTextSubtitle(context),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _serviceName(service),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.getTextTitle(context),
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            _money(_asDouble(service['price'])),
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
                           ),
                         ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            // Video Background
-                            if (_youtubeController != null)
-                              YoutubePlayer(
-                                controller: _youtubeController!,
-                                backgroundColor: Colors.transparent,
-                              )
-                            else if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
-                              FittedBox(
-                                fit: BoxFit.cover,
-                                child: SizedBox(
-                                  width: _videoPlayerController!.value.size.width,
-                                  height: _videoPlayerController!.value.size.height,
-                                  child: VideoPlayer(_videoPlayerController!),
-                                ),
-                              )
-                            else
-                              Container(
-                                color: const Color(0xFF1E3A8A),
-                                child: const Center(child: CircularProgressIndicator(color: Colors.white)),
-                              ),
-
-                            // Overlay Gradient
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    const Color(0xFF1E3A8A).withValues(alpha: 0.8),
-                                    const Color(0xFF1E3A8A).withValues(alpha: 0.3),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            
-                            // Left Decoration Tag (using Blue instead of Green)
-                            Positioned(
-                              left: 0,
-                              top: 20,
-                              bottom: 20,
-                              child: Container(
-                                width: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF3B82F6),
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8),
-                                    bottomRight: Radius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                            // Text & Play Button
-                            Positioned(
-                              right: 20,
-                              top: 0,
-                              bottom: 0,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'ناساندنی دکتۆر',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'ببینە چۆن یارمەتیت دەدەم',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white.withValues(alpha: 0.8),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Center Play Button Overlay (Glassmorphism)
-                            Center(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.15),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
-                                    ),
-                                    child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                            // Duration Badge
-                            Positioned(
-                              left: 20,
-                              bottom: 16,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.6),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '0:45',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
-                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 100.ms),
+                    const SizedBox(width: 10),
+                    _radio(isSelected),
+                  ],
+                ),
+              ),
+            );
+          }),
+      ],
+    );
+  }
 
-                  const SizedBox(height: 32),
+  Widget _radio(bool isSelected) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isSelected ? AppColors.primary : Colors.transparent,
+        border: Border.all(
+          color: isSelected ? AppColors.primary : AppColors.getBorder(context),
+          width: 2,
+        ),
+      ),
+      child: isSelected
+          ? const Icon(Icons.check_rounded, size: 14, color: Colors.white)
+          : null,
+    );
+  }
 
-                  // --- SERVICES SECTION ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'خزمەتگوزارییەکان و داشکانەکان',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+  // ── schedule ──
+
+  Widget _buildSchedule(bool isDark) {
+    return Column(
+      key: _scheduleKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(Iconsax.calendar_1, 'dd_schedule'.tr()),
+        const SizedBox(height: 12),
+        if (_days.isEmpty)
+          _emptyBox('dd_no_days'.tr(), isDark)
+        else ...[
+          SizedBox(
+            height: 84,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.zero,
+              itemCount: _days.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final day = _days[index];
+                final isSelected = _dayIndex == index;
+
+                return GestureDetector(
+                  onTap: () => setState(() {
+                    _dayIndex = index;
+                    _timeIndex = -1;
+                    _times = _buildTimes();
+                  }),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 68,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.getBorder(context),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  SizedBox(
-                    height: 200,
-                    child: _services.isEmpty
-                      ? Center(
-                          child: Text(
-                            'هیچ خزمەتگوزارییەک نەدۆزرایەوە',
-                            style: GoogleFonts.poppins(color: const Color(0xFF64748B)),
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: _services.length,
-                          itemBuilder: (context, index) {
-                            final service = _services[index];
-                            final isSelected = _selectedServiceIndex == index;
-                            
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedServiceIndex = index;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: 160,
-                                margin: const EdgeInsets.only(left: 12),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(
-                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9), // Slate 100
-                                    width: isSelected ? 2.5 : 1,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                                      blurRadius: 25,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    // Discount Badge & Icon
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // Pink/Red badge
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFEE2E2), // Red-100
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            'داشکانی تایبەت',
-                                            style: GoogleFonts.poppins(
-                                              color: const Color(0xFFEF4444), // Red-500
-                                              fontSize: 8,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        // Icon with blue background instead of green
-                                        Container(
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFFDBEAFE), // Blue-100
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const Icon(Iconsax.magic_star, color: Color(0xFF2563EB), size: 18),
-                                        ),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    Text(
-                                      service['name'] ?? 'خزمەتگوزاری',
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF0F172A),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    // Prices
-                                    Text(
-                                      '~${(service['price'] * 1.5).toStringAsFixed(0)} د.ع~', // Mocked old price for visual
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        color: const Color(0xFF94A3B8),
-                                        decoration: TextDecoration.lineThrough,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${service['price']} د.ع',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
-                                        color: const Color(0xFF2563EB), // Primary Blue
-                                      ),
-                                    ),
-                                    Text(
-                                      '(30% داشکان)', // Mocked discount text for visual
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 10,
-                                        color: const Color(0xFF475569),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                                blurRadius: 14,
+                                offset: const Offset(0, 6),
                               ),
-                            );
-                          },
-                        ),
-                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 200.ms),
-
-                  const SizedBox(height: 32),
-
-                  // --- CLINIC IMAGES SECTION ---
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                            ]
+                          : null,
+                    ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end, // Align text RTL
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'وێنەی کلینیکەکە',
+                          _dayLabel(day.date),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.poppins(
-                            fontSize: 18,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.85)
+                                : AppColors.getTextSubtitle(context),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          DateFormat('dd').format(day.date),
+                          style: GoogleFonts.poppins(
+                            fontSize: 19,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF0F172A),
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.getTextTitle(context),
                           ),
                         ),
                         Text(
-                          'تیمێکی کارامە و کەرەستەی سەردەمیانە',
+                          _monthName(day.date),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            color: const Color(0xFF64748B),
+                            fontSize: 10,
+                            color: isSelected
+                                ? Colors.white.withValues(alpha: 0.85)
+                                : AppColors.textLight,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  
-                  SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: images.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          width: 120,
-                          margin: const EdgeInsets.only(left: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF0F172A).withValues(alpha: 0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                            image: DecorationImage(
-                              image: images[index].startsWith('http')
-                                ? NetworkImage(images[index])
-                                : AssetImage(images[index]) as ImageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 300.ms),
-
-                  const SizedBox(height: 40), // Spacing for bottom button
-                ],
-              ),
+                );
+              },
             ),
           ),
-          
-          // --- FIXED BOTTOM BOOKING BUTTON ---
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
+          const SizedBox(height: 18),
+          if (_times.isEmpty)
+            _emptyBox('dd_no_times'.tr(), isDark)
+          else
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: List.generate(_times.length, (index) {
+                final isSelected = _timeIndex == index;
+                return GestureDetector(
+                  onTap: () => setState(() => _timeIndex = index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.getSurface(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.getBorder(context),
+                      ),
+                    ),
+                    child: Text(
+                      _clock(_times[index]),
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.getTextTitle(context),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+        ],
+      ],
+    );
+  }
+
+  // ── bottom bar ──
+
+  Widget _buildBottomBar(bool isDark) {
+    final ready = _selectedDateTime != null;
+    final price = _selectedPrice;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+      decoration: BoxDecoration(
+        color: AppColors.getSurface(context),
+        border: Border(top: BorderSide(color: AppColors.getDivider(context))),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'total_price'.tr(),
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppColors.getTextSubtitle(context),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _money(price),
+                  style: GoogleFonts.poppins(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.getTextTitle(context),
+                  ),
                 ),
               ],
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
             ),
-            child: SafeArea(
-              top: false,
-              child: Container(
-                width: double.infinity,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], // Blue-500 to Blue-700
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                height: 54,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Open Bottom Sheet for Calendar and Time
-                    _showBookingBottomSheet(context);
-                  },
+                  onPressed: _isBooking ? null : _onBookPressed,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
+                    backgroundColor:
+                        ready ? AppColors.primary : AppColors.getSurfaceSecondary(context),
+                    foregroundColor:
+                        ready ? Colors.white : AppColors.getTextSubtitle(context),
+                    elevation: ready ? 6 : 0,
+                    shadowColor: AppColors.primary.withValues(alpha: 0.4),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(18),
                     ),
                   ),
                   child: Text(
-                    'گرتنی نۆرەیەک',
+                    ready ? 'dd_book_now'.tr() : 'select_time'.tr(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
-                      fontSize: 18,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // --- BOTTOM SHEET FOR CALENDAR AND TIME ---
-  void _showBookingBottomSheet(BuildContext context) {
+  // ── summary sheet ──
+
+  void _showSummarySheet() {
+    final slot = _selectedDateTime;
+    if (slot == null) return;
+    final service = _selectedService;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (BuildContext ctx) {
+      builder: (sheetContext) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
+          builder: (context, setSheetState) {
             return Container(
-              height: MediaQuery.of(context).size.height * 0.7,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              decoration: BoxDecoration(
+                color: AppColors.getSurface(context),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(28),
                 ),
               ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 12),
-                  // Handle indicator
-                  Container(
-                    width: 50,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFCBD5E1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(Iconsax.calendar_1, color: Color(0xFF2563EB), size: 20),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'هەڵبژاردنی بەروار',
-                                  style: GoogleFonts.poppins(
-                                    color: const Color(0xFF0F172A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            height: 90,
-                            child: _dynamicDates.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      "ببوورە کاتی بەردەست دیاری نەکراوە",
-                                      style: GoogleFonts.poppins(color: const Color(0xFFEF4444), fontSize: 13, fontWeight: FontWeight.w600),
-                                    ),
-                                  )
-                                : ListView.builder(
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                    scrollDirection: Axis.horizontal,
-                                    physics: const BouncingScrollPhysics(),
-                                    itemCount: _dynamicDates.length,
-                                    itemBuilder: (context, index) {
-                                      final isSelected = _selectedDateIndex == index;
-                                      final item = _dynamicDates[index];
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setModalState(() {
-                                            _selectedDateIndex = index;
-                                            _updateDynamicTimes();
-                                          });
-                                          // also update parent state
-                                          setState(() {});
-                                        },
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 250),
-                                          margin: const EdgeInsets.only(left: 10),
-                                          width: 72,
-                                          decoration: BoxDecoration(
-                                            color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-                                            borderRadius: BorderRadius.circular(22),
-                                            border: Border.all(
-                                              color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-                                              width: isSelected ? 2 : 1,
-                                            ),
-                                            boxShadow: isSelected
-                                                ? [
-                                                    BoxShadow(
-                                                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                                                      blurRadius: 12,
-                                                      offset: const Offset(0, 6),
-                                                    )
-                                                  ]
-                                                : [],
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                item['day'],
-                                                style: GoogleFonts.poppins(
-                                                  color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF64748B),
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                item['date'],
-                                                style: GoogleFonts.poppins(
-                                                  color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                item['month'],
-                                                style: GoogleFonts.poppins(
-                                                  color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF94A3B8),
-                                                  fontSize: 11,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                          const SizedBox(height: 32),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(Iconsax.clock, color: Color(0xFF2563EB), size: 20),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'کاتژمێرە بەردەستەکان',
-                                  style: GoogleFonts.poppins(
-                                    color: const Color(0xFF0F172A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: _dynamicTimes.isEmpty
-                                ? Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFEF2F2),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      'تکایە کاتژمێری دیاریکراو لەم بەشەدا بەردەست نییە',
-                                      style: GoogleFonts.poppins(color: const Color(0xFF991B1B), fontSize: 13, fontWeight: FontWeight.w600),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                : Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    alignment: WrapAlignment.start,
-                                    children: List.generate(_dynamicTimes.length, (index) {
-                                      final isSelected = _selectedTimeIndex == index;
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setModalState(() => _selectedTimeIndex = index);
-                                          setState(() {});
-                                        },
-                                        child: AnimatedContainer(
-                                          duration: const Duration(milliseconds: 200),
-                                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                                          decoration: BoxDecoration(
-                                            color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-                                            borderRadius: BorderRadius.circular(16),
-                                            border: Border.all(
-                                              color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-                                            ),
-                                            boxShadow: isSelected
-                                                ? [
-                                                    BoxShadow(
-                                                      color: const Color(0xFF2563EB).withValues(alpha: 0.25),
-                                                      blurRadius: 10,
-                                                      offset: const Offset(0, 4),
-                                                    )
-                                                  ]
-                                                : [],
-                                          ),
-                                          child: Text(
-                                            _dynamicTimes[index],
-                                            style: GoogleFonts.poppins(
-                                              color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                                              fontSize: 14,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                          ),
-                          const SizedBox(height: 32),
-                        ],
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 44,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.getDivider(context),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 20,
-                          offset: const Offset(0, -5),
+                    const SizedBox(height: 20),
+                    Text(
+                      'dd_summary'.tr(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.getTextTitle(context),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _summaryRow(Iconsax.user, 'dd_doctor'.tr(), _doctorName),
+                    if (service != null)
+                      _summaryRow(
+                        Iconsax.health,
+                        'dd_service'.tr(),
+                        _serviceName(service),
+                      ),
+                    _summaryRow(
+                      Iconsax.calendar_1,
+                      'dd_date'.tr(),
+                      _fullDate(slot),
+                    ),
+                    _summaryRow(
+                      Iconsax.clock,
+                      'dd_time'.tr(),
+                      _clock(slot),
+                    ),
+                    const SizedBox(height: 6),
+                    Divider(color: AppColors.getDivider(context)),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'total_price'.tr(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.getTextSubtitle(context),
+                          ),
+                        ),
+                        Text(
+                          _money(_selectedPrice),
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
-                    child: SafeArea(
-                      top: false,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: _isBooking ? null : () {
-                            if (_selectedTimeIndex != -1) {
-                              _bookAppointment();
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('تکایە کاتژمێرێک هەڵبژێرە'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2563EB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton(
+                        onPressed:
+                            _isBooking ? null : () => _submitBooking(setSheetState),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
                           ),
-                          child: _isBooking
-                              ? const SizedBox(
-                                  width: 24, height: 24,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
-                                )
-                              : Text(
-                                  'تەواوکردنی نۆرە',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
                         ),
+                        child: _isBooking
+                            ? const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
+                              )
+                            : Text(
+                                'dd_confirm'.tr(),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
         );
       },
+    );
+  }
+
+  Widget _summaryRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 17, color: AppColors.primary),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: AppColors.getTextSubtitle(context),
+            ),
+          ),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: AppColors.getTextTitle(context),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── login prompt ──
+
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.getSurface(context),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'dd_login_title'.tr(),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            color: AppColors.getTextTitle(context),
+          ),
+        ),
+        content: Text(
+          'dd_login_desc'.tr(),
+          style: GoogleFonts.poppins(
+            fontSize: 13.5,
+            height: 1.7,
+            color: AppColors.getTextSubtitle(context),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'dd_later'.tr(),
+              style: GoogleFonts.poppins(color: AppColors.getTextSubtitle(context)),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AppFlow(startAtLogin: true),
+                ),
+                (route) => false,
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: Text(
+              'dd_login'.tr(),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── shared building blocks ──
+
+  Widget _sectionHeader(IconData icon, String title, {String? subtitle}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 17, color: AppColors.primary),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.getTextTitle(context),
+                ),
+              ),
+              if (subtitle != null)
+                Text(
+                  subtitle,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11.5,
+                    color: AppColors.getTextSubtitle(context),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _card({
+    required bool isDark,
+    required Widget child,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppColors.getSurface(context),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.getBorder(context)),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _selectableTile({
+    required bool isDark,
+    required bool isSelected,
+    required VoidCallback onTap,
+    required Widget child,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? AppColors.primary.withValues(alpha: isDark ? 0.14 : 0.06)
+                : AppColors.getSurface(context),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.getBorder(context),
+              width: isSelected ? 1.6 : 1,
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyBox(String message, bool isDark) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+      decoration: BoxDecoration(
+        color: AppColors.getSurfaceSecondary(context),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          color: AppColors.getTextSubtitle(context),
+        ),
+      ),
+    );
+  }
+
+  // ── loading / error ──
+
+  List<Widget> _buildSkeleton(bool isDark) {
+    Widget bar(double height, double widthFactor) => FractionallySizedBox(
+          alignment: AlignmentDirectional.centerStart,
+          widthFactor: widthFactor,
+          child: Container(
+            height: height,
+            decoration: BoxDecoration(
+              color: AppColors.getSurfaceSecondary(context),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+
+    return [
+      bar(86, 1),
+      const SizedBox(height: 24),
+      bar(20, 0.4),
+      const SizedBox(height: 12),
+      bar(90, 1),
+      const SizedBox(height: 24),
+      bar(20, 0.5),
+      const SizedBox(height: 12),
+      bar(70, 1),
+      const SizedBox(height: 12),
+      bar(70, 1),
+    ].animate(onPlay: (c) => c.repeat()).fadeIn(duration: 700.ms).then().fadeOut(
+          duration: 700.ms,
+          begin: 0.4,
+        );
+  }
+
+  Widget _buildErrorState() {
+    return SafeArea(
+      child: Column(
+        children: [
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18,
+                color: AppColors.getTextTitle(context),
+              ),
+            ),
+          ),
+          const Spacer(),
+          Icon(Iconsax.cloud_cross, size: 56, color: AppColors.textLight),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'dd_load_failed'.tr(),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                height: 1.7,
+                color: AppColors.getTextSubtitle(context),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _loading = true;
+                _loadFailed = false;
+              });
+              _fetchDoctor();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: Text(
+              'dd_retry'.tr(),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+            ),
+          ),
+          const Spacer(flex: 2),
+        ],
+      ),
     );
   }
 }
