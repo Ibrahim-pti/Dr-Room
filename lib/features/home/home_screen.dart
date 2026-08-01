@@ -1564,7 +1564,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final next = upcoming.first;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -1573,7 +1573,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         child: Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.getSurface(context),
             borderRadius: BorderRadius.circular(24),
@@ -1588,85 +1588,159 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          child: Row(
+          child: Column(
             children: [
-              Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                  image: next.doctorImageUrl != null
-                      ? DecorationImage(
-                          image: CachedNetworkImageProvider(
-                            next.doctorImageUrl!,
-                          ),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: next.doctorImageUrl == null
-                    ? const Icon(Iconsax.user, color: Color(0xFF3B82F6))
-                    : null,
+              // ── Header: Title & Status ──
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'upcoming_appointments'.tr(),
+                    style: GoogleFonts.poppins(
+                      color: AppColors.getTextTitle(context),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: next.status.color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      next.status.kurdiName, // Kurdish translation for status
+                      style: GoogleFonts.poppins(
+                        color: next.status.color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              const SizedBox(height: 16),
+              
+              // ── Doctor Info ──
+              Row(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                      image: next.doctorImageUrl != null
+                          ? DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                next.doctorImageUrl!,
+                              ),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: next.doctorImageUrl == null
+                        ? const Icon(Iconsax.user, color: Color(0xFF3B82F6))
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            'upcoming_appointments'.tr(),
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextSubtitle(context),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
+                        Text(
+                          next.doctorName.isNotEmpty ? next.doctorName : 'Doctor',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.getTextTitle(context),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
+                        const SizedBox(height: 4),
+                        Text(
+                          next.doctorSpecialty.isNotEmpty 
+                              ? next.doctorSpecialty 
+                              : 'پزیشکی گشتی',
+                          style: GoogleFonts.poppins(
+                            color: AppColors.getTextSubtitle(context),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                           ),
-                          decoration: BoxDecoration(
-                            color: next.status.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            next.status.displayName,
-                            style: GoogleFonts.poppins(
-                              color: next.status.color,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEFF6FF),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Iconsax.arrow_left_2, // Left arrow for RTL
+                      color: Color(0xFF3B82F6),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              const Divider(color: Color(0xFFF1F5F9), height: 1),
+              const SizedBox(height: 16),
+              
+              // ── Date & Time (Moved down nicely) ──
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Iconsax.calendar_1, 
+                          color: Color(0xFF64748B), 
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          next.formattedDate,
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF475569),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      next.doctorName.isNotEmpty ? next.doctorName : 'Doctor',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Iconsax.clock, 
+                          color: Color(0xFF64748B), 
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          next.formattedTime,
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF475569),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      next.formattedDateTime,
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextSubtitle(context),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
