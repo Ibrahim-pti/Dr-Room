@@ -28,7 +28,11 @@ class FavoriteDoctorsScreen extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.getTextTitle(context), size: 20),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: AppColors.getTextTitle(context),
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -47,7 +51,11 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                       color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Iconsax.heart_slash, size: 48, color: Color(0xFFEF4444)),
+                    child: const Icon(
+                      Iconsax.heart_slash,
+                      size: 48,
+                      color: Color(0xFFEF4444),
+                    ),
                   ),
                   const SizedBox(height: 24),
                   Text(
@@ -78,80 +86,90 @@ class FavoriteDoctorsScreen extends StatelessWidget {
               final doctor = favorites[index];
               return Padding(
                 padding: const EdgeInsetsDirectional.only(bottom: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DoctorDetailsScreen(
-                          doctorId: doctor['id'] ?? 1,
-                          name: doctor['doctor']!,
-                          specialty: doctor['specialty']!,
-                          image: doctor['image']!,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.getSurface(context),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage(doctor['image']!),
-                              fit: BoxFit.cover,
+                child:
+                    GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DoctorDetailsScreen(
+                                  doctorId: doctor['id'] ?? 1,
+                                  name: doctor['doctor']!,
+                                  specialty: doctor['specialty']!,
+                                  image: doctor['image']!,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppColors.getSurface(context),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: AssetImage(doctor['image']!),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        doctor['doctor']!,
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextTitle(
+                                            context,
+                                          ),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        doctor['specialty']!,
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.textLight,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.favorite,
+                                    color: Color(0xFFEF4444),
+                                  ),
+                                  onPressed: () {
+                                    favoriteProvider.toggleFavorite(doctor);
+                                  },
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doctor['doctor']!,
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getTextTitle(context),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                doctor['specialty']!,
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.textLight,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.favorite, color: Color(0xFFEF4444)),
-                          onPressed: () {
-                            favoriteProvider.toggleFavorite(doctor);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate(delay: (100 * index).ms).fadeIn().slideY(begin: 0.1, end: 0),
+                        )
+                        .animate(delay: (100 * index).ms)
+                        .fadeIn()
+                        .slideY(begin: 0.1, end: 0),
               );
             },
           );

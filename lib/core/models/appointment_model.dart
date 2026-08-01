@@ -1,3 +1,4 @@
+import 'package:dr_room/core/utils/api_client.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -61,24 +62,24 @@ class Doctor {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'user_id': userId,
-        'name': name,
-        'specialty': specialty,
-        'bio': bio,
-        'rating': rating,
-        'total_reviews': totalReviews,
-        'consultation_fee': consultationFee,
-        'experience_years': experienceYears,
-        'phone': phone,
-        'available_days': availableDays,
-        'image_path': imagePath,
-      };
+    'id': id,
+    'user_id': userId,
+    'name': name,
+    'specialty': specialty,
+    'bio': bio,
+    'rating': rating,
+    'total_reviews': totalReviews,
+    'consultation_fee': consultationFee,
+    'experience_years': experienceYears,
+    'phone': phone,
+    'available_days': availableDays,
+    'image_path': imagePath,
+  };
 
   /// Absolute URL for the profile photo, or null when none is set.
   String? get imageUrl => (imagePath == null || imagePath!.isEmpty)
       ? null
-      : '${AppConfig.storageUrl}/$imagePath';
+      : ApiClient.getImageUrl(imagePath!);
 
   String get formattedFee => '\$${consultationFee.toStringAsFixed(0)}';
 }
@@ -136,27 +137,28 @@ class Appointment {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'doctor_id': doctorId,
-        'patient_id': patientId,
-        'appointment_date': appointmentDate.toIso8601String(),
-        'fee': fee,
-        'type': type.apiValue,
-        'notes': notes,
-        'status': status.apiValue,
-        'doctor': {
-          'specialty': doctorSpecialty,
-          'image_path': doctorImagePath,
-          'user': {'name': doctorName},
-        },
-      };
+    'id': id,
+    'doctor_id': doctorId,
+    'patient_id': patientId,
+    'appointment_date': appointmentDate.toIso8601String(),
+    'fee': fee,
+    'type': type.apiValue,
+    'notes': notes,
+    'status': status.apiValue,
+    'doctor': {
+      'specialty': doctorSpecialty,
+      'image_path': doctorImagePath,
+      'user': {'name': doctorName},
+    },
+  };
 
   String? get doctorImageUrl =>
       (doctorImagePath == null || doctorImagePath!.isEmpty)
-          ? null
-          : '${AppConfig.storageUrl}/$doctorImagePath';
+      ? null
+      : ApiClient.getImageUrl(doctorImagePath!);
 
-  String get formattedDate => DateFormat('MMM dd, yyyy').format(appointmentDate);
+  String get formattedDate =>
+      DateFormat('MMM dd, yyyy').format(appointmentDate);
   String get formattedTime => DateFormat('hh:mm a').format(appointmentDate);
   String get formattedDateTime => '$formattedDate • $formattedTime';
   String get formattedFee => '\$${fee.toStringAsFixed(2)}';
@@ -183,14 +185,14 @@ enum AppointmentType {
       .firstWhere((t) => t.apiValue == value, orElse: () => inPerson);
 
   String get displayName => switch (this) {
-        AppointmentType.inPerson => 'In person',
-        AppointmentType.online => 'Online',
-      };
+    AppointmentType.inPerson => 'In person',
+    AppointmentType.online => 'Online',
+  };
 
   String get kurdiName => switch (this) {
-        AppointmentType.inPerson => 'سەردانی نۆرینگە',
-        AppointmentType.online => 'ڕاوێژی ئۆنلاین',
-      };
+    AppointmentType.inPerson => 'سەردانی نۆرینگە',
+    AppointmentType.online => 'ڕاوێژی ئۆنلاین',
+  };
 }
 
 /// `appointments.status` — the API validates
@@ -209,25 +211,25 @@ enum AppointmentStatus {
       .firstWhere((s) => s.apiValue == value, orElse: () => pending);
 
   String get displayName => switch (this) {
-        AppointmentStatus.pending => 'Pending',
-        AppointmentStatus.confirmed => 'Confirmed',
-        AppointmentStatus.cancelled => 'Cancelled',
-        AppointmentStatus.completed => 'Completed',
-      };
+    AppointmentStatus.pending => 'Pending',
+    AppointmentStatus.confirmed => 'Confirmed',
+    AppointmentStatus.cancelled => 'Cancelled',
+    AppointmentStatus.completed => 'Completed',
+  };
 
   String get kurdiName => switch (this) {
-        AppointmentStatus.pending => 'چاوەڕوانکراو',
-        AppointmentStatus.confirmed => 'پەسەندکراو',
-        AppointmentStatus.cancelled => 'هەڵوەشاوە',
-        AppointmentStatus.completed => 'تەواوکراو',
-      };
+    AppointmentStatus.pending => 'چاوەڕوانکراو',
+    AppointmentStatus.confirmed => 'پەسەندکراو',
+    AppointmentStatus.cancelled => 'هەڵوەشاوە',
+    AppointmentStatus.completed => 'تەواوکراو',
+  };
 
   Color get color => switch (this) {
-        AppointmentStatus.pending => const Color(0xFFF39C12),
-        AppointmentStatus.confirmed => const Color(0xFF2E86DE),
-        AppointmentStatus.cancelled => const Color(0xFFEF4444),
-        AppointmentStatus.completed => const Color(0xFF27AE60),
-      };
+    AppointmentStatus.pending => const Color(0xFFF39C12),
+    AppointmentStatus.confirmed => const Color(0xFF2E86DE),
+    AppointmentStatus.cancelled => const Color(0xFFEF4444),
+    AppointmentStatus.completed => const Color(0xFF27AE60),
+  };
 }
 
 // ── Coercion helpers ────────────────────────────────────────────────────────
@@ -235,24 +237,25 @@ enum AppointmentStatus {
 // either int or string depending on the driver, so parse defensively.
 
 int _asInt(dynamic value) => switch (value) {
-      int v => v,
-      num v => v.toInt(),
-      String v => int.tryParse(v) ?? 0,
-      _ => 0,
-    };
+  int v => v,
+  num v => v.toInt(),
+  String v => int.tryParse(v) ?? 0,
+  _ => 0,
+};
 
 double _asDouble(dynamic value) => switch (value) {
-      double v => v,
-      num v => v.toDouble(),
-      String v => double.tryParse(v) ?? 0,
-      _ => 0,
-    };
+  double v => v,
+  num v => v.toDouble(),
+  String v => double.tryParse(v) ?? 0,
+  _ => 0,
+};
 
-DateTime _asDate(dynamic value) =>
-    value is String ? (DateTime.tryParse(value) ?? DateTime.now()) : DateTime.now();
+DateTime _asDate(dynamic value) => value is String
+    ? (DateTime.tryParse(value) ?? DateTime.now())
+    : DateTime.now();
 
 List<String> _asStringList(dynamic value) => switch (value) {
-      List v => v.map((e) => e.toString()).toList(),
-      String v when v.isNotEmpty => [v],
-      _ => <String>[],
-    };
+  List v => v.map((e) => e.toString()).toList(),
+  String v when v.isNotEmpty => [v],
+  _ => <String>[],
+};

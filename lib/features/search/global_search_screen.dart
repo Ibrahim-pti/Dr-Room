@@ -273,7 +273,7 @@ class _GlobalSearchScreenState extends State<GlobalSearchScreen> {
   String? _getImageUrl(String? image) {
     if (image != null && image.isNotEmpty && image != 'image') {
       if (image.startsWith('http')) return image;
-      return '${ApiClient.storageUrl}/$image';
+      return ApiClient.getImageUrl(image);
     }
     return null;
   }

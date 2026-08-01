@@ -1364,7 +1364,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             image: profileImage != null
                                                 ? DecorationImage(
                                                     image: CachedNetworkImageProvider(
-                                                      'http://127.0.0.1:8000/storage/$profileImage',
+                                                      ApiClient.getImageUrl(profileImage),
                                                     ),
                                                     fit: BoxFit.cover,
                                                   )

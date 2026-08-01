@@ -106,7 +106,7 @@ class _PromoCarouselState extends State<PromoCarousel> {
                       ),
                     ],
                     image: DecorationImage(
-                      image: NetworkImage('${ApiClient.storageUrl}/${promo['image_path']}'),
+                      image: NetworkImage(ApiClient.getImageUrl(promo['image_path'])),
                       fit: BoxFit.cover,
                     ),
                   ),
