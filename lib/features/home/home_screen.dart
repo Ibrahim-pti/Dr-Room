@@ -256,10 +256,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       clipBehavior: Clip.none,
                       children: [
                         // Blue Gradient Background
-                        Container(
-                          height: 190,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
+                        ClipPath(
+                          clipper: OvalBottomBorderClipper(),
+                          child: Container(
+                            height: 280,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
@@ -309,6 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ],
                           ),
+                        ),
                         ),
 
                         // Content over background
@@ -523,9 +526,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.2, end: 0),
-
-                                const SizedBox(height: 24),
-
+                                const SizedBox(height: 50),
                                 // ── Search Bar ──
                                 GestureDetector(
                                       onTap: () {
@@ -2186,4 +2187,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class OvalBottomBorderClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 50);
+    path.quadraticBezierTo(
+        size.width / 2, size.height, size.width, size.height - 50);
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
