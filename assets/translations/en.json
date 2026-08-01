@@ -479,5 +479,8 @@
   "rv_failed": "Couldn't send your review, please try again",
   "rv_load_failed": "Couldn't load reviews",
   "rv_patient": "A patient",
-  "rv_edit_note": "You already reviewed — sending again replaces it."
+  "rv_edit_note": "You already reviewed — sending again replaces it.",
+  "dd_location": "Clinic location",
+  "dd_open_maps": "Open in Maps",
+  "dd_no_address": "No address provided"
 }

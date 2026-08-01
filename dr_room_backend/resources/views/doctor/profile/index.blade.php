@@ -107,6 +107,48 @@
             </div>
         </div>
 
+        <!-- Clinic location -->
+        <div class="space-y-4 pt-2 border-t border-slate-100">
+            <h4 class="text-sm font-bold text-slate-800 pt-4">شوێنی کلینیک</h4>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="clinic_name" class="block text-sm font-medium text-slate-700 mb-2">ناوی کلینیک</label>
+                    <input type="text" id="clinic_name" name="clinic_name" value="{{ old('clinic_name', $doctor->clinic_name) }}" placeholder="کلینیکی ..."
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
+
+                <div>
+                    <label for="address" class="block text-sm font-medium text-slate-700 mb-2">ناونیشان</label>
+                    <input type="text" id="address" name="address" value="{{ old('address', $doctor->address) }}" placeholder="شەقام، گەڕەک، شار"
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">شوێن لەسەر نەخشە</label>
+                <p class="text-xs text-slate-400 mb-2">کلیک لەسەر نەخشەکە بکە بۆ دانانی نیشانە، یان دوگمەی «شوێنی ئێستام» لێبدە.</p>
+                <div id="map" class="w-full h-72 rounded-xl border border-slate-200 z-0"></div>
+
+                <div class="flex flex-wrap items-center gap-3 mt-3">
+                    <button type="button" onclick="useMyLocation()"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        شوێنی ئێستام
+                    </button>
+                    <button type="button" onclick="clearLocation()"
+                        class="px-4 py-2 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 transition-colors text-sm font-medium">
+                        سڕینەوەی شوێن
+                    </button>
+                    <span id="coords_label" class="text-xs text-slate-400" dir="ltr"></span>
+                </div>
+
+                <input type="hidden" id="latitude" name="latitude" value="{{ old('latitude', $doctor->latitude) }}">
+                <input type="hidden" id="longitude" name="longitude" value="{{ old('longitude', $doctor->longitude) }}">
+                @error('latitude') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
         <!-- Bio -->
         <div class="space-y-4">
             <div>
@@ -226,5 +268,78 @@
         btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> چاوەڕێ بکە...';
         btn.classList.add('opacity-70', 'cursor-not-allowed');
     });
+</script>
+
+{{-- Leaflet + OpenStreetMap: no API key, same tiles the Flutter app uses. --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    // Erbil, as a starting view when the doctor has no pin yet.
+    const DEFAULT_CENTER = [36.1911, 44.0092];
+
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const coordsLabel = document.getElementById('coords_label');
+
+    const savedLat = parseFloat(latInput.value);
+    const savedLng = parseFloat(lngInput.value);
+    const hasSaved = !isNaN(savedLat) && !isNaN(savedLng);
+
+    const map = L.map('map').setView(hasSaved ? [savedLat, savedLng] : DEFAULT_CENTER, hasSaved ? 15 : 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    let marker = null;
+
+    function setLocation(lat, lng, fly) {
+        latInput.value = lat.toFixed(7);
+        lngInput.value = lng.toFixed(7);
+        coordsLabel.textContent = lat.toFixed(5) + ', ' + lng.toFixed(5);
+
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', function (e) {
+                const p = e.target.getLatLng();
+                setLocation(p.lat, p.lng, false);
+            });
+        }
+
+        if (fly) map.setView([lat, lng], 16);
+    }
+
+    function clearLocation() {
+        latInput.value = '';
+        lngInput.value = '';
+        coordsLabel.textContent = '';
+        if (marker) {
+            map.removeLayer(marker);
+            marker = null;
+        }
+    }
+
+    function useMyLocation() {
+        if (!navigator.geolocation) {
+            alert('وێبگەڕەکەت پشتگیری شوێن ناکات.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function (pos) { setLocation(pos.coords.latitude, pos.coords.longitude, true); },
+            function () { alert('نەتوانرا شوێنەکەت بدۆزرێتەوە. ڕێگەپێدان بپشکنە.'); },
+        );
+    }
+
+    map.on('click', function (e) { setLocation(e.latlng.lat, e.latlng.lng, false); });
+
+    if (hasSaved) setLocation(savedLat, savedLng, false);
+
+    // The container starts hidden inside the form layout on some screens.
+    setTimeout(function () { map.invalidateSize(); }, 200);
 </script>
 @endsection

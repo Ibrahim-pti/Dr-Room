@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -549,17 +550,20 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         ..add(_buildVideo(isDark));
     }
 
-    if ((_doctor?['phone']?.toString() ?? '').isNotEmpty) {
-      sections
-        ..add(const SizedBox(height: 16))
-        ..add(_buildCallButton(isDark));
-    }
-
     sections
       ..add(const SizedBox(height: 24))
       ..add(_buildServices(isDark))
       ..add(const SizedBox(height: 24))
       ..add(_buildSchedule(isDark));
+
+    // Last: once the slot is picked, "where do I go?" is the next question.
+    final address = _doctor?['address']?.toString().trim() ?? '';
+    final clinic = _doctor?['clinic_name']?.toString().trim() ?? '';
+    if (_hasLocation || address.isNotEmpty || clinic.isNotEmpty) {
+      sections
+        ..add(const SizedBox(height: 24))
+        ..add(_buildLocation(isDark));
+    }
 
     return sections
         .animate(interval: 40.ms)
@@ -859,7 +863,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     final rating = _asDouble(_doctor?['rating']);
     final reviews = _asInt(_doctor?['total_reviews']) ?? 0;
     final years = _asInt(_doctor?['experience_years']) ?? 0;
-    final fee = _asDouble(_doctor?['consultation_fee']);
+    final phone = _doctor?['phone']?.toString().trim() ?? '';
 
     // Always three columns — a card with a single centred stat reads as broken
     // when the doctor hasn't filled in their profile yet.
@@ -878,11 +882,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         value: years > 0 ? '$years' : '—',
         label: 'dd_years_exp'.tr(),
       ),
+      // Tapping dials — a number you can't call is just decoration.
       _stat(
-        icon: Iconsax.wallet_3,
+        icon: Iconsax.call,
         color: AppColors.success,
-        value: fee > 0 ? NumberFormat('#,###').format(fee) : '—',
-        label: 'consultation_price'.tr(),
+        value: phone.isNotEmpty ? phone : '—',
+        valueSize: 12.5,
+        label: 'call'.tr(),
+        onTap: phone.isNotEmpty ? _callDoctor : null,
       ),
     ];
 
@@ -906,6 +913,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     required Color color,
     required String value,
     required String label,
+    double valueSize = 15,
     VoidCallback? onTap,
   }) {
     final column = Column(
@@ -915,8 +923,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         const SizedBox(height: 4),
         Text(
           value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textDirection: TextDirection.ltr,
           style: GoogleFonts.poppins(
-            fontSize: 15,
+            fontSize: valueSize,
             fontWeight: FontWeight.bold,
             color: AppColors.getTextTitle(context),
           ),
@@ -964,38 +975,143 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   // ── quick actions ──
 
-  /// Only rendered when the doctor published a phone number.
-  Widget _buildCallButton(bool isDark) {
-    return Material(
-      color: AppColors.getSurface(context),
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: _callDoctor,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: AppColors.getBorder(context)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+  // ── location ──
+
+  double? get _latitude => double.tryParse(_doctor?['latitude']?.toString() ?? '');
+  double? get _longitude => double.tryParse(_doctor?['longitude']?.toString() ?? '');
+  bool get _hasLocation => _latitude != null && _longitude != null;
+
+  Future<void> _openInMaps() async {
+    final lat = _latitude;
+    final lng = _longitude;
+    if (lat == null || lng == null) return;
+
+    final label = Uri.encodeComponent(
+      _doctor?['clinic_name']?.toString().trim().isNotEmpty == true
+          ? _doctor!['clinic_name'].toString()
+          : _doctorName,
+    );
+    final uri = Uri.parse('geo:$lat,$lng?q=$lat,$lng($label)');
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      return;
+    }
+    // No maps app registered for geo: — fall back to the browser.
+    await launchUrl(
+      Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng'),
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  Widget _buildLocation(bool isDark) {
+    final clinic = _doctor?['clinic_name']?.toString().trim() ?? '';
+    final address = _doctor?['address']?.toString().trim() ?? '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionHeader(Iconsax.location, 'dd_location'.tr()),
+        const SizedBox(height: 10),
+        _card(
+          isDark: isDark,
+          padding: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Iconsax.call, size: 19, color: AppColors.primary),
-              const SizedBox(width: 10),
-              Text(
-                'call'.tr(),
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.getTextTitle(context),
+              if (_hasLocation)
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(21),
+                  ),
+                  child: SizedBox(
+                    height: 170,
+                    child: Stack(
+                      children: [
+                        GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: LatLng(_latitude!, _longitude!),
+                            zoom: 15,
+                          ),
+                          markers: {
+                            Marker(
+                              markerId: MarkerId('doctor-${widget.doctorId}'),
+                              position: LatLng(_latitude!, _longitude!),
+                            ),
+                          },
+                          zoomControlsEnabled: false,
+                          myLocationButtonEnabled: false,
+                          liteModeEnabled: true, // static preview, cheap to draw
+                        ),
+                        // Lite mode swallows taps, so the whole preview opens
+                        // the real maps app instead.
+                        Positioned.fill(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(onTap: _openInMaps),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (clinic.isNotEmpty)
+                            Text(
+                              clinic,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.getTextTitle(context),
+                              ),
+                            ),
+                          if (clinic.isNotEmpty && address.isNotEmpty)
+                            const SizedBox(height: 3),
+                          Text(
+                            address.isNotEmpty ? address : 'dd_no_address'.tr(),
+                            style: GoogleFonts.poppins(
+                              fontSize: 12.5,
+                              height: 1.6,
+                              color: address.isNotEmpty
+                                  ? AppColors.getTextSubtitle(context)
+                                  : AppColors.textLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_hasLocation) ...[
+                      const SizedBox(width: 10),
+                      TextButton.icon(
+                        onPressed: _openInMaps,
+                        icon: const Icon(Iconsax.direct_right, size: 16),
+                        label: Text(
+                          'dd_open_maps'.tr(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 

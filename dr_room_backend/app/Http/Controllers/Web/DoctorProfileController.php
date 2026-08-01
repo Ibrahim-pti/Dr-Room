@@ -31,6 +31,10 @@ class DoctorProfileController extends Controller
             'bio_ar' => 'nullable|string',
             'experience_years' => 'nullable|integer|min:0|max:70',
             'consultation_fee' => 'nullable|numeric|min:0',
+            'clinic_name' => 'nullable|string|max:255',
+            'address' => 'nullable|string|max:500',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'image' => 'nullable|image|max:5120',
             'video_type' => 'nullable|in:youtube,uploaded',
             'youtube_url' => 'nullable|url',
@@ -48,6 +52,13 @@ class DoctorProfileController extends Controller
                 'bio' => $request->bio,
                 'experience_years' => $request->filled('experience_years') ? $request->experience_years : null,
                 'consultation_fee' => $request->filled('consultation_fee') ? $request->consultation_fee : null,
+                'clinic_name' => $request->clinic_name,
+                'address' => $request->address,
+                'latitude' => $request->filled('latitude') ? $request->latitude : null,
+                'longitude' => $request->filled('longitude') ? $request->longitude : null,
+                // The API exposes the doctor record, not the user, so the
+                // contact number has to live on both.
+                'phone' => $request->phone,
             ];
 
             if ($request->hasFile('image')) {
