@@ -1004,6 +1004,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => DoctorReviewsScreen(
+          doctorId: widget.doctorId,
           doctorName: _doctorName,
           rating: _asDouble(_doctor?['rating']).toStringAsFixed(1),
         ),
