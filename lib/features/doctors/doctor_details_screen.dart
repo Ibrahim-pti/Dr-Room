@@ -169,6 +169,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       _times = _buildTimes();
       if (_timeIndex >= _times.length) _timeIndex = -1;
     });
+    _startVideo();
   }
 
   /// Projects the weekly schedule onto the next 30 calendar days, keeping only
@@ -452,9 +453,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     return url;
   }
 
+  /// Runs as soon as the doctor's data lands — the intro video autoplays.
   void _startVideo() {
     final url = _videoUrl;
-    if (url == null || _videoStarted) return;
+    if (url == null || _videoStarted || !mounted) return;
 
     if (_isYoutube) {
       final id = _youtubeId(url);
@@ -473,6 +475,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       final full = url.startsWith('http') ? url : ApiClient.getImageUrl(url);
       _videoController = VideoPlayerController.networkUrl(Uri.parse(full))
         ..initialize().then((_) {
+          _videoController?.setLooping(true);
           _videoController?.play();
           if (mounted) setState(() {});
         }).catchError((_) {});
@@ -515,9 +518,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   List<Widget> _buildSections(bool isDark) {
     final sections = <Widget>[
-      _buildStatsCard(isDark),
-      const SizedBox(height: 28),
       _buildAbout(isDark),
+      const SizedBox(height: 20),
+      _buildStatsCard(isDark),
     ];
 
     if (_videoUrl != null) {
@@ -1033,45 +1036,34 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   // ── video ──
 
   Widget _buildVideo(bool isDark) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _sectionHeader(
-          Iconsax.video_play,
-          'dd_intro_video'.tr(),
-          subtitle: 'dd_intro_video_sub'.tr(),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (_videoStarted && _youtubeController != null)
+              YoutubePlayer(
+                controller: _youtubeController!,
+                backgroundColor: Colors.black,
+              )
+            else if (_videoStarted &&
+                _videoController != null &&
+                _videoController!.value.isInitialized)
+              FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _videoController!.value.size.width,
+                  height: _videoController!.value.size.height,
+                  child: VideoPlayer(_videoController!),
+                ),
+              )
+            else
+              _buildVideoPoster(),
+          ],
         ),
-        const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                if (_videoStarted && _youtubeController != null)
-                  YoutubePlayer(
-                    controller: _youtubeController!,
-                    backgroundColor: Colors.black,
-                  )
-                else if (_videoStarted &&
-                    _videoController != null &&
-                    _videoController!.value.isInitialized)
-                  FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _videoController!.value.size.width,
-                      height: _videoController!.value.size.height,
-                      child: VideoPlayer(_videoController!),
-                    ),
-                  )
-                else
-                  _buildVideoPoster(),
-              ],
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
