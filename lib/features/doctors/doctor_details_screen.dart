@@ -165,8 +165,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       _doctor = handedOver;
       _loading = false;
       _services = (handedOver['services'] as List?) ?? const [];
-      _selectedServiceId =
-          _services.isNotEmpty ? _asInt(_services.first['id']) : null;
+      _selectedServiceId = _services.isNotEmpty
+          ? _asInt(_services.first['id'])
+          : null;
     }
 
     _fetchDoctor();
@@ -211,7 +212,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       _loading = false;
       _loadFailed = false;
       _services = (data['services'] as List?) ?? const [];
-      _selectedServiceId ??= _services.isNotEmpty ? _asInt(_services.first['id']) : null;
+      _selectedServiceId ??= _services.isNotEmpty
+          ? _asInt(_services.first['id'])
+          : null;
     });
     _startVideo();
   }
@@ -220,8 +223,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   /// which times are already booked, neither of which the app can infer.
   Future<void> _fetchAvailability() async {
     try {
-      final response =
-          await ApiClient.get('/doctors/${widget.doctorId}/availability');
+      final response = await ApiClient.get(
+        '/doctors/${widget.doctorId}/availability',
+      );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final days = <_BookableDay>[];
@@ -244,12 +248,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     if (mounted) setState(() => _slotsLoading = false);
   }
 
-  List<_Slot> get _slots =>
-      _days.isEmpty || _dayIndex >= _days.length ? const [] : _days[_dayIndex].slots;
+  List<_Slot> get _slots => _days.isEmpty || _dayIndex >= _days.length
+      ? const []
+      : _days[_dayIndex].slots;
 
   // ─────────────────────── value helpers ───────────────────────
 
-  static int? _asInt(dynamic v) => v == null ? null : int.tryParse(v.toString());
+  static int? _asInt(dynamic v) =>
+      v == null ? null : int.tryParse(v.toString());
 
   static double _asDouble(dynamic v) =>
       v == null ? 0 : double.tryParse(v.toString()) ?? 0;
@@ -287,7 +293,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   /// columns so a card never renders as an empty box.
   String _serviceName(Map service) {
     final locale = context.locale.languageCode;
-    for (final key in ['name_$locale', 'name_ckb', 'name_en', 'name_ar', 'name']) {
+    for (final key in [
+      'name_$locale',
+      'name_ckb',
+      'name_en',
+      'name_ar',
+      'name',
+    ]) {
       final value = service[key]?.toString();
       if (value != null && value.trim().isNotEmpty) return value;
     }
@@ -321,11 +333,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     final service = _selectedService;
     if (service == null || service['has_discount'] != true) return 0;
 
-    final saving = _asDouble(service['old_price']) - _asDouble(service['price']);
+    final saving =
+        _asDouble(service['old_price']) - _asDouble(service['price']);
     return saving > 0 ? saving : 0;
   }
 
-  DateTime? get _selectedDateTime => _timeIndex >= 0 && _timeIndex < _slots.length
+  DateTime? get _selectedDateTime =>
+      _timeIndex >= 0 && _timeIndex < _slots.length
       ? _slots[_timeIndex].dateTime
       : null;
 
@@ -472,8 +486,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   String _youtubeId(String url) {
     if (url.contains('v=')) return url.split('v=')[1].split('&').first;
-    if (url.contains('youtu.be/')) return url.split('youtu.be/')[1].split('?').first;
-    if (url.contains('/embed/')) return url.split('/embed/')[1].split('?').first;
+    if (url.contains('youtu.be/'))
+      return url.split('youtu.be/')[1].split('?').first;
+    if (url.contains('/embed/'))
+      return url.split('/embed/')[1].split('?').first;
     return url;
   }
 
@@ -498,11 +514,13 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     } else {
       final full = url.startsWith('http') ? url : ApiClient.getImageUrl(url);
       _videoController = VideoPlayerController.networkUrl(Uri.parse(full))
-        ..initialize().then((_) {
-          _videoController?.setLooping(true);
-          _videoController?.play();
-          if (mounted) setState(() {});
-        }).catchError((_) {});
+        ..initialize()
+            .then((_) {
+              _videoController?.setLooping(true);
+              _videoController?.play();
+              if (mounted) setState(() {});
+            })
+            .catchError((_) {});
     }
     setState(() => _videoStarted = true);
   }
@@ -535,15 +553,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar:
-          _doctor == null && _loading ? null : _buildBottomBar(isDark),
+      bottomNavigationBar: _doctor == null && _loading
+          ? null
+          : _buildBottomBar(isDark),
     );
   }
 
   List<Widget> _buildSections(bool isDark) {
-    final sections = <Widget>[
-      _buildAbout(isDark),
-    ];
+    final sections = <Widget>[_buildAbout(isDark)];
 
     if (_videoUrl != null) {
       sections
@@ -590,9 +607,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         builder: (context, constraints) {
           final maxHeight = _heroHeight + topPadding;
           final minHeight = kToolbarHeight + topPadding;
-          final t = ((maxHeight - constraints.maxHeight) /
-                  (maxHeight - minHeight))
-              .clamp(0.0, 1.0);
+          final t =
+              ((maxHeight - constraints.maxHeight) / (maxHeight - minHeight))
+                  .clamp(0.0, 1.0);
 
           // The photo runs under the status bar, so its icons have to be white
           // while it is on screen and flip back once the bar collapses.
@@ -722,7 +739,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
+                                  loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     ),
@@ -730,7 +747,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 },
                 errorBuilder: (_, _, _) => Container(
                   color: AppColors.primary,
-                  child: const Icon(Iconsax.user, color: Colors.white, size: 44),
+                  child: const Icon(
+                    Iconsax.user,
+                    color: Colors.white,
+                    size: 44,
+                  ),
                 ),
               ),
             ),
@@ -813,8 +834,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     // White over the photo, switching to the normal text colour once the
     // photo has scrolled away.
     final fade = ((t - 0.5) / 0.5).clamp(0.0, 1.0);
-    final iconColor =
-        Color.lerp(Colors.white, AppColors.getTextTitle(context), fade)!;
+    final iconColor = Color.lerp(
+      Colors.white,
+      AppColors.getTextTitle(context),
+      fade,
+    )!;
     final chipColor = Color.lerp(
       Colors.black.withValues(alpha: 0.3),
       AppColors.getSurface(context),
@@ -992,8 +1016,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   // ── location ──
 
-  double? get _latitude => double.tryParse(_doctor?['latitude']?.toString() ?? '');
-  double? get _longitude => double.tryParse(_doctor?['longitude']?.toString() ?? '');
+  double? get _latitude =>
+      double.tryParse(_doctor?['latitude']?.toString() ?? '');
+  double? get _longitude =>
+      double.tryParse(_doctor?['longitude']?.toString() ?? '');
   bool get _hasLocation => _latitude != null && _longitude != null;
 
   Future<void> _openInMaps() async {
@@ -1056,7 +1082,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                           },
                           zoomControlsEnabled: false,
                           myLocationButtonEnabled: false,
-                          liteModeEnabled: true, // static preview, cheap to draw
+                          liteModeEnabled:
+                              true, // static preview, cheap to draw
                         ),
                         // Lite mode swallows taps, so the whole preview opens
                         // the real maps app instead.
@@ -1163,7 +1190,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               Text(
                 hasBio ? bio : 'dd_no_bio'.tr(),
                 maxLines: isLong && !_bioExpanded ? 3 : null,
-                overflow: isLong && !_bioExpanded ? TextOverflow.ellipsis : null,
+                overflow: isLong && !_bioExpanded
+                    ? TextOverflow.ellipsis
+                    : null,
                 style: GoogleFonts.poppins(
                   fontSize: 13.5,
                   height: 1.75,
@@ -1250,7 +1279,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   child: CircularProgressIndicator(
                     value: loadingProgress.expectedTotalBytes != null
                         ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
+                              loadingProgress.expectedTotalBytes!
                         : null,
                   ),
                 ),
@@ -1259,7 +1288,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             errorBuilder: (_, _, _) => Container(
               color: AppColors.getSurfaceSecondary(context),
               child: const Center(
-                child: Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 32),
+                child: Icon(
+                  Icons.image_not_supported_rounded,
+                  color: Colors.grey,
+                  size: 32,
+                ),
               ),
             ),
           ),
@@ -1298,9 +1331,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             ),
           ),
           if (_videoStarted)
-            const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
         ],
       ),
     );
@@ -1384,7 +1415,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.error.withValues(alpha: 0.1),
+                                    color: AppColors.error.withValues(
+                                      alpha: 0.1,
+                                    ),
                                     borderRadius: BorderRadius.circular(7),
                                   ),
                                   child: Text(
@@ -1586,8 +1619,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       color: isTaken
                           ? AppColors.getSurfaceSecondary(context)
                           : isSelected
-                              ? AppColors.primary
-                              : AppColors.getSurface(context),
+                          ? AppColors.primary
+                          : AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: isSelected && !isTaken
@@ -1599,15 +1632,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       _clock(slot.dateTime),
                       style: GoogleFonts.poppins(
                         fontSize: 13,
-                        fontWeight:
-                            isSelected && !isTaken ? FontWeight.bold : FontWeight.w500,
+                        fontWeight: isSelected && !isTaken
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                         decoration: isTaken ? TextDecoration.lineThrough : null,
                         decorationColor: AppColors.textLight,
                         color: isTaken
                             ? AppColors.textLight
                             : isSelected
-                                ? Colors.white
-                                : AppColors.getTextTitle(context),
+                            ? Colors.white
+                            : AppColors.getTextTitle(context),
                       ),
                     ),
                   ),
@@ -1671,10 +1705,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: _isBooking ? null : _onBookPressed,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        ready ? AppColors.primary : AppColors.getSurfaceSecondary(context),
-                    foregroundColor:
-                        ready ? Colors.white : AppColors.getTextSubtitle(context),
+                    backgroundColor: ready
+                        ? AppColors.primary
+                        : AppColors.getSurfaceSecondary(context),
+                    foregroundColor: ready
+                        ? Colors.white
+                        : AppColors.getTextSubtitle(context),
                     elevation: ready ? 6 : 0,
                     shadowColor: AppColors.primary.withValues(alpha: 0.4),
                     shape: RoundedRectangleBorder(
@@ -1759,11 +1795,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       'dd_date'.tr(),
                       _fullDate(slot),
                     ),
-                    _summaryRow(
-                      Iconsax.clock,
-                      'dd_time'.tr(),
-                      _clock(slot),
-                    ),
+                    _summaryRow(Iconsax.clock, 'dd_time'.tr(), _clock(slot)),
                     const SizedBox(height: 6),
                     Divider(color: AppColors.getDivider(context)),
                     const SizedBox(height: 6),
@@ -1824,8 +1856,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       width: double.infinity,
                       height: 54,
                       child: ElevatedButton(
-                        onPressed:
-                            _isBooking ? null : () => _submitBooking(setSheetState),
+                        onPressed: _isBooking
+                            ? null
+                            : () => _submitBooking(setSheetState),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
@@ -1931,7 +1964,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             onPressed: () => Navigator.pop(dialogContext),
             child: Text(
               'dd_later'.tr(),
-              style: GoogleFonts.poppins(color: AppColors.getTextSubtitle(context)),
+              style: GoogleFonts.poppins(
+                color: AppColors.getTextSubtitle(context),
+              ),
             ),
           ),
           ElevatedButton(
@@ -2051,7 +2086,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 : AppColors.getSurface(context),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.getBorder(context),
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.getBorder(context),
               width: isSelected ? 1.6 : 1,
             ),
           ),
@@ -2084,33 +2121,34 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   List<Widget> _buildSkeleton(bool isDark) {
     Widget bar(double height, double widthFactor) => FractionallySizedBox(
-          alignment: AlignmentDirectional.centerStart,
-          widthFactor: widthFactor,
-          child: Container(
-            height: height,
-            decoration: BoxDecoration(
-              color: AppColors.getSurfaceSecondary(context),
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
+      alignment: AlignmentDirectional.centerStart,
+      widthFactor: widthFactor,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: AppColors.getSurfaceSecondary(context),
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
 
     return [
-      bar(86, 1),
-      const SizedBox(height: 24),
-      bar(20, 0.4),
-      const SizedBox(height: 12),
-      bar(90, 1),
-      const SizedBox(height: 24),
-      bar(20, 0.5),
-      const SizedBox(height: 12),
-      bar(70, 1),
-      const SizedBox(height: 12),
-      bar(70, 1),
-    ].animate(onPlay: (c) => c.repeat()).fadeIn(duration: 700.ms).then().fadeOut(
-          duration: 700.ms,
-          begin: 0.4,
-        );
+          bar(86, 1),
+          const SizedBox(height: 24),
+          bar(20, 0.4),
+          const SizedBox(height: 12),
+          bar(90, 1),
+          const SizedBox(height: 24),
+          bar(20, 0.5),
+          const SizedBox(height: 12),
+          bar(70, 1),
+          const SizedBox(height: 12),
+          bar(70, 1),
+        ]
+        .animate(onPlay: (c) => c.repeat())
+        .fadeIn(duration: 700.ms)
+        .then()
+        .fadeOut(duration: 700.ms, begin: 0.4);
   }
 
   Widget _buildErrorState() {
