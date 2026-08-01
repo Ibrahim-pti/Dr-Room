@@ -229,7 +229,7 @@
                             <input type="checkbox" name="remember" checked>
                             Remember me
                         </label>
-                        <a href="#" class="forgot">Forgot Password?</a>
+                        <a href="{{ route('password.request') }}" class="forgot">Forgot Password?</a>
                     </div>
 
                     <button type="submit" class="btn-login">Login</button>
