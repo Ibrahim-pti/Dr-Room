@@ -81,6 +81,9 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
     Route::get('/schedules', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'index'])->name('doctor.schedules.index');
     Route::post('/schedules', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'store'])->name('doctor.schedules.store');
     Route::delete('/schedules/{id}', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'destroy'])->name('doctor.schedules.destroy');
+
+    Route::post('/time-offs', [\App\Http\Controllers\Web\DoctorTimeOffController::class, 'store'])->name('doctor.time_offs.store');
+    Route::delete('/time-offs/{id}', [\App\Http\Controllers\Web\DoctorTimeOffController::class, 'destroy'])->name('doctor.time_offs.destroy');
     
 });
 

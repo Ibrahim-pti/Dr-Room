@@ -39,6 +39,7 @@ class AppointmentSlotService
         }
 
         $taken = $this->takenTimes($doctor);
+        $timeOffs = $this->timeOffs($doctor);
         $today = Carbon::today();
         $days = [];
 
@@ -50,7 +51,7 @@ class AppointmentSlotService
                 continue;
             }
 
-            $slots = $this->slotsForDate($daySchedules, $date, $taken);
+            $slots = $this->slotsForDate($daySchedules, $date, $taken, $timeOffs);
 
             // A day with nothing left (all past or all booked) is not offered.
             if (empty($slots)) {
@@ -88,8 +89,9 @@ class AppointmentSlotService
         }
 
         $wanted = $dateTime->format('H:i');
+        $timeOffs = $this->timeOffs($doctor);
 
-        foreach ($this->slotsForDate($daySchedules, $dateTime->copy()->startOfDay(), $this->takenTimes($doctor)) as $slot) {
+        foreach ($this->slotsForDate($daySchedules, $dateTime->copy()->startOfDay(), $this->takenTimes($doctor), $timeOffs) as $slot) {
             if ($slot['time'] === $wanted && ! $slot['taken']) {
                 return true;
             }
@@ -102,9 +104,9 @@ class AppointmentSlotService
      * Splits a day's opening hours into slots, marking the booked ones and
      * dropping any that have already passed.
      *
-     * @return array<int, array{time: string, label: string, taken: bool}>
+     * @return array<int, array{time: string, label: string, taken: bool, reason?: string}>
      */
-    private function slotsForDate(Collection $daySchedules, Carbon $date, Collection $taken): array
+    private function slotsForDate(Collection $daySchedules, Carbon $date, Collection $taken, Collection $timeOffs): array
     {
         $now = Carbon::now();
         $slots = [];
@@ -123,11 +125,24 @@ class AppointmentSlotService
             while ($cursor->lessThan($end)) {
                 if ($cursor->greaterThan($now)) {
                     $key = $cursor->format('Y-m-d H:i');
-                    $slots[$key] = [
-                        'time' => $cursor->format('H:i'),
-                        'label' => $cursor->format('h:i A'),
-                        'taken' => $taken->contains($key),
-                    ];
+                    $timeOff = $this->getTimeOff($cursor, $timeOffs);
+                    
+                    if ($timeOff) {
+                        // Mark as taken with a reason
+                        $slots[$key] = [
+                            'time' => $cursor->format('H:i'),
+                            'label' => $cursor->format('h:i A'),
+                            'taken' => true,
+                            'reason' => $timeOff->reason ?: __('Not Available'),
+                        ];
+                    } else {
+                        // Regular slot
+                        $slots[$key] = [
+                            'time' => $cursor->format('H:i'),
+                            'label' => $cursor->format('h:i A'),
+                            'taken' => $taken->contains($key),
+                        ];
+                    }
                 }
                 $cursor->addMinutes($step);
             }
@@ -147,5 +162,24 @@ class AppointmentSlotService
             ->where('appointment_date', '>=', Carbon::today())
             ->pluck('appointment_date')
             ->map(fn ($value) => Carbon::parse($value)->format('Y-m-d H:i'));
+    }
+
+    /** All time offs from today onwards for the doctor. */
+    private function timeOffs(Doctor $doctor): Collection
+    {
+        return $doctor->relationLoaded('timeOffs')
+            ? $doctor->timeOffs->filter(fn($to) => $to->end_datetime->greaterThanOrEqualTo(Carbon::today()))
+            : $doctor->timeOffs()->where('end_datetime', '>=', Carbon::today())->get();
+    }
+
+    /** Returns the time-off period if the $cursor falls within one, or null. */
+    private function getTimeOff(Carbon $cursor, Collection $timeOffs)
+    {
+        foreach ($timeOffs as $timeOff) {
+            if ($cursor->greaterThanOrEqualTo($timeOff->start_datetime) && $cursor->lessThan($timeOff->end_datetime)) {
+                return $timeOff;
+            }
+        }
+        return null;
     }
 }

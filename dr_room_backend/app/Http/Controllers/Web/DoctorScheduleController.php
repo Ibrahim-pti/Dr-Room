@@ -13,7 +13,8 @@ class DoctorScheduleController extends Controller
     {
         $doctor = Auth::user()->doctor;
         $schedules = $doctor->schedules;
-        return view('doctor.schedules.index', compact('schedules'));
+        $timeOffs = $doctor->timeOffs()->orderBy('start_datetime', 'desc')->get();
+        return view('doctor.schedules.index', compact('schedules', 'timeOffs'));
     }
 
     private const DAYS = [

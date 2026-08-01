@@ -78,6 +78,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/appointments', [DoctorController::class, 'appointments']);
         Route::patch('/appointments/{id}/status', [DoctorController::class, 'updateAppointmentStatus']);
         Route::get('/patients', [DoctorController::class, 'patients']);
+        
+        // Time Offs
+        Route::get('/time-offs', [\App\Http\Controllers\Api\DoctorTimeOffController::class, 'index']);
+        Route::post('/time-offs', [\App\Http\Controllers\Api\DoctorTimeOffController::class, 'store']);
+        Route::delete('/time-offs/{id}', [\App\Http\Controllers\Api\DoctorTimeOffController::class, 'destroy']);
     });
 
     // ─── Admin Routes ───────────────────────────────────────────────────────
