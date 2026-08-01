@@ -95,7 +95,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   static const double _carouselHeight = 330;
   // Carousel (which absorbs the status bar) + name + specialty pills.
-  static const double _heroHeight = _carouselHeight + 102;
+  static const double _heroHeight = _carouselHeight + 88;
   static const int _slotMinutes = 30;
 
   Map<String, dynamic>? _doctor;
@@ -522,7 +522,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               slivers: [
                 _buildHero(isDark),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate(
                       _loading && _doctor == null
@@ -541,26 +541,24 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   List<Widget> _buildSections(bool isDark) {
     final sections = <Widget>[
       _buildAbout(isDark),
-      const SizedBox(height: 20),
-      _buildStatsCard(isDark),
     ];
 
     if (_videoUrl != null) {
       sections
-        ..add(const SizedBox(height: 28))
+        ..add(const SizedBox(height: 22))
         ..add(_buildVideo(isDark));
     }
 
     if ((_doctor?['phone']?.toString() ?? '').isNotEmpty) {
       sections
-        ..add(const SizedBox(height: 20))
+        ..add(const SizedBox(height: 16))
         ..add(_buildCallButton(isDark));
     }
 
     sections
-      ..add(const SizedBox(height: 28))
+      ..add(const SizedBox(height: 24))
       ..add(_buildServices(isDark))
-      ..add(const SizedBox(height: 28))
+      ..add(const SizedBox(height: 24))
       ..add(_buildSchedule(isDark));
 
     return sections
@@ -656,7 +654,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildHeroCarousel(),
-        const SizedBox(height: 18),
+        const SizedBox(height: 12),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
@@ -856,7 +854,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   // ── stats ──
 
-  Widget _buildStatsCard(bool isDark) {
+  /// Bare row — it lives inside the about card rather than in one of its own.
+  Widget _buildStatsRow() {
     final rating = _asDouble(_doctor?['rating']);
     final reviews = _asInt(_doctor?['total_reviews']) ?? 0;
     final years = _asInt(_doctor?['experience_years']) ?? 0;
@@ -887,22 +886,18 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       ),
     ];
 
-    return _card(
-      isDark: isDark,
-      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
-      child: Row(
-        children: [
-          for (var i = 0; i < stats.length; i++) ...[
-            if (i > 0)
-              Container(
-                width: 1,
-                height: 34,
-                color: AppColors.getDivider(context),
-              ),
-            Expanded(child: stats[i]),
-          ],
+    return Row(
+      children: [
+        for (var i = 0; i < stats.length; i++) ...[
+          if (i > 0)
+            Container(
+              width: 1,
+              height: 34,
+              color: AppColors.getDivider(context),
+            ),
+          Expanded(child: stats[i]),
         ],
-      ),
+      ],
     );
   }
 
@@ -1059,6 +1054,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   ),
                 ),
               ],
+              // Rating / experience / price share this card — they describe the
+              // same doctor, so a second card between them was just a seam.
+              const SizedBox(height: 16),
+              Divider(height: 1, color: AppColors.getDivider(context)),
+              const SizedBox(height: 16),
+              _buildStatsRow(),
             ],
           ),
         ),
