@@ -18,16 +18,20 @@ class TranslateController extends Controller
 
         try {
             $tr = new GoogleTranslate();
+            // Explicitly set source language to Kurdish (Sorani) to prevent auto-detect hallucinations
+            $tr->setSource('ckb');
+            
             $en = $tr->setTarget('en')->translate($text);
+            
+            // Re-instantiate or just change target for Arabic
             $ar = $tr->setTarget('ar')->translate($text);
-            $ckb = $tr->setTarget('ckb')->translate($text);
 
             return response()->json([
                 'success' => true,
                 'translations' => [
                     'en' => $en,
                     'ar' => $ar,
-                    'ckb' => $ckb,
+                    'ckb' => $text, // The input is already in Kurdish
                 ]
             ]);
         } catch (\Exception $e) {

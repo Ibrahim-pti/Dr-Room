@@ -34,11 +34,23 @@
     <div class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Name -->
-            <div>
-                <label for="name" class="block text-sm font-medium text-slate-700 mb-2">ناوی تەواو</label>
-                <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required
-                    class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
-                @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-slate-700 mb-2">ناوی تەواو (کوردی)</label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="name_ar" class="block text-sm font-medium text-slate-700 mb-2">ناوی تەواو (عەرەبی)</label>
+                    <input type="text" id="name_ar" name="name_ar" value="{{ old('name_ar', $user->name_ar) }}" dir="rtl"
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
+                <div>
+                    <label for="name_en" class="block text-sm font-medium text-slate-700 mb-2">ناوی تەواو (ئینگلیزی)</label>
+                    <input type="text" id="name_en" name="name_en" value="{{ old('name_en', $user->name_en) }}" dir="ltr"
+                        class="w-full text-left px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
             </div>
 
             <!-- Phone -->
@@ -112,16 +124,40 @@
             <h4 class="text-sm font-bold text-slate-800 pt-4">شوێنی کلینیک</h4>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="clinic_name" class="block text-sm font-medium text-slate-700 mb-2">ناوی کلینیک</label>
-                    <input type="text" id="clinic_name" name="clinic_name" value="{{ old('clinic_name', $doctor->clinic_name) }}" placeholder="کلینیکی ..."
-                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                <div class="space-y-4">
+                    <div>
+                        <label for="clinic_name" class="block text-sm font-medium text-slate-700 mb-2">ناوی کلینیک (کوردی)</label>
+                        <input type="text" id="clinic_name" name="clinic_name" value="{{ old('clinic_name', $doctor->clinic_name) }}" placeholder="کلینیکی ..."
+                            class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
+                    <div>
+                        <label for="clinic_name_ar" class="block text-sm font-medium text-slate-700 mb-2">ناوی کلینیک (عەرەبی)</label>
+                        <input type="text" id="clinic_name_ar" name="clinic_name_ar" value="{{ old('clinic_name_ar', $doctor->clinic_name_ar) }}" dir="rtl"
+                            class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
+                    <div>
+                        <label for="clinic_name_en" class="block text-sm font-medium text-slate-700 mb-2">ناوی کلینیک (ئینگلیزی)</label>
+                        <input type="text" id="clinic_name_en" name="clinic_name_en" value="{{ old('clinic_name_en', $doctor->clinic_name_en) }}" dir="ltr"
+                            class="w-full text-left px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
                 </div>
 
-                <div>
-                    <label for="address" class="block text-sm font-medium text-slate-700 mb-2">ناونیشان</label>
-                    <input type="text" id="address" name="address" value="{{ old('address', $doctor->address) }}" placeholder="شەقام، گەڕەک، شار"
-                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                <div class="space-y-4">
+                    <div>
+                        <label for="address" class="block text-sm font-medium text-slate-700 mb-2">ناونیشان (کوردی)</label>
+                        <input type="text" id="address" name="address" value="{{ old('address', $doctor->address) }}" placeholder="شەقام، گەڕەک، شار"
+                            class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
+                    <div>
+                        <label for="address_ar" class="block text-sm font-medium text-slate-700 mb-2">ناونیشان (عەرەبی)</label>
+                        <input type="text" id="address_ar" name="address_ar" value="{{ old('address_ar', $doctor->address_ar) }}" dir="rtl"
+                            class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
+                    <div>
+                        <label for="address_en" class="block text-sm font-medium text-slate-700 mb-2">ناونیشان (ئینگلیزی)</label>
+                        <input type="text" id="address_en" name="address_en" value="{{ old('address_en', $doctor->address_en) }}" dir="ltr"
+                            class="w-full text-left px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    </div>
                 </div>
             </div>
 
@@ -224,30 +260,36 @@
         btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>چاوەڕێبە...</span>';
         btn.disabled = true;
 
-        const specialty = document.getElementById('specialty').value;
-        const bio = document.getElementById('bio').value;
+        const specialty = document.getElementById('specialty')?.value;
+        const bio = document.getElementById('bio')?.value;
+        const name = document.getElementById('name')?.value;
+        const clinic_name = document.getElementById('clinic_name')?.value;
+        const address = document.getElementById('address')?.value;
 
         try {
-            if (specialty) {
-                const res = await fetch(`/api/translate`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                    body: JSON.stringify({text: specialty})
-                });
-                const data = await res.json();
-                document.getElementById('specialty_en').value = data.translations?.en || '';
-                document.getElementById('specialty_ar').value = data.translations?.ar || '';
-            }
+            const fieldsToTranslate = [
+                { id: 'specialty', val: specialty },
+                { id: 'bio', val: bio },
+                { id: 'name', val: name },
+                { id: 'clinic_name', val: clinic_name },
+                { id: 'address', val: address }
+            ];
 
-            if (bio) {
-                const res = await fetch(`/api/translate`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                    body: JSON.stringify({text: bio})
-                });
-                const data = await res.json();
-                document.getElementById('bio_en').value = data.translations?.en || '';
-                document.getElementById('bio_ar').value = data.translations?.ar || '';
+            for (const field of fieldsToTranslate) {
+                if (field.val) {
+                    const res = await fetch(`/api/translate`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                        body: JSON.stringify({text: field.val})
+                    });
+                    const data = await res.json();
+                    if(document.getElementById(field.id + '_en')) {
+                        document.getElementById(field.id + '_en').value = data.translations?.en || '';
+                    }
+                    if(document.getElementById(field.id + '_ar')) {
+                        document.getElementById(field.id + '_ar').value = data.translations?.ar || '';
+                    }
+                }
             }
             
             // Re-enable submit button
@@ -264,13 +306,15 @@
     }
 
     // Disable submit if translation needed
-    ['specialty', 'bio'].forEach(id => {
+    ['specialty', 'bio', 'name', 'clinic_name', 'address'].forEach(id => {
         const el = document.getElementById(id);
         if(el) {
             el.addEventListener('input', () => {
                 const submitBtn = document.getElementById('submit-btn');
-                submitBtn.disabled = true;
-                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                if(submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
             });
         }
     });

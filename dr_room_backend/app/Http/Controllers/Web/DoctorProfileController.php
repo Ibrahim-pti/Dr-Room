@@ -22,6 +22,8 @@ class DoctorProfileController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'name_en' => 'nullable|string|max:255',
+            'name_ar' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
             'specialty' => 'nullable|string|max:255',
             'specialty_en' => 'nullable|string|max:255',
@@ -32,7 +34,11 @@ class DoctorProfileController extends Controller
             'experience_years' => 'nullable|integer|min:0|max:70',
             'consultation_fee' => 'nullable|numeric|min:0',
             'clinic_name' => 'nullable|string|max:255',
+            'clinic_name_en' => 'nullable|string|max:255',
+            'clinic_name_ar' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
+            'address_en' => 'nullable|string|max:500',
+            'address_ar' => 'nullable|string|max:500',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'image' => 'nullable|image|max:5120',
@@ -43,6 +49,8 @@ class DoctorProfileController extends Controller
 
         $user->update([
             'name' => $request->name,
+            'name_en' => $request->name_en,
+            'name_ar' => $request->name_ar,
             'phone' => $request->phone,
         ]);
 
@@ -53,7 +61,11 @@ class DoctorProfileController extends Controller
                 'experience_years' => $request->filled('experience_years') ? $request->experience_years : null,
                 'consultation_fee' => $request->filled('consultation_fee') ? $request->consultation_fee : null,
                 'clinic_name' => $request->clinic_name,
+                'clinic_name_en' => $request->clinic_name_en,
+                'clinic_name_ar' => $request->clinic_name_ar,
                 'address' => $request->address,
+                'address_en' => $request->address_en,
+                'address_ar' => $request->address_ar,
                 'latitude' => $request->filled('latitude') ? $request->latitude : null,
                 'longitude' => $request->filled('longitude') ? $request->longitude : null,
                 // The API exposes the doctor record, not the user, so the
