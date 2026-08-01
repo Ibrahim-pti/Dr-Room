@@ -1,3 +1,4 @@
+import 'package:dr_room/core/utils/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:provider/provider.dart';
@@ -84,6 +85,14 @@ class FavoriteDoctorsScreen extends StatelessWidget {
             itemCount: favorites.length,
             itemBuilder: (context, index) {
               final doctor = favorites[index];
+              final name = doctor['user'] != null
+                  ? doctor['user']['name']
+                  : (doctor['doctor'] ?? doctor['name'] ?? 'Doctor');
+              final specialty = doctor['specialty'] ?? '';
+              final image = doctor['image_path'] != null
+                  ? ApiClient.getImageUrl(doctor['image_path'])
+                  : (doctor['image'] ?? 'assets/images/doctor.png');
+
               return Padding(
                 padding: const EdgeInsetsDirectional.only(bottom: 16),
                 child:
@@ -94,9 +103,12 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => DoctorDetailsScreen(
                                   doctorId: doctor['id'] ?? 1,
-                                  name: doctor['doctor']!,
-                                  specialty: doctor['specialty']!,
-                                  image: doctor['image']!,
+                                  name: name,
+                                  specialty: specialty,
+                                  image: image,
+                                  initialDoctor: Map<String, dynamic>.from(
+                                    doctor,
+                                  ),
                                 ),
                               ),
                             );
@@ -122,7 +134,9 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
-                                      image: AssetImage(doctor['image']!),
+                                      image: image.startsWith('http')
+                                          ? NetworkImage(image)
+                                          : AssetImage(image) as ImageProvider,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -134,7 +148,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        doctor['doctor']!,
+                                        name,
                                         style: GoogleFonts.poppins(
                                           color: AppColors.getTextTitle(
                                             context,
@@ -145,7 +159,7 @@ class FavoriteDoctorsScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        doctor['specialty']!,
+                                        specialty,
                                         style: GoogleFonts.poppins(
                                           color: AppColors.textLight,
                                           fontSize: 13,
