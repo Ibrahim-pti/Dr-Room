@@ -117,57 +117,108 @@ class _AllDoctorsScreenState extends State<AllDoctorsScreen> {
                           );
                         },
                         child: Container(
-                          height: 160,
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 20,
-                                offset: const Offset(0, 4),
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
                               ),
                             ],
+                            border: Border.all(
+                              color: const Color(0xFFF1F5F9),
+                              width: 1.5,
+                            ),
                           ),
-                          child: Stack(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(20),
+                              // Image Container
+                              Container(
+                                width: 88,
+                                height: 88,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: const Color(0xFFF8FAFC),
+                                  image: DecorationImage(
+                                    image: doc['image_path'] != null 
+                                      ? NetworkImage(image) as ImageProvider
+                                      : AssetImage(image),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              
+                              // Info Column
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      name.replaceFirst(' ', '\n'), // Split into two lines like design
+                                      name,
                                       style: GoogleFonts.poppins(
                                         color: const Color(0xFF0F172A),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.2,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 8),
+                                    const SizedBox(height: 4),
                                     Text(
                                       specialty,
                                       style: GoogleFonts.poppins(
                                         color: const Color(0xFF64748B),
                                         fontSize: 13,
+                                        fontWeight: FontWeight.w500,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const Spacer(),
+                                    const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        const Icon(
-                                          Icons.star_rounded,
-                                          color: Color(0xFFFBBF24),
-                                          size: 20,
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFEF3C7),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.star_rounded,
+                                                color: Color(0xFFF59E0B),
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                rating,
+                                                style: GoogleFonts.poppins(
+                                                  color: const Color(0xFFB45309),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          rating,
-                                          style: GoogleFonts.poppins(
-                                            color: const Color(0xFF0F172A),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            '${doc['total_reviews'] ?? 45} هەڵسەنگاندن',
+                                            style: GoogleFonts.poppins(
+                                              color: const Color(0xFF94A3B8),
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       ],
@@ -175,43 +226,18 @@ class _AllDoctorsScreenState extends State<AllDoctorsScreen> {
                                   ],
                                 ),
                               ),
-                              PositionedDirectional(
-                                end: 0,
-                                bottom: 0,
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadiusDirectional.only(
-                                    bottomEnd: Radius.circular(24),
-                                  ),
-                                  child: doc['image_path'] != null
-                                      ? Image.network(
-                                          image,
-                                          height: 150,
-                                          width: 120,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.asset(
-                                          image,
-                                          height: 150,
-                                          width: 120,
-                                          fit: BoxFit.cover,
-                                        ),
+                              
+                              // Action (Heart)
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF0F4FD),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                              ),
-                              PositionedDirectional(
-                                top: 16,
-                                end: 16,
-                                child: Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFF0F4FD),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.favorite,
-                                    color: Color(0xFF3B82F6),
-                                    size: 18,
-                                  ),
+                                child: const Icon(
+                                  Icons.favorite_border_rounded,
+                                  color: Color(0xFF3B82F6),
+                                  size: 22,
                                 ),
                               ),
                             ],
