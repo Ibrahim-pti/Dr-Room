@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/utils/api_client.dart';
-import 'chat_screen.dart';
+
 import 'doctor_reviews_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
@@ -188,72 +188,60 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.getBackground(context),
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.getSurface(context),
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.getSurface(context).withValues(alpha: 0.8),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: 20,
-                color: AppColors.getTextTitle(context),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+        centerTitle: true,
+        title: Text(
+          'detail_doctor'.tr(), // Needs translation or fallback
+          style: GoogleFonts.poppins(
+            color: AppColors.getTextTitle(context),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 20,
+            color: AppColors.getTextTitle(context),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.getSurface(context).withValues(alpha: 0.8),
-                shape: BoxShape.circle,
-              ),
-              child: Consumer<FavoriteProvider>(
-                builder: (context, favoriteProvider, child) {
-                  final isFavorite = favoriteProvider.isFavorite(
-                    widget.doctorId,
-                  );
-                  return IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Iconsax.heart,
-                      color: isFavorite
-                          ? const Color(0xFFEF4444)
-                          : AppColors.getTextTitle(context),
+          Consumer<FavoriteProvider>(
+            builder: (context, favoriteProvider, child) {
+              final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
+              return IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Iconsax.heart,
+                  color: isFavorite
+                      ? const Color(0xFFEF4444)
+                      : AppColors.getTextTitle(context),
+                ),
+                onPressed: () {
+                  favoriteProvider.toggleFavorite({
+                    'id': widget.doctorId,
+                    'doctor': widget.name,
+                    'specialty': widget.specialty,
+                    'image': widget.image,
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        isFavorite
+                            ? 'Removed from favorites'
+                            : 'Added to favorites',
+                      ),
+                      backgroundColor: isFavorite
+                          ? Colors.red
+                          : const Color(0xFF10B981),
+                      duration: const Duration(seconds: 2),
                     ),
-                    onPressed: () {
-                      favoriteProvider.toggleFavorite({
-                        'id': widget.doctorId,
-                        'doctor': widget.name,
-                        'specialty': widget.specialty,
-                        'image': widget.image,
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            isFavorite
-                                ? 'Removed from favorites'
-                                : 'Added to favorites',
-                          ),
-                          backgroundColor: isFavorite
-                              ? Colors.red
-                              : const Color(0xFF10B981),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
                   );
                 },
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
@@ -264,94 +252,95 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Header Profile ──
-                Container(
+                // ── Hero Image ──
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Hero(
+                    tag: widget.name,
+                    child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsetsDirectional.only(
-                        top: 70,
-                        bottom: 20,
-                        start: 24,
-                        end: 24,
-                      ),
+                      height: 280,
                       decoration: BoxDecoration(
-                        color: AppColors.getSurface(context),
-                        borderRadius: const BorderRadiusDirectional.only(
-                          bottomStart: Radius.circular(40),
-                          bottomEnd: Radius.circular(40),
+                        color: const Color(0xFFEFF6FF), // Soft blue background
+                        borderRadius: BorderRadius.circular(24),
+                        image: DecorationImage(
+                          image: AssetImage(widget.image),
+                          fit: BoxFit.cover, // Or fitHeight depending on images
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
-                      child: Column(
-                        children: [
-                          Hero(
-                            tag: widget.name,
-                            child: Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF3B82F6),
-                                  width: 3,
-                                ),
-                                image: DecorationImage(
-                                  image: AssetImage(widget.image),
-                                  fit: BoxFit.cover,
-                                ),
+                    ),
+                  ),
+                ).animate().slideY(begin: -0.1, end: 0).fadeIn(duration: 400.ms),
+
+                // ── Doctor Info Section ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.name,
+                              style: GoogleFonts.poppins(
+                                color: AppColors.getTextTitle(context),
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            widget.name,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextTitle(context),
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.specialty,
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF64748B),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.specialty,
-                            style: GoogleFonts.poppins(
-                              color: AppColors.textLight,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildStatItem(
-                                'patients'.tr(),
-                                '1.5k+',
-                                Iconsax.people,
-                              ),
-                              _buildStatItem(
-                                'experience'.tr(),
-                                '8 yr+',
-                                Iconsax.briefcase,
-                              ),
-                              _buildStatItem(
-                                'rating'.tr(),
-                                '4.9',
-                                Iconsax.star,
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    )
-                    .animate()
-                    .slideY(begin: -0.2, end: 0)
-                    .fadeIn(duration: 500.ms),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF3C7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Color(0xFFF59E0B),
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '4.9',
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFFD97706),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().slideY(begin: 0.1, end: 0).fadeIn(duration: 400.ms),
 
                 const SizedBox(height: 24),
 
@@ -572,40 +561,41 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             start: 0,
             end: 0,
             child: Container(
-              padding: EdgeInsetsDirectional.only(
-                top: 0,
-                start: 24,
-                end: 24,
-                bottom: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              decoration: BoxDecoration(
+                color: AppColors.getSurface(context),
+                border: Border(
+                  top: BorderSide(
+                    color: AppColors.getBorder(context).withValues(alpha: 0.5),
+                  ),
+                ),
               ),
               child: Row(
                 children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Iconsax.message,
-                        color: Color(0xFF10B981),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'consultation_price'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF64748B),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChatScreen(
-                              doctorName: widget.name,
-                              doctorImage: widget.image,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '\$15.00',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 24),
                   Expanded(
                     child: SizedBox(
                       height: 56,
@@ -652,32 +642,5 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: const Color(0xFF3B82F6), size: 20),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            color: AppColors.getTextTitle(context),
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          label,
-          style: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 11),
-        ),
-      ],
-    );
-  }
+
 }
