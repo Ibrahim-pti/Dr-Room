@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
@@ -23,24 +24,35 @@ import 'doctor_reviews_screen.dart';
 class _HeroCurveClipper extends CustomClipper<Path> {
   const _HeroCurveClipper();
 
-  static const double _sideInset = 46;
-  static const double _dip = 46;
+  /// How far above the bottom the two side edges stop.
+  static const double _sideInset = 78;
 
-  /// Rounds off the points where the straight side edges meet the arc, so the
-  /// shape reads as a curve rather than a box with a bite taken out of it.
-  static const double _corner = 30;
+  /// Rounds off the three points of the V, so it reads as a soft chevron
+  /// rather than a shape with knife edges.
+  static const double _sideCorner = 26;
+  static const double _tipCorner = 34;
 
   @override
   Path getClip(Size size) {
     final w = size.width;
     final h = size.height;
     final edge = h - _sideInset;
+    final mid = w / 2;
+
+    // Pull back from the tip along each diagonal by _tipCorner, then round the
+    // gap between the two points.
+    final slope = Offset(mid, h - edge);
+    final length = slope.distance;
+    final backX = mid * (_tipCorner / length);
+    final backY = (h - edge) * (_tipCorner / length);
 
     return Path()
-      ..lineTo(0, edge - _corner)
-      ..quadraticBezierTo(0, edge, _corner, edge)
-      ..quadraticBezierTo(w / 2, h + _dip, w - _corner, edge)
-      ..quadraticBezierTo(w, edge, w, edge - _corner)
+      ..lineTo(0, edge - _sideCorner)
+      ..quadraticBezierTo(0, edge, _sideCorner, edge + _sideCorner * 0.35)
+      ..lineTo(mid - backX, h - backY)
+      ..quadraticBezierTo(mid, h, mid + backX, h - backY)
+      ..lineTo(w - _sideCorner, edge + _sideCorner * 0.35)
+      ..quadraticBezierTo(w, edge, w, edge - _sideCorner)
       ..lineTo(w, 0)
       ..close();
   }
@@ -81,7 +93,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  static const double _carouselHeight = 316;
+  static const double _carouselHeight = 330;
   // Carousel (which absorbs the status bar) + name + specialty pills.
   static const double _heroHeight = _carouselHeight + 102;
   static const int _slotMinutes = 30;
@@ -579,49 +591,58 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   (maxHeight - minHeight))
               .clamp(0.0, 1.0);
 
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(color: background),
-              // Expanded content fades out as the bar collapses.
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                child: Opacity(
-                  opacity: (1 - t * 1.6).clamp(0.0, 1.0),
-                  child: _buildHeroContent(),
+          // The photo runs under the status bar, so its icons have to be white
+          // while it is on screen and flip back once the bar collapses.
+          final overStatusBar = t < 0.5;
+
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: overStatusBar || isDark
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ColoredBox(color: background),
+                // Expanded content fades out as the bar collapses.
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  child: Opacity(
+                    opacity: (1 - t * 1.6).clamp(0.0, 1.0),
+                    child: _buildHeroContent(),
+                  ),
                 ),
-              ),
-              // Collapsed title fades in.
-              Positioned(
-                left: 56,
-                right: 56,
-                top: topPadding,
-                height: kToolbarHeight,
-                child: Opacity(
-                  opacity: ((t - 0.6) / 0.4).clamp(0.0, 1.0),
-                  child: Center(
-                    child: Text(
-                      _doctorName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                // Collapsed title fades in.
+                Positioned(
+                  left: 56,
+                  right: 56,
+                  top: topPadding,
+                  height: kToolbarHeight,
+                  child: Opacity(
+                    opacity: ((t - 0.6) / 0.4).clamp(0.0, 1.0),
+                    child: Center(
+                      child: Text(
+                        _doctorName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          color: AppColors.getTextTitle(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: topPadding + 4,
-                left: 12,
-                right: 12,
-                child: _buildHeroActions(t, isDark),
-              ),
-            ],
+                Positioned(
+                  top: topPadding + 4,
+                  left: 12,
+                  right: 12,
+                  child: _buildHeroActions(t, isDark),
+                ),
+              ],
+            ),
           );
         },
       ),
@@ -696,7 +717,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                 ),
               ),
             ),
-            // Keeps the floating back / favourite buttons legible on light photos.
+            // Keeps the status bar icons and the floating back / favourite
+            // buttons legible on light photos.
             IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -704,10 +726,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withValues(alpha: 0.28),
+                      Colors.black.withValues(alpha: 0.45),
+                      Colors.black.withValues(alpha: 0.12),
                       Colors.transparent,
                     ],
-                    stops: const [0.0, 0.35],
+                    stops: const [0.0, 0.18, 0.4],
                   ),
                 ),
               ),
@@ -716,7 +739,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 18,
+                bottom: 92,
                 child: Center(
                   child: AnimatedSmoothIndicator(
                     activeIndex: _heroPage,
