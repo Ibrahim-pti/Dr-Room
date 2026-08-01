@@ -173,8 +173,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   static double _asDouble(dynamic v) =>
       v == null ? 0 : double.tryParse(v.toString()) ?? 0;
 
-  String get _doctorName =>
-      _doctor?['user']?['name']?.toString() ?? widget.name;
+  String get _doctorName {
+    final locale = context.locale.languageCode;
+    final localized = _doctor?['user']?['name_$locale']?.toString();
+    if (localized != null && localized.trim().isNotEmpty) return localized.trim();
+    return _doctor?['user']?['name']?.toString() ?? widget.name;
+  }
 
   String get _doctorSpecialty {
     final locale = context.locale.languageCode;
@@ -539,10 +543,17 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   }
 
   List<Widget> _buildSections(bool isDark) {
+    final locale = context.locale.languageCode;
+
+    var bio = _doctor?['bio_$locale']?.toString().trim();
+    if (bio == null || bio.isEmpty) {
+      bio = _doctor?['bio']?.toString().trim() ?? '';
+    }
+
     final sections = <Widget>[
       DoctorDetailsAbout(
         isDark: isDark,
-        bio: _doctor?['bio']?.toString().trim() ?? '',
+        bio: bio,
         bioExpanded: _bioExpanded,
         onToggleBio: () => setState(() => _bioExpanded = !_bioExpanded),
         rating: _asDouble(_doctor?['rating']),
@@ -595,8 +606,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         scheduleKey: _scheduleKey,
       ));
 
-    final address = _doctor?['address']?.toString().trim() ?? '';
-    final clinic = _doctor?['clinic_name']?.toString().trim() ?? '';
+    var address = _doctor?['address_$locale']?.toString().trim();
+    if (address == null || address.isEmpty) {
+      address = _doctor?['address']?.toString().trim() ?? '';
+    }
+
+    var clinic = _doctor?['clinic_name_$locale']?.toString().trim();
+    if (clinic == null || clinic.isEmpty) {
+      clinic = _doctor?['clinic_name']?.toString().trim() ?? '';
+    }
+
     if (_hasLocation || address.isNotEmpty || clinic.isNotEmpty) {
       sections
         ..add(const SizedBox(height: 24))
