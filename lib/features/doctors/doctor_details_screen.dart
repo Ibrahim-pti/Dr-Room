@@ -4,16 +4,15 @@ import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import 'package:provider/provider.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'dart:convert';
-import 'dart:ui';
 
 import '../../core/providers/favorite_provider.dart';
 import '../../core/utils/api_client.dart';
-import 'doctor_reviews_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
   final int doctorId;
@@ -37,9 +36,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   int _selectedDateIndex = 0;
   int _selectedTimeIndex = -1;
   int _selectedServiceIndex = 0;
-  int _selectedTabIndex = 0;
-  int _currentImageIndex = 0;
-  final PageController _imagePageController = PageController();
   bool _isBooking = false;
   final List<Map<String, dynamic>> _dynamicDates = [];
   final List<String> _dynamicTimes = [];
@@ -49,7 +45,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   VideoPlayerController? _videoPlayerController;
   YoutubePlayerController? _youtubeController;
   String? _initializedVideoUrl;
-  bool _isLoadingDetails = true;
 
   @override
   void initState() {
@@ -66,7 +61,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         final data = jsonDecode(cachedStr);
         setState(() {
           _doctorDetails = data;
-          _isLoadingDetails = false;
           if (data['services'] != null && (data['services'] as List).isNotEmpty) {
             _services = data['services'];
           }
@@ -88,7 +82,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         if (mounted) {
           setState(() {
             _doctorDetails = data;
-            _isLoadingDetails = false;
             if (data['services'] != null && (data['services'] as List).isNotEmpty) {
               _services = data['services'];
             }
@@ -98,11 +91,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         }
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoadingDetails = false;
-        });
-      }
+      // Intentionally left empty if it fails we have cache
     }
   }
 
@@ -282,7 +271,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        Navigator.pop(context);
+        Navigator.pop(context); // Close bottom sheet
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -372,13 +361,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     if (widget.image.isNotEmpty) {
       list.add(widget.image);
     }
-    // Add additional gallery photos if present in _doctorDetails or fallbacks
     if (_doctorDetails != null && _doctorDetails!['gallery'] != null && (_doctorDetails!['gallery'] as List).isNotEmpty) {
       for (var img in _doctorDetails!['gallery']) {
         list.add(ApiClient.getImageUrl(img.toString()));
       }
     } else {
-      // Add tasteful fallback gallery images for carousel experience
       list.addAll([
         'assets/images/doctor1.png',
         'assets/images/doctor2.png',
@@ -410,1078 +397,607 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     return widget.specialty;
   }
 
-  String _getDoctorBio() {
-    final locale = context.locale.languageCode;
-    if (_doctorDetails != null) {
-      if (locale == 'en' && _doctorDetails!['bio_en'] != null && _doctorDetails!['bio_en'].toString().isNotEmpty) {
-        return _doctorDetails!['bio_en'];
-      }
-      if (locale == 'ar' && _doctorDetails!['bio_ar'] != null && _doctorDetails!['bio_ar'].toString().isNotEmpty) {
-        return _doctorDetails!['bio_ar'];
-      }
-      if (_doctorDetails!['bio'] != null && _doctorDetails!['bio'].toString().isNotEmpty) {
-        return _doctorDetails!['bio'];
-      }
-    }
-    return 'doctor_desc'.tr(args: [_getDoctorName(), _getDoctorSpecialty()]);
-  }
-
-  String _getCurrentPrice() {
-    if (_selectedServiceIndex != -1 && _services.isNotEmpty) {
-      final price = _services[_selectedServiceIndex]['price'];
-      if (price != null) return '\$$price';
-    }
-    if (_doctorDetails != null && _doctorDetails!['consultation_fee'] != null) {
-      return '\$${_doctorDetails!['consultation_fee']}';
-    }
-    return '\$15.00';
-  }
-
   @override
   Widget build(BuildContext context) {
     final doctorName = _getDoctorName();
     final doctorSpecialty = _getDoctorSpecialty();
-    final doctorBio = _getDoctorBio();
+    final rating = _doctorDetails?['rating']?.toString() ?? '5.0';
+    final images = _getDoctorImages();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
-      body: Stack(
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: Column(
         children: [
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              // ── Ultra Modern Flexible Hero Header (Curved Carousel) ──
-              SliverAppBar(
-                expandedHeight: 340,
-                pinned: true,
-                stretch: true,
-                backgroundColor: const Color(0xFFF1F5F9),
-                elevation: 0,
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
-                          onPressed: () => Navigator.pop(context),
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- HEADER SECTION ---
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Light Blue Curved Background with Premium Shadow
+                      Container(
+                        height: 220,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFE0F2FE), Color(0xFFF1F5F9)], // Very soft sky blue to slate
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(50),
+                            bottomRight: Radius.circular(50),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                              blurRadius: 30,
+                              offset: const Offset(0, 10),
+                            )
+                          ],
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                actions: [
-                  Consumer<FavoriteProvider>(
-                    builder: (context, favoriteProvider, child) {
-                      final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(14),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              child: IconButton(
-                                icon: Icon(
-                                  isFavorite ? Icons.favorite_rounded : Iconsax.heart,
-                                  color: isFavorite ? const Color(0xFFEF4444) : Colors.white,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  favoriteProvider.toggleFavorite({
-                                    'id': widget.doctorId,
-                                    'doctor': doctorName,
-                                    'specialty': doctorSpecialty,
-                                    'image': widget.image,
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
-                  background: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(36),
-                      bottomRight: Radius.circular(36),
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Carousel Image PageView
-                        Builder(
-                          builder: (context) {
-                            final images = _getDoctorImages();
-                            return Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                PageView.builder(
-                                  controller: _imagePageController,
-                                  itemCount: images.length,
-                                  onPageChanged: (idx) {
-                                    setState(() {
-                                      _currentImageIndex = idx;
-                                    });
-                                  },
-                                  itemBuilder: (context, idx) {
-                                    final img = images[idx];
-                                    return Hero(
-                                      tag: idx == 0 ? widget.name : 'doctor_img_$idx',
-                                      child: img.startsWith('http')
-                                          ? Image.network(img, fit: BoxFit.cover, alignment: Alignment.topCenter)
-                                          : Image.asset(img, fit: BoxFit.cover, alignment: Alignment.topCenter),
-                                    );
-                                  },
-                                ),
-                                // Carousel Indicator Dots Pill
-                                if (images.length > 1)
-                                  Positioned(
-                                    top: 55,
-                                    left: 0,
-                                    right: 0,
-                                    child: Center(
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                            color: Colors.black.withValues(alpha: 0.3),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: List.generate(images.length, (idx) {
-                                                final isSelected = _currentImageIndex == idx;
-                                                return AnimatedContainer(
-                                                  duration: const Duration(milliseconds: 300),
-                                                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                                                  width: isSelected ? 20 : 6,
-                                                  height: 6,
-                                                  decoration: BoxDecoration(
-                                                    color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.4),
-                                                    borderRadius: BorderRadius.circular(4),
-                                                  ),
-                                                );
-                                              }),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
-                        // Vignette / Gradient Overlay
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withValues(alpha: 0.45),
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.82),
-                              ],
-                              stops: const [0.0, 0.45, 1.0],
-                            ),
-                          ),
-                        ),
-                        // Header Info Title overlay
-                        Positioned(
-                          bottom: 24,
-                          left: 20,
-                          right: 20,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                      
+                      // App Bar row
+                      SafeArea(
+                        bottom: false,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      doctorName,
-                                      style: GoogleFonts.poppins(
+                              GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.05),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF0F172A)),
+                                ),
+                              ),
+                              Consumer<FavoriteProvider>(
+                                builder: (context, favoriteProvider, child) {
+                                  final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
+                                  return GestureDetector(
+                                    onTap: () {
+                                      favoriteProvider.toggleFavorite({
+                                        'id': widget.doctorId,
+                                        'doctor': doctorName,
+                                        'specialty': doctorSpecialty,
+                                        'image': widget.image,
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
                                         color: Colors.white,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        shadows: [
-                                          Shadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10),
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.05),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 2),
+                                          ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF2563EB),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                doctorSpecialty,
-                                style: GoogleFonts.poppins(
-                                  color: const Color(0xFF60A5FA),
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // ── Main Body Content ──
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 160),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 16),
-
-                      // ── Quick Info Stats Bar (Floating Pills) ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF64748B).withValues(alpha: 0.08),
-                                blurRadius: 20,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildStatItem(
-                                icon: Iconsax.star_1,
-                                iconColor: const Color(0xFFF59E0B),
-                                title: _doctorDetails?['rating']?.toString() ?? '4.9',
-                                subtitle: '124 reviews',
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DoctorReviewsScreen(
-                                        doctorName: doctorName,
-                                        rating: '4.9',
+                                      child: Icon(
+                                        isFavorite ? Icons.favorite_rounded : Iconsax.heart,
+                                        size: 20,
+                                        color: isFavorite ? const Color(0xFFEF4444) : const Color(0xFF0F172A),
                                       ),
                                     ),
                                   );
                                 },
                               ),
-                              _buildDivider(),
-                              _buildStatItem(
-                                icon: Iconsax.award,
-                                iconColor: const Color(0xFF2563EB),
-                                title: '10+ Yrs',
-                                subtitle: 'Experience',
-                              ),
-                              _buildDivider(),
-                              _buildStatItem(
-                                icon: Iconsax.people,
-                                iconColor: const Color(0xFF10B981),
-                                title: '1.2k+',
-                                subtitle: 'Patients',
-                              ),
                             ],
                           ),
                         ),
-                      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                      ),
 
-                      const SizedBox(height: 24),
-
-                      // ── Segmented Tab Switcher Bar (ناساندن / خزمەتگوزارییەکان) ──
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          height: 60,
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(22),
-                            border: Border.all(
-                              color: const Color(0xFFE2E8F0),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF64748B).withValues(alpha: 0.06),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              // Tab 0: ناساندن
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _selectedTabIndex = 0),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 250),
-                                    curve: Curves.easeInOut,
-                                    decoration: BoxDecoration(
-                                      gradient: _selectedTabIndex == 0
-                                          ? const LinearGradient(
-                                              colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            )
-                                          : null,
-                                      color: _selectedTabIndex == 0 ? null : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: _selectedTabIndex == 0
-                                          ? [
-                                              BoxShadow(
-                                                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ]
-                                          : [],
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Iconsax.user_tag,
-                                          size: 20,
-                                          color: _selectedTabIndex == 0 ? Colors.white : const Color(0xFF64748B),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          'ناساندن',
-                                          style: GoogleFonts.poppins(
-                                            color: _selectedTabIndex == 0 ? Colors.white : const Color(0xFF64748B),
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              // Tab 1: خزمەتگوزارییەکان
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _selectedTabIndex = 1),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 250),
-                                    curve: Curves.easeInOut,
-                                    decoration: BoxDecoration(
-                                      gradient: _selectedTabIndex == 1
-                                          ? const LinearGradient(
-                                              colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            )
-                                          : null,
-                                      color: _selectedTabIndex == 1 ? null : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: _selectedTabIndex == 1
-                                          ? [
-                                              BoxShadow(
-                                                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ]
-                                          : [],
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Iconsax.health,
-                                          size: 20,
-                                          color: _selectedTabIndex == 1 ? Colors.white : const Color(0xFF64748B),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          'خزمەتگوزارییەکان',
-                                          style: GoogleFonts.poppins(
-                                            color: _selectedTabIndex == 1 ? Colors.white : const Color(0xFF64748B),
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ).animate().fadeIn(duration: 400.ms),
-
-                      const SizedBox(height: 20),
-
-                      // ── Tab 0: ناساندن (Intro Video & About Doctor) ──
-                      if (_selectedTabIndex == 0) ...[
-                        if (_isLoadingDetails && _doctorDetails == null) ...[
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Container(
-                              height: 120,
+                      // Doctor Info & Avatar
+                      Positioned(
+                        top: 100,
+                        left: 20,
+                        right: 20,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          textDirection: TextDirection.rtl,
+                          children: [
+                            // Avatar on Right
+                            Container(
+                              width: 85,
+                              height: 85,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Center(
-                                child: CircularProgressIndicator(color: Color(0xFF2563EB)),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 4),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF0F172A).withValues(alpha: 0.08),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                                image: DecorationImage(
+                                  image: widget.image.startsWith('http') 
+                                    ? NetworkImage(widget.image) 
+                                    : AssetImage(widget.image) as ImageProvider,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
+                            const SizedBox(width: 16),
+                            // Info on Left
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                textDirection: TextDirection.rtl,
+                                children: [
+                                  Text(
+                                    doctorName,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF0F172A),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    doctorSpecialty,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF475569),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    textDirection: TextDirection.rtl,
+                                    children: [
+                                      Text(
+                                        rating,
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF0F172A),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 18),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10), // Reduced gap for overlap feel
+
+                  // --- VIDEO CARD SECTION ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      height: 180,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A), // Slate 900
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0F172A).withValues(alpha: 0.15),
+                            blurRadius: 30,
+                            offset: const Offset(0, 15),
                           ),
-                        ] else ...[
-                          // Intro Video Player Card
-                          if (_youtubeController != null || (_videoPlayerController != null && _videoPlayerController!.value.isInitialized) || (_doctorDetails != null && _doctorDetails!['video_url'] != null && _doctorDetails!['video_url'].toString().isNotEmpty)) ...[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            // Video Background
+                            if (_youtubeController != null)
+                              YoutubePlayer(
+                                controller: _youtubeController!,
+                                backgroundColor: Colors.transparent,
+                              )
+                            else if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
+                              FittedBox(
+                                fit: BoxFit.cover,
+                                child: SizedBox(
+                                  width: _videoPlayerController!.value.size.width,
+                                  height: _videoPlayerController!.value.size.height,
+                                  child: VideoPlayer(_videoPlayerController!),
+                                ),
+                              )
+                            else
+                              Container(
+                                color: const Color(0xFF1E3A8A),
+                                child: const Center(child: CircularProgressIndicator(color: Colors.white)),
+                              ),
+
+                            // Overlay Gradient
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    const Color(0xFF1E3A8A).withValues(alpha: 0.8),
+                                    const Color(0xFF1E3A8A).withValues(alpha: 0.3),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            
+                            // Left Decoration Tag (using Blue instead of Green)
+                            Positioned(
+                              left: 0,
+                              top: 20,
+                              bottom: 20,
                               child: Container(
+                                width: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF3B82F6),
+                                  borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            
+                            // Text & Play Button
+                            Positioned(
+                              right: 20,
+                              top: 0,
+                              bottom: 0,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'ناساندنی دکتۆر',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'ببینە چۆن یارمەتیت دەدەم',
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white.withValues(alpha: 0.8),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Center Play Button Overlay (Glassmorphism)
+                            Center(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                                    ),
+                                    child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            
+                            // Duration Badge
+                            Positioned(
+                              left: 20,
+                              bottom: 16,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '0:45',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 100.ms),
+
+                  const SizedBox(height: 32),
+
+                  // --- SERVICES SECTION ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'خزمەتگوزارییەکان و داشکانەکان',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0F172A),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  SizedBox(
+                    height: 200,
+                    child: _services.isEmpty
+                      ? Center(
+                          child: Text(
+                            'هیچ خزمەتگوزارییەک نەدۆزرایەوە',
+                            style: GoogleFonts.poppins(color: const Color(0xFF64748B)),
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: _services.length,
+                          itemBuilder: (context, index) {
+                            final service = _services[index];
+                            final isSelected = _selectedServiceIndex == index;
+                            
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedServiceIndex = index;
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                width: 160,
+                                margin: const EdgeInsets.only(left: 12),
+                                padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9), // Slate 100
+                                    width: isSelected ? 2.5 : 1,
+                                  ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFF2563EB).withValues(alpha: 0.08),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 8),
+                                      color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+                                      blurRadius: 25,
+                                      offset: const Offset(0, 10),
                                     ),
                                   ],
                                 ),
-                                padding: const EdgeInsets.all(16),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    // Discount Badge & Icon
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        // Pink/Red badge
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFEE2E2), // Red-100
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            'داشکانی تایبەت',
+                                            style: GoogleFonts.poppins(
+                                              color: const Color(0xFFEF4444), // Red-500
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        // Icon with blue background instead of green
                                         Container(
                                           padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFEFF6FF),
-                                            borderRadius: BorderRadius.circular(12),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFDBEAFE), // Blue-100
+                                            shape: BoxShape.circle,
                                           ),
-                                          child: const Icon(Iconsax.video_play, color: Color(0xFF2563EB), size: 20),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          'ڤیدیۆی ناساندنی دکتۆر',
-                                          style: GoogleFonts.poppins(
-                                            color: const Color(0xFF0F172A),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                          child: const Icon(Iconsax.magic_star, color: Color(0xFF2563EB), size: 18),
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 14),
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: _youtubeController != null
-                                            ? YoutubePlayer(controller: _youtubeController!)
-                                            : (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
-                                                ? Stack(
-                                                    alignment: Alignment.bottomCenter,
-                                                    children: [
-                                                      VideoPlayer(_videoPlayerController!),
-                                                      Positioned(
-                                                        bottom: 0,
-                                                        left: 0,
-                                                        right: 0,
-                                                        child: VideoProgressIndicator(
-                                                          _videoPlayerController!,
-                                                          allowScrubbing: true,
-                                                          colors: const VideoProgressColors(
-                                                            playedColor: Color(0xFF2563EB),
-                                                            bufferedColor: Color(0xFF94A3B8),
-                                                            backgroundColor: Color(0xFFCBD5E1),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : const SizedBox.shrink(),
+                                    const Spacer(),
+                                    Text(
+                                      service['name'] ?? 'خزمەتگوزاری',
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Prices
+                                    Text(
+                                      '~${(service['price'] * 1.5).toStringAsFixed(0)} د.ع~', // Mocked old price for visual
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        color: const Color(0xFF94A3B8),
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${service['price']} د.ع',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                        color: const Color(0xFF2563EB), // Primary Blue
+                                      ),
+                                    ),
+                                    Text(
+                                      '(30% داشکان)', // Mocked discount text for visual
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                        color: const Color(0xFF475569),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ).animate().fadeIn(duration: 300.ms),
-                            const SizedBox(height: 20),
-                          ],
+                            );
+                          },
+                        ),
+                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 200.ms),
 
-                          // About Doctor Card
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF64748B).withValues(alpha: 0.06),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFEFF6FF),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: const Icon(Iconsax.user_tag, color: Color(0xFF2563EB), size: 20),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        'about_doctor'.tr(),
-                                        style: GoogleFonts.poppins(
-                                          color: const Color(0xFF0F172A),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    doctorBio,
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(0xFF475569),
-                                      fontSize: 14,
-                                      height: 1.6,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ).animate().fadeIn(duration: 300.ms),
-                        ],
-                      ],
+                  const SizedBox(height: 32),
 
-                      // ── Tab 1: خزمەتگوزارییەکان (Services List) ──
-                      if (_selectedTabIndex == 1) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(Iconsax.health, color: Color(0xFF2563EB), size: 20),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'جۆری سەردان (خزمەتگوزاری)',
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(0xFF0F172A),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              _services.isEmpty
-                                  ? Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(20),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'هیچ خزمەتگوزارییەک لەم بەشەدا بەردەست نییە',
-                                          style: GoogleFonts.poppins(
-                                            color: const Color(0xFF64748B),
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  : ListView.separated(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: _services.length,
-                                      separatorBuilder: (context, index) => const SizedBox(height: 12),
-                                      itemBuilder: (context, index) {
-                                        final isSelected = _selectedServiceIndex == index;
-                                        final service = _services[index];
-                                        final locale = context.locale.languageCode;
-                                        
-                                        String name = service['name_ckb'] ?? service['name'] ?? '';
-                                        if (locale == 'en' && service['name_en'] != null) name = service['name_en'];
-                                        if (locale == 'ar' && service['name_ar'] != null) name = service['name_ar'];
-
-                                        String desc = service['description_ckb'] ?? service['description'] ?? '';
-                                        if (locale == 'en' && service['description_en'] != null) desc = service['description_en'];
-                                        if (locale == 'ar' && service['description_ar'] != null) desc = service['description_ar'];
-
-                                        return GestureDetector(
-                                          onTap: () => setState(() => _selectedServiceIndex = index),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 250),
-                                            padding: const EdgeInsets.all(18),
-                                            decoration: BoxDecoration(
-                                              color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
-                                              borderRadius: BorderRadius.circular(20),
-                                              border: Border.all(
-                                                color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-                                                width: isSelected ? 2 : 1,
-                                              ),
-                                              boxShadow: isSelected
-                                                  ? [
-                                                      BoxShadow(
-                                                        color: const Color(0xFF2563EB).withValues(alpha: 0.14),
-                                                        blurRadius: 16,
-                                                        offset: const Offset(0, 6),
-                                                      )
-                                                    ]
-                                                  : [
-                                                      BoxShadow(
-                                                        color: const Color(0xFF64748B).withValues(alpha: 0.04),
-                                                        blurRadius: 10,
-                                                        offset: const Offset(0, 4),
-                                                      )
-                                                    ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                AnimatedContainer(
-                                                  duration: const Duration(milliseconds: 200),
-                                                  padding: const EdgeInsets.all(10),
-                                                  decoration: BoxDecoration(
-                                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: Icon(
-                                                    isSelected ? Icons.check_rounded : Iconsax.hospital,
-                                                    color: isSelected ? Colors.white : const Color(0xFF64748B),
-                                                    size: 20,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 14),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        name,
-                                                        style: GoogleFonts.poppins(
-                                                          color: const Color(0xFF0F172A),
-                                                          fontSize: 15,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      if (desc.isNotEmpty) ...[
-                                                        const SizedBox(height: 2),
-                                                        Text(
-                                                          desc,
-                                                          style: GoogleFonts.poppins(
-                                                            color: const Color(0xFF64748B),
-                                                            fontSize: 12,
-                                                          ),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.ellipsis,
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                                  decoration: BoxDecoration(
-                                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF8FAFC),
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: Text(
-                                                    '\$${service['price']}',
-                                                    style: GoogleFonts.poppins(
-                                                      color: isSelected ? Colors.white : const Color(0xFF2563EB),
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                            ],
-                          ),
-                        ).animate().fadeIn(duration: 300.ms),
-                        const SizedBox(height: 24),
-
-                        // ── Schedule Calendar Section ──
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(Iconsax.calendar_1, color: Color(0xFF2563EB), size: 20),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'select_date'.tr(),
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(0xFF0F172A),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              SizedBox(
-                                height: 90,
-                                child: _dynamicDates.isEmpty
-                                    ? Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFFEF2F2),
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "ببوورە کاتی بەردەست دیاری نەکراوە",
-                                            style: GoogleFonts.poppins(color: const Color(0xFFEF4444), fontSize: 13, fontWeight: FontWeight.w600),
-                                          ),
-                                        ),
-                                      )
-                                    : ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        physics: const BouncingScrollPhysics(),
-                                        itemCount: _dynamicDates.length,
-                                        itemBuilder: (context, index) {
-                                          final isSelected = _selectedDateIndex == index;
-                                          final item = _dynamicDates[index];
-                                          return GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _selectedDateIndex = index;
-                                                _updateDynamicTimes();
-                                              });
-                                            },
-                                            child: AnimatedContainer(
-                                              duration: const Duration(milliseconds: 250),
-                                              margin: const EdgeInsets.only(right: 10),
-                                              width: 72,
-                                              decoration: BoxDecoration(
-                                                color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-                                                borderRadius: BorderRadius.circular(22),
-                                                border: Border.all(
-                                                  color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-                                                  width: isSelected ? 2 : 1,
-                                                ),
-                                                boxShadow: isSelected
-                                                    ? [
-                                                        BoxShadow(
-                                                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                                                          blurRadius: 12,
-                                                          offset: const Offset(0, 6),
-                                                        )
-                                                      ]
-                                                    : [
-                                                        BoxShadow(
-                                                          color: const Color(0xFF64748B).withValues(alpha: 0.04),
-                                                          blurRadius: 8,
-                                                          offset: const Offset(0, 4),
-                                                        )
-                                                      ],
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    item['day'],
-                                                    style: GoogleFonts.poppins(
-                                                      color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF64748B),
-                                                      fontSize: 12,
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    item['date'],
-                                                    style: GoogleFonts.poppins(
-                                                      color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    item['month'],
-                                                    style: GoogleFonts.poppins(
-                                                      color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF94A3B8),
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ).animate(delay: 250.ms).fadeIn(),
-
-                        const SizedBox(height: 24),
-
-                        // ── Available Time Slots Section ──
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(Iconsax.clock, color: Color(0xFF2563EB), size: 20),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'available_time'.tr(),
-                                    style: GoogleFonts.poppins(
-                                      color: const Color(0xFF0F172A),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              _dynamicTimes.isEmpty
-                                  ? Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFEF2F2),
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Text(
-                                        'تکایە کاتژمێری دیاریکراو لەم بەشەدا بەردەست نییە',
-                                        style: GoogleFonts.poppins(color: const Color(0xFF991B1B), fontSize: 13, fontWeight: FontWeight.w600),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : Wrap(
-                                      spacing: 10,
-                                      runSpacing: 10,
-                                      children: List.generate(_dynamicTimes.length, (index) {
-                                        final isSelected = _selectedTimeIndex == index;
-                                        return GestureDetector(
-                                          onTap: () => setState(() => _selectedTimeIndex = index),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(milliseconds: 200),
-                                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                                            decoration: BoxDecoration(
-                                              color: isSelected ? const Color(0xFF2563EB) : Colors.white,
-                                              borderRadius: BorderRadius.circular(16),
-                                              border: Border.all(
-                                                color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-                                              ),
-                                              boxShadow: isSelected
-                                                  ? [
-                                                      BoxShadow(
-                                                        color: const Color(0xFF2563EB).withValues(alpha: 0.25),
-                                                        blurRadius: 10,
-                                                        offset: const Offset(0, 4),
-                                                      )
-                                                    ]
-                                                  : [
-                                                      BoxShadow(
-                                                        color: const Color(0xFF64748B).withValues(alpha: 0.03),
-                                                        blurRadius: 6,
-                                                        offset: const Offset(0, 2),
-                                                      )
-                                                    ],
-                                            ),
-                                            child: Text(
-                                              _dynamicTimes[index],
-                                              style: GoogleFonts.poppins(
-                                                color: isSelected ? Colors.white : const Color(0xFF0F172A),
-                                                fontSize: 14,
-                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                    ),
-                            ],
-                          ),
-                        ).animate(delay: 300.ms).fadeIn(),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // ── Ultra Floating Bottom Action Bar ──
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
-                        blurRadius: 30,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'consultation_price'.tr(),
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF64748B),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            _getCurrentPrice(),
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF1D4ED8),
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 20),
-                      Expanded(
-                        child: SizedBox(
-                          height: 54,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
-                                  blurRadius: 14,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: (_selectedTimeIndex != -1 && !_isBooking)
-                                  ? _bookAppointment
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                disabledBackgroundColor: const Color(0xFF94A3B8).withValues(alpha: 0.5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                              ),
-                              child: _isBooking
-                                  ? const SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Text(
-                                      'book_appointment'.tr(),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                            ),
+                  // --- CLINIC IMAGES SECTION ---
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end, // Align text RTL
+                      children: [
+                        Text(
+                          'وێنەی کلینیکەکە',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF0F172A),
                           ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          'تیمێکی کارامە و کەرەستەی سەردەمیانە',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: const Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  SizedBox(
+                    height: 100,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: images.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: 120,
+                          margin: const EdgeInsets.only(left: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF0F172A).withValues(alpha: 0.1),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                            image: DecorationImage(
+                              image: images[index].startsWith('http')
+                                ? NetworkImage(images[index])
+                                : AssetImage(images[index]) as ImageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 300.ms),
+
+                  const SizedBox(height: 40), // Spacing for bottom button
+                ],
+              ),
+            ),
+          ),
+          
+          // --- FIXED BOTTOM BOOKING BUTTON ---
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Container(
+                width: double.infinity,
+                height: 60,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], // Blue-500 to Blue-700
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Open Bottom Sheet for Calendar and Time
+                    _showBookingBottomSheet(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: Text(
+                    'گرتنی نۆرەیەک',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -1492,55 +1008,299 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
-  Widget _buildStatItem({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Column(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: iconColor, size: 18),
-                const SizedBox(width: 4),
-                Text(
-                  title,
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF0F172A),
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+  // --- BOTTOM SHEET FOR CALENDAR AND TIME ---
+  void _showBookingBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-              ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: GoogleFonts.poppins(
-                color: const Color(0xFF64748B),
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Container(
-      height: 28,
-      width: 1,
-      color: const Color(0xFFE2E8F0),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  // Handle indicator
+                  Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFCBD5E1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(Iconsax.calendar_1, color: Color(0xFF2563EB), size: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'هەڵبژاردنی بەروار',
+                                  style: GoogleFonts.poppins(
+                                    color: const Color(0xFF0F172A),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: 90,
+                            child: _dynamicDates.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      "ببوورە کاتی بەردەست دیاری نەکراوە",
+                                      style: GoogleFonts.poppins(color: const Color(0xFFEF4444), fontSize: 13, fontWeight: FontWeight.w600),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    scrollDirection: Axis.horizontal,
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: _dynamicDates.length,
+                                    itemBuilder: (context, index) {
+                                      final isSelected = _selectedDateIndex == index;
+                                      final item = _dynamicDates[index];
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setModalState(() {
+                                            _selectedDateIndex = index;
+                                            _updateDynamicTimes();
+                                          });
+                                          // also update parent state
+                                          setState(() {});
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 250),
+                                          margin: const EdgeInsets.only(left: 10),
+                                          width: 72,
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+                                            borderRadius: BorderRadius.circular(22),
+                                            border: Border.all(
+                                              color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                                              width: isSelected ? 2 : 1,
+                                            ),
+                                            boxShadow: isSelected
+                                                ? [
+                                                    BoxShadow(
+                                                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                                      blurRadius: 12,
+                                                      offset: const Offset(0, 6),
+                                                    )
+                                                  ]
+                                                : [],
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                item['day'],
+                                                style: GoogleFonts.poppins(
+                                                  color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF64748B),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                item['date'],
+                                                style: GoogleFonts.poppins(
+                                                  color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                item['month'],
+                                                style: GoogleFonts.poppins(
+                                                  color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF94A3B8),
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                          const SizedBox(height: 32),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(Iconsax.clock, color: Color(0xFF2563EB), size: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'کاتژمێرە بەردەستەکان',
+                                  style: GoogleFonts.poppins(
+                                    color: const Color(0xFF0F172A),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: _dynamicTimes.isEmpty
+                                ? Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFEF2F2),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      'تکایە کاتژمێری دیاریکراو لەم بەشەدا بەردەست نییە',
+                                      style: GoogleFonts.poppins(color: const Color(0xFF991B1B), fontSize: 13, fontWeight: FontWeight.w600),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  )
+                                : Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    alignment: WrapAlignment.start,
+                                    children: List.generate(_dynamicTimes.length, (index) {
+                                      final isSelected = _selectedTimeIndex == index;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setModalState(() => _selectedTimeIndex = index);
+                                          setState(() {});
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 200),
+                                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                                            ),
+                                            boxShadow: isSelected
+                                                ? [
+                                                    BoxShadow(
+                                                      color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                                                      blurRadius: 10,
+                                                      offset: const Offset(0, 4),
+                                                    )
+                                                  ]
+                                                : [],
+                                          ),
+                                          child: Text(
+                                            _dynamicTimes[index],
+                                            style: GoogleFonts.poppins(
+                                              color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                                              fontSize: 14,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, -5),
+                        ),
+                      ],
+                    ),
+                    child: SafeArea(
+                      top: false,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: _isBooking ? null : () {
+                            if (_selectedTimeIndex != -1) {
+                              _bookAppointment();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('تکایە کاتژمێرێک هەڵبژێرە'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2563EB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: _isBooking
+                              ? const SizedBox(
+                                  width: 24, height: 24,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                                )
+                              : Text(
+                                  'تەواوکردنی نۆرە',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
