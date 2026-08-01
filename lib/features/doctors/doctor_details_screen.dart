@@ -265,7 +265,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                         borderRadius: BorderRadius.circular(24),
                         image: DecorationImage(
                           image: AssetImage(widget.image),
-                          fit: BoxFit.cover, // Or fitHeight depending on images
+                          fit: BoxFit.cover,
+                          alignment: Alignment.topCenter,
                         ),
                         boxShadow: [
                           BoxShadow(
