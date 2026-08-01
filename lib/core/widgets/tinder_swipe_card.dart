@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class TinderSwipeCard extends StatefulWidget {
   final Widget child;
-  final VoidCallback onSwiped;
+  final Future<bool> Function() onSwiped;
   
   const TinderSwipeCard({
     Key? key,
@@ -89,12 +89,16 @@ class _TinderSwipeCardState extends State<TinderSwipeCard> with SingleTickerProv
     
     final anim = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     
-    _controller.forward(from: 0).then((_) {
+    _controller.forward(from: 0).then((_) async {
+      final success = await widget.onSwiped();
       if (mounted) {
-        setState(() {
-          _isDismissed = true;
-        });
-        widget.onSwiped();
+        if (success) {
+          setState(() {
+            _isDismissed = true;
+          });
+        } else {
+          _animateBack();
+        }
       }
     });
     

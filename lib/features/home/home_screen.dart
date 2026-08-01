@@ -1759,24 +1759,47 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           TinderSwipeCard(
-            onSwiped: () {
-              appointmentProvider.cancelAppointment(next.id);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'appointment_cancelled'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 13,
+            onSwiped: () async {
+              final success =
+                  await appointmentProvider.cancelAppointment(next.id);
+              
+              if (success) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'appointment_cancelled'.tr(),
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  backgroundColor: Colors.redAccent,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
+                  );
+                }
+              } else {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Failed to cancel appointment on server.',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+              return success;
             },
             child:
                 GestureDetector(
@@ -1980,20 +2003,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     )
-                    .animate(onPlay: (c) => c.repeat())
-                    .shake(
-                      hz: 1.5,
-                      rotation: 0.015,
-                      curve: Curves.easeInOutSine,
-                      delay: 3500.ms,
-                      duration: 1200.ms,
-                    )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
                     .moveX(
-                      begin: -4,
-                      end: 4,
+                      begin: -0.5,
+                      end: 0.5,
                       curve: Curves.easeInOutSine,
                       delay: 3500.ms,
-                      duration: 1200.ms,
+                      duration: 2500.ms,
+                    )
+                    .rotate(
+                      begin: -0.002,
+                      end: 0.002,
+                      curve: Curves.easeInOutSine,
+                      delay: 3500.ms,
+                      duration: 2500.ms,
                     ),
           ),
         ],
