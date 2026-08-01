@@ -31,10 +31,9 @@
             <div class="flex gap-2">
                 <input type="text" id="name_ckb" name="name_ckb" value="{{ old('name_ckb') }}" required
                     class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
-                <button type="button" onclick="translateService()" class="px-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors" title="وەرگێڕان بۆ زمانەکانی تر">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.516l1.285 2.57A9.957 9.957 0 0113 7h-1a7.962 7.962 0 00-1.742 1.353l1.854 3.708A7.95 7.95 0 0015 10h1a9.953 9.953 0 01-3.666 3.666l-1.39-2.78A5.952 5.952 0 019 12a5.952 5.952 0 01-1.944-1.114l-1.39 2.78A9.953 9.953 0 012 10h1a7.95 7.95 0 002.888 2.061l1.854-3.708A7.962 7.962 0 006 7H5a1 1 0 110-2h3V3a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
+                <button type="button" onclick="translateService()" id="add_translate_btn" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors text-sm font-medium whitespace-nowrap">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                    <span>وەرگێڕانی ئۆتۆماتیکی</span>
                 </button>
             </div>
             @error('name_ckb') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
@@ -220,10 +219,9 @@
                     <div class="flex gap-2">
                         <input type="text" name="name_ckb" id="edit_name_ckb" required
                             class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-                        <button type="button" onclick="translateEditService()" class="px-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors" title="وەرگێڕان">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                              <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.516l1.285 2.57A9.957 9.957 0 0113 7h-1a7.962 7.962 0 00-1.742 1.353l1.854 3.708A7.95 7.95 0 0015 10h1a9.953 9.953 0 01-3.666 3.666l-1.39-2.78A5.952 5.952 0 019 12a5.952 5.952 0 01-1.944-1.114l-1.39 2.78A9.953 9.953 0 012 10h1a7.95 7.95 0 002.888 2.061l1.854-3.708A7.962 7.962 0 006 7H5a1 1 0 110-2h3V3a1 1 0 011-1z" clip-rule="evenodd" />
-                            </svg>
+                        <button type="button" onclick="translateEditService()" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors text-sm font-medium whitespace-nowrap">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            <span>وەرگێڕانی ئۆتۆماتیکی</span>
                         </button>
                     </div>
                 </div>
