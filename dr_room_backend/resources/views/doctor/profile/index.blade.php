@@ -249,6 +249,12 @@
                 document.getElementById('bio_en').value = data.translations?.en || '';
                 document.getElementById('bio_ar').value = data.translations?.ar || '';
             }
+            
+            // Re-enable submit button
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
         } catch(e) {
             alert('کێشەیەک ڕوویدا لە وەرگێڕان');
         }
@@ -256,6 +262,18 @@
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
+
+    // Disable submit if translation needed
+    ['specialty', 'bio'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) {
+            el.addEventListener('input', () => {
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+        }
+    });
 
     function toggleVideoInputs(type) {
         document.getElementById('youtube_input').style.display = type === 'youtube' ? 'block' : 'none';

@@ -90,7 +90,7 @@
     </div>
 
     <div class="flex justify-end">
-        <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30">
+        <button type="submit" id="add_submit_btn" disabled class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30 opacity-50 cursor-not-allowed">
             زیادکردنی خزمەتگوزاری
         </button>
     </div>
@@ -217,8 +217,15 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">ناو (کوردی)</label>
-                    <input type="text" name="name_ckb" id="edit_name_ckb" required
-                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                    <div class="flex gap-2">
+                        <input type="text" name="name_ckb" id="edit_name_ckb" required
+                            class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                        <button type="button" onclick="translateEditService()" class="px-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors" title="وەرگێڕان">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M7 2a1 1 0 011 1v1h3a1 1 0 110 2H9.516l1.285 2.57A9.957 9.957 0 0113 7h-1a7.962 7.962 0 00-1.742 1.353l1.854 3.708A7.95 7.95 0 0015 10h1a9.953 9.953 0 01-3.666 3.666l-1.39-2.78A5.952 5.952 0 019 12a5.952 5.952 0 01-1.944-1.114l-1.39 2.78A9.953 9.953 0 012 10h1a7.95 7.95 0 002.888 2.061l1.854-3.708A7.962 7.962 0 006 7H5a1 1 0 110-2h3V3a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -256,7 +263,7 @@
 
             <div class="flex justify-end gap-3 mt-6">
                 <button type="button" onclick="closeEdit()" class="px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium hover:bg-slate-200 transition-colors">پاشگەزبوونەوە</button>
-                <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">پاشەکەوتکردن</button>
+                <button type="submit" id="edit_submit_btn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">پاشەکەوتکردن</button>
             </div>
         </form>
     </div>
@@ -333,9 +340,54 @@
             if (data.success) {
                 document.getElementById('name_en').value = data.translations.en;
                 document.getElementById('name_ar').value = data.translations.ar;
+                
+                const addBtn = document.getElementById('add_submit_btn');
+                addBtn.disabled = false;
+                addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         });
     }
+
+    function translateEditService() {
+        const text = document.getElementById('edit_name_ckb').value;
+        if (!text) return;
+
+        document.getElementById('edit_name_en').value = 'لە وەرگێڕاندایە...';
+        document.getElementById('edit_name_ar').value = 'لە وەرگێڕاندایە...';
+
+        fetch('{{ route('api.translate') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('edit_name_en').value = data.translations.en;
+                document.getElementById('edit_name_ar').value = data.translations.ar;
+                
+                const editBtn = document.getElementById('edit_submit_btn');
+                editBtn.disabled = false;
+                editBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    }
+
+    // Disable submit buttons on input change
+    document.getElementById('name_ckb').addEventListener('input', function() {
+        const addBtn = document.getElementById('add_submit_btn');
+        addBtn.disabled = true;
+        addBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
+
+    document.getElementById('edit_name_ckb').addEventListener('input', function() {
+        const editBtn = document.getElementById('edit_submit_btn');
+        editBtn.disabled = true;
+        editBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    });
 
     // Keep the offer block open when validation bounced the form back.
     @if(old('old_price'))
