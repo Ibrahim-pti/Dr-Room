@@ -241,6 +241,20 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.getBackground(context),
+      appBar: AppBar(
+        backgroundColor: AppColors.getBackground(context),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        title: Text(
+          'زانیاری و ڕێنمایی پزیشکی',
+          style: GoogleFonts.poppins(
+            color: AppColors.getTextTitle(context),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _fetchArticles,
@@ -251,83 +265,10 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
               // Top Header Bar & Search
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Title & Badge
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.12,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Iconsax.verify,
-                                          color: AppColors.primary,
-                                          size: 14,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'داتاکانی ئادمینی گشتی',
-                                          style: GoogleFonts.poppins(
-                                            color: AppColors.primary,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'زانیاری و ڕێنمایی پزیشکی',
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.getTextTitle(context),
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // Refresh Button
-                          GestureDetector(
-                            onTap: _fetchArticles,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppColors.getSurfaceSecondary(context),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Iconsax.refresh,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
 
                       // Search Box
                       Container(
