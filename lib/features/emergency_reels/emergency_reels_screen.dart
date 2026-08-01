@@ -33,7 +33,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
       'title_ar': 'دليل الإسعافات الأولية للإنعاش قلبي رئوي (CPR)',
       'category': 'فریاکەوتن',
       'category_key': 'first_aid',
-      'content': '''کاتێک کەسێک لەناکاو دەکەوێت و هەناسەدانی دەوەستێت، ئەنجامدانی فریاکەوتنی خێرا (CPR) دەتوانێت ژیانی ڕزگار بکات.
+      'content':
+          '''کاتێک کەسێک لەناکاو دەکەوێت و هەناسەدانی دەوەستێت، ئەنجامدانی فریاکەوتنی خێرا (CPR) دەتوانێت ژیانی ڕزگار بکات.
 
 ١. بەپەلە پەیوەندی بە ژمارەی فریاکەوتنی پزیشکی (122) بکە.
 ٢. نەخۆشەکە لەسەر پشتی بە تەختی دابنێ.
@@ -42,7 +43,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
 ٥. تا گەیشتنی تیمی پزیشکی یان ژیانەوەی نەخۆشەکە بەردەوام بە.
 
 تێبینی: ئەگەر ڕاهێنراو نیت لە هەناسەی دەستکرد، تەنها پەستاوتنی سنگ بەسە.''',
-      'image_url': 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
+      'image_url':
+          'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
       'author': 'ئادمینی گشتی - Dr. Room',
       'created_at': '2026-08-01',
       'is_admin_post': true,
@@ -54,7 +56,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
       'title_ar': 'الأعراض المبكرة للنوبة القلبية والإجراءات الطارئة',
       'category': 'نیشانەکان',
       'category_key': 'symptoms',
-      'content': '''جەڵتەی دڵ یەکێکە لە حاڵەتە کتوپڕەکان کە پێویستی بە وەڵامدانەوەی خێرا هەیە.
+      'content':
+          '''جەڵتەی دڵ یەکێکە لە حاڵەتە کتوپڕەکان کە پێویستی بە وەڵامدانەوەی خێرا هەیە.
 
 نیشانە سەرەتاییەکان:
 • ئازار و پەستانی توند لە ناوەڕاستی سنگ یان لای چەپ.
@@ -67,7 +70,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
 ٢. نەخۆشەکە لە شوێنێکی ئارام دابنیشێنە یان پاڵی بخەرەوە.
 ٣. جلوبەرگی تەنگ خاو بکەرەوە بۆ ئاسانکاری لە هەناسەدان.
 ٤. ڕێگەی مەدە نەخۆشەکە جوڵەی زۆر بکات.''',
-      'image_url': 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800&q=80',
+      'image_url':
+          'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=800&q=80',
       'author': 'ئادمینی گشتی - Dr. Room',
       'created_at': '2026-07-30',
       'is_admin_post': true,
@@ -90,7 +94,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
 - سەهۆڵی ڕاستەوخۆ مەخەرە سەر برینەکە.
 - خەمیرە، ڕۆن، یان مەعجونی ددان لێمەدە.
 - قڵپکردنی پەقپەقەی سووتاوییەکە مەشکێنە.''',
-      'image_url': 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&q=80',
+      'image_url':
+          'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&q=80',
       'author': 'ئادمینی گشتی - Dr. Room',
       'created_at': '2026-07-28',
       'is_admin_post': true,
@@ -102,14 +107,16 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
       'title_ar': 'دليل التحكم في النزيف الحاد والإسعافات الأولية',
       'category': 'خۆپارێزی',
       'category_key': 'prevention',
-      'content': '''خوێنربوونی توند پێویستی بە هەنگاوی بەپەلە هەیە بۆ ڕێگریکردن لە شوکی خوێنربوون.
+      'content':
+          '''خوێنربوونی توند پێویستی بە هەنگاوی بەپەلە هەیە بۆ ڕێگریکردن لە شوکی خوێنربوون.
 
 هەنگاوەکانی فریاکەوتن:
 ١. پارچە پەڕۆیەکی خاوێن یان گازی پزیشکی بپەستێنە سەر شوێنی برینەکە.
 ٢. پەستانەکە بە بەردەوامی و بێ پچڕان ڕابگرە بۆ ماوەی ٥-١٠ خولەک.
 ٣. ئەگەر بەردەست بوو، ئەندامی برینداربوو بەرزتر بکەرەوە لە ئاستی دڵ.
 ٤. بپێچەرەوە و پەیوەندی بە تیمی فریاکەوتنەوە بکە.''',
-      'image_url': 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80',
+      'image_url':
+          'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80',
       'author': 'ئادمینی گشتی - Dr. Room',
       'created_at': '2026-07-25',
       'is_admin_post': true,
@@ -128,7 +135,7 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
       final response = await ApiClient.get('/articles');
       if (response.statusCode == 200 && mounted) {
         final List<dynamic> data = jsonDecode(response.body);
-        
+
         final List<Map<String, dynamic>> apiArticles = data.map((item) {
           String? imgUrl = item['image_path'];
           if (imgUrl != null && imgUrl.isNotEmpty) {
@@ -148,7 +155,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
             'category': 'ئادمینی گشتی',
             'image_url': imgUrl,
             'author': 'ئادمینی گشتی - Dr. Room',
-            'created_at': item['created_at']?.toString().split('T').first ?? '2026-08-01',
+            'created_at':
+                item['created_at']?.toString().split('T').first ?? '2026-08-01',
             'is_admin_post': true,
           };
         }).toList();
@@ -182,13 +190,17 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
       final content = (article['content'] ?? '').toString().toLowerCase();
       final query = _searchQuery.toLowerCase();
 
-      final matchesQuery = query.isEmpty || title.contains(query) || content.contains(query);
+      final matchesQuery =
+          query.isEmpty || title.contains(query) || content.contains(query);
 
       if (_selectedCategory == 'all') return matchesQuery;
-      if (_selectedCategory == 'bookmarked') return matchesQuery && _bookmarkedIds.contains(article['id']);
-      
+      if (_selectedCategory == 'bookmarked')
+        return matchesQuery && _bookmarkedIds.contains(article['id']);
+
       final category = (article['category'] ?? '').toString();
-      return matchesQuery && (category.contains(_selectedCategory) || article['category_key'] == _selectedCategory);
+      return matchesQuery &&
+          (category.contains(_selectedCategory) ||
+              article['category_key'] == _selectedCategory);
     }).toList();
   }
 
@@ -209,7 +221,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
   }
 
   void _shareArticle(Map<String, dynamic> article) {
-    final String shareText = "${article['title']}\n\n"
+    final String shareText =
+        "${article['title']}\n\n"
         "${article['content']}\n\n"
         "لە ئەپڵیکەیشنی Dr. Room دەستت دەکەوێت";
     SharePlus.instance.share(ShareParams(text: shareText));
@@ -252,15 +265,24 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(alpha: 0.12),
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.12,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Icon(Iconsax.verify, color: AppColors.primary, size: 14),
+                                        const Icon(
+                                          Iconsax.verify,
+                                          color: AppColors.primary,
+                                          size: 14,
+                                        ),
                                         const SizedBox(width: 4),
                                         Text(
                                           'داتاکانی ئادمینی گشتی',
@@ -312,10 +334,14 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.getSurface(context),
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: AppColors.getBorder(context)),
+                          border: Border.all(
+                            color: AppColors.getBorder(context),
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                              color: Colors.black.withValues(
+                                alpha: isDark ? 0.2 : 0.04,
+                              ),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -323,7 +349,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                         ),
                         child: TextField(
                           controller: _searchController,
-                          onChanged: (val) => setState(() => _searchQuery = val),
+                          onChanged: (val) =>
+                              setState(() => _searchQuery = val),
                           style: GoogleFonts.poppins(
                             color: AppColors.getTextTitle(context),
                             fontSize: 14,
@@ -334,7 +361,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                               color: AppColors.getTextSubtitle(context),
                               fontSize: 13,
                             ),
-                            prefixIcon: const Icon(Iconsax.search_normal_1, color: AppColors.primary, size: 20),
+                            prefixIcon: const Icon(
+                              Iconsax.search_normal_1,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
                             suffixIcon: _searchQuery.isNotEmpty
                                 ? IconButton(
                                     icon: const Icon(Icons.close, size: 18),
@@ -345,7 +376,10 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                                   )
                                 : null,
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
                           ),
                         ),
                       ),
@@ -359,13 +393,29 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                           children: [
                             _buildCategoryChip('all', 'هەمووی', Iconsax.grid_5),
                             const SizedBox(width: 8),
-                            _buildCategoryChip('first_aid', 'فریاکەوتن', Iconsax.hospital),
+                            _buildCategoryChip(
+                              'first_aid',
+                              'فریاکەوتن',
+                              Iconsax.hospital,
+                            ),
                             const SizedBox(width: 8),
-                            _buildCategoryChip('symptoms', 'نیشانەکان', Iconsax.activity),
+                            _buildCategoryChip(
+                              'symptoms',
+                              'نیشانەکان',
+                              Iconsax.activity,
+                            ),
                             const SizedBox(width: 8),
-                            _buildCategoryChip('prevention', 'خۆپارێزی', Iconsax.shield_tick),
+                            _buildCategoryChip(
+                              'prevention',
+                              'خۆپارێزی',
+                              Iconsax.shield_tick,
+                            ),
                             const SizedBox(width: 8),
-                            _buildCategoryChip('bookmarked', 'نیشانەکراوەکان', Iconsax.archive_book),
+                            _buildCategoryChip(
+                              'bookmarked',
+                              'نیشانەکراوەکان',
+                              Iconsax.archive_book,
+                            ),
                           ],
                         ),
                       ),
@@ -394,7 +444,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                             color: AppColors.primary.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Iconsax.document_text, size: 48, color: AppColors.primary),
+                          child: const Icon(
+                            Iconsax.document_text,
+                            size: 48,
+                            color: AppColors.primary,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -419,10 +473,15 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                 )
               else ...[
                 // Spotlight / Hero Article Banner (First Item)
-                if (_searchQuery.isEmpty && _selectedCategory == 'all' && filtered.isNotEmpty) ...[
+                if (_searchQuery.isEmpty &&
+                    _selectedCategory == 'all' &&
+                    filtered.isNotEmpty) ...[
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
                       child: _buildHeroArticleCard(filtered.first),
                     ),
                   ),
@@ -434,11 +493,13 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final actualIndex = (_searchQuery.isEmpty && _selectedCategory == 'all')
+                        final actualIndex =
+                            (_searchQuery.isEmpty && _selectedCategory == 'all')
                             ? index + 1
                             : index;
 
-                        if (actualIndex >= filtered.length) return const SizedBox.shrink();
+                        if (actualIndex >= filtered.length)
+                          return const SizedBox.shrink();
                         final article = filtered[actualIndex];
 
                         return Padding(
@@ -449,7 +510,8 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                               .slideY(begin: 0.1, end: 0, duration: 350.ms),
                         );
                       },
-                      childCount: (_searchQuery.isEmpty && _selectedCategory == 'all')
+                      childCount:
+                          (_searchQuery.isEmpty && _selectedCategory == 'all')
                           ? (filtered.length > 1 ? filtered.length - 1 : 0)
                           : filtered.length,
                     ),
@@ -472,12 +534,12 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : AppColors.getSurface(context),
+          color: isSelected ? AppColors.primary : AppColors.getSurface(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.getBorder(context),
+            color: isSelected
+                ? AppColors.primary
+                : AppColors.getBorder(context),
           ),
           boxShadow: [
             if (isSelected)
@@ -493,7 +555,9 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
             Icon(
               icon,
               size: 15,
-              color: isSelected ? Colors.white : AppColors.getTextSubtitle(context),
+              color: isSelected
+                  ? Colors.white
+                  : AppColors.getTextSubtitle(context),
             ),
             const SizedBox(width: 6),
             Text(
@@ -578,15 +642,24 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Iconsax.star_1, color: Colors.amber, size: 14),
+                              const Icon(
+                                Iconsax.star_1,
+                                color: Colors.amber,
+                                size: 14,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'پێشنیارکراوی ئادمین',
@@ -602,7 +675,9 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                         IconButton(
                           onPressed: () => _toggleBookmark(id),
                           icon: Icon(
-                            isBookmarked ? Iconsax.archive_tick : Iconsax.archive_book,
+                            isBookmarked
+                                ? Iconsax.archive_tick
+                                : Iconsax.archive_book,
                             color: isBookmarked ? Colors.amber : Colors.white,
                             size: 22,
                           ),
@@ -627,7 +702,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            const Icon(Iconsax.clock, color: Colors.white70, size: 13),
+                            const Icon(
+                              Iconsax.clock,
+                              color: Colors.white70,
+                              size: 13,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               '$readTime خولەک خوێندنەوە',
@@ -638,7 +717,10 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                             ),
                             const Spacer(),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(16),
@@ -654,7 +736,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_forward_rounded, color: AppColors.primary, size: 14),
+                                  const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    color: AppColors.primary,
+                                    size: 14,
+                                  ),
                                 ],
                               ),
                             ),
@@ -709,7 +795,10 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                           imageUrl: imgUrl,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primary,
+                            ),
                           ),
                           errorWidget: (context, url, error) => const Icon(
                             Iconsax.document_text,
@@ -734,7 +823,10 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -752,15 +844,23 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                           children: [
                             GestureDetector(
                               onTap: () => _shareArticle(article),
-                              child: const Icon(Iconsax.share, size: 17, color: Colors.grey),
+                              child: const Icon(
+                                Iconsax.share,
+                                size: 17,
+                                color: Colors.grey,
+                              ),
                             ),
                             const SizedBox(width: 10),
                             GestureDetector(
                               onTap: () => _toggleBookmark(id),
                               child: Icon(
-                                isBookmarked ? Iconsax.archive_tick : Iconsax.archive_book,
+                                isBookmarked
+                                    ? Iconsax.archive_tick
+                                    : Iconsax.archive_book,
                                 size: 18,
-                                color: isBookmarked ? Colors.amber : Colors.grey,
+                                color: isBookmarked
+                                    ? Colors.amber
+                                    : Colors.grey,
                               ),
                             ),
                           ],
@@ -784,7 +884,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
 
                     Row(
                       children: [
-                        Icon(Iconsax.clock, size: 12, color: AppColors.getTextSubtitle(context)),
+                        Icon(
+                          Iconsax.clock,
+                          size: 12,
+                          color: AppColors.getTextSubtitle(context),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '$readTime خولەک',
@@ -794,7 +898,11 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Icon(Iconsax.verify, size: 12, color: AppColors.primary),
+                        Icon(
+                          Iconsax.verify,
+                          size: 12,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'ئادمین',
@@ -835,10 +943,7 @@ class _ArticleDetailSheet extends StatefulWidget {
   final Map<String, dynamic> article;
   final VoidCallback onShare;
 
-  const _ArticleDetailSheet({
-    required this.article,
-    required this.onShare,
-  });
+  const _ArticleDetailSheet({required this.article, required this.onShare});
 
   @override
   State<_ArticleDetailSheet> createState() => _ArticleDetailSheetState();
@@ -854,10 +959,12 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
     String title = widget.article['title'] ?? '';
     String content = widget.article['content'] ?? '';
 
-    if (_activeLang == 'en' && (widget.article['title_en'] ?? '').toString().isNotEmpty) {
+    if (_activeLang == 'en' &&
+        (widget.article['title_en'] ?? '').toString().isNotEmpty) {
       title = widget.article['title_en'];
       content = widget.article['content_en'] ?? widget.article['content'];
-    } else if (_activeLang == 'ar' && (widget.article['title_ar'] ?? '').toString().isNotEmpty) {
+    } else if (_activeLang == 'ar' &&
+        (widget.article['title_ar'] ?? '').toString().isNotEmpty) {
       title = widget.article['title_ar'];
       content = widget.article['content_ar'] ?? widget.article['content'];
     }
@@ -900,7 +1007,8 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
                               child: CachedNetworkImage(
                                 imageUrl: imgUrl,
                                 fit: BoxFit.cover,
-                                errorWidget: (context, url, error) => const SizedBox(),
+                                errorWidget: (context, url, error) =>
+                                    const SizedBox(),
                               ),
                             ),
                           ),
@@ -916,17 +1024,24 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
                                   width: 38,
                                   height: 38,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.12),
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.12,
+                                    ),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Iconsax.verify, color: AppColors.primary, size: 20),
+                                  child: const Icon(
+                                    Iconsax.verify,
+                                    color: AppColors.primary,
+                                    size: 20,
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      widget.article['author'] ?? 'ئادمینی گشتی',
+                                      widget.article['author'] ??
+                                          'ئادمینی گشتی',
                                       style: GoogleFonts.poppins(
                                         color: AppColors.getTextTitle(context),
                                         fontSize: 13,
@@ -936,7 +1051,9 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
                                     Text(
                                       'پۆستکراوە لە ${widget.article['created_at'] ?? ''}',
                                       style: GoogleFonts.poppins(
-                                        color: AppColors.getTextSubtitle(context),
+                                        color: AppColors.getTextSubtitle(
+                                          context,
+                                        ),
                                         fontSize: 11,
                                       ),
                                     ),
@@ -988,11 +1105,17 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.2),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Iconsax.info_circle, color: AppColors.primary, size: 22),
+                              const Icon(
+                                Iconsax.info_circle,
+                                color: AppColors.primary,
+                                size: 22,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
@@ -1033,7 +1156,11 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: widget.onShare,
-                    icon: const Icon(Iconsax.share, color: Colors.white, size: 18),
+                    icon: const Icon(
+                      Iconsax.share,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     label: Text(
                       'بەشکردنی بابەتەکە',
                       style: GoogleFonts.poppins(
@@ -1082,13 +1209,17 @@ class _ArticleDetailSheetState extends State<_ArticleDetailSheet> {
           color: isSelected ? AppColors.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.grey.withValues(alpha: 0.4),
+            color: isSelected
+                ? AppColors.primary
+                : Colors.grey.withValues(alpha: 0.4),
           ),
         ),
         child: Text(
           label,
           style: GoogleFonts.poppins(
-            color: isSelected ? Colors.white : AppColors.getTextSubtitle(context),
+            color: isSelected
+                ? Colors.white
+                : AppColors.getTextSubtitle(context),
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
