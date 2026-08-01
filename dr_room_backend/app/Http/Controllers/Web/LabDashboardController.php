@@ -12,6 +12,7 @@ class LabDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $lab = $user->lab;
 
         // lab_results is still an id + timestamps shell — no lab_id, no status,
         // no patient. Until that migration lands there is nothing real to count,
@@ -35,6 +36,7 @@ class LabDashboardController extends Controller
 
         return view('lab.dashboard.index', compact(
             'user',
+            'lab',
             'schemaReady',
             'todayRequests',
             'completedTests',

@@ -12,6 +12,7 @@ class Lab extends Model
         'available_days' => 'array',
         'rating' => 'decimal:1',
         'is_approved' => 'boolean',
+        'home_sample_collection' => 'boolean',
     ];
 
     public function user()

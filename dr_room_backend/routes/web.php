@@ -133,47 +133,50 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
 
 // Lab Dashboard Routes
 Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Web\LabDashboardController::class, 'index'])->name('lab.dashboard');
-    
-    // Patients
-    Route::get('/patients', [\App\Http\Controllers\Web\LabPatientController::class, 'index'])->name('lab.patients.index');
     
     // Profile
     Route::get('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'index'])->name('lab.profile.index');
     Route::put('/profile', [\App\Http\Controllers\Web\LabProfileController::class, 'update'])->name('lab.profile.update');
-    
-    // New Feature Placeholders (Lab)
-    $labPlaceholder = function ($title) {
-        return view('shared.placeholder', ['layout' => 'lab.layouts.app', 'title' => $title]);
-    };
-    
-    // Tests
-    Route::get('/tests', fn() => $labPlaceholder('پشکنینەکان'))->name('lab.tests.index');
-    Route::get('/tests/create', fn() => view('lab.tests.create'))->name('lab.tests.create');
-    Route::get('/test-types/create', fn() => view('lab.test-types.create'))->name('lab.test-types.create');
-    Route::get('/tests/blood', fn() => $labPlaceholder('پشکنینی خوێن'))->name('lab.tests.blood');
-    Route::get('/tests/urine', fn() => $labPlaceholder('پشکنینی میز'))->name('lab.tests.urine');
-    Route::get('/tests/hormone', fn() => $labPlaceholder('پشکنینی هۆرمۆن'))->name('lab.tests.hormone');
-    Route::get('/tests/other', fn() => $labPlaceholder('پشکنینەکانی تر'))->name('lab.tests.other');
-    
-    // Management
-    Route::get('/management/approve', fn() => $labPlaceholder('پەسەندکردنی پشکنین'))->name('lab.management.approve');
-    Route::get('/management/complete', fn() => $labPlaceholder('تەواوکردنی پشکنین'))->name('lab.management.complete');
-    
-    // Results
-    Route::get('/results', fn() => $labPlaceholder('ئەنجامەکان'))->name('lab.results.index');
-    Route::get('/results/add', fn() => $labPlaceholder('زیادکردنی ئەنجام'))->name('lab.results.add');
-    Route::get('/results/edit', fn() => $labPlaceholder('گۆڕانکاری لە ئەنجام'))->name('lab.results.edit');
-    Route::get('/results/upload', fn() => $labPlaceholder('بەرزکردنەوەی PDF'))->name('lab.results.upload');
-    
-    // Reports
-    Route::get('/reports', fn() => $labPlaceholder('ڕاپۆرتەکان'))->name('lab.reports.index');
-    
-    // Communication
-    Route::get('/communication', fn() => $labPlaceholder('پەیوەندی'))->name('lab.communication.index');
-    
-    // Profile sub-routes
-    Route::get('/profile/staff', fn() => $labPlaceholder('ستافی تاقیگە'))->name('lab.profile.staff');
+
+    Route::middleware('lab.profile.complete')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Web\LabDashboardController::class, 'index'])->name('lab.dashboard');
+        
+        // Patients
+        Route::get('/patients', [\App\Http\Controllers\Web\LabPatientController::class, 'index'])->name('lab.patients.index');
+        
+        // New Feature Placeholders (Lab)
+        $labPlaceholder = function ($title) {
+            return view('shared.placeholder', ['layout' => 'lab.layouts.app', 'title' => $title]);
+        };
+        
+        // Tests
+        Route::get('/tests', fn() => $labPlaceholder('پشکنینەکان'))->name('lab.tests.index');
+        Route::get('/tests/create', fn() => view('lab.tests.create'))->name('lab.tests.create');
+        Route::get('/test-types/create', fn() => view('lab.test-types.create'))->name('lab.test-types.create');
+        Route::get('/tests/blood', fn() => $labPlaceholder('پشکنینی خوێن'))->name('lab.tests.blood');
+        Route::get('/tests/urine', fn() => $labPlaceholder('پشکنینی میز'))->name('lab.tests.urine');
+        Route::get('/tests/hormone', fn() => $labPlaceholder('پشکنینی هۆرمۆن'))->name('lab.tests.hormone');
+        Route::get('/tests/other', fn() => $labPlaceholder('پشکنینەکانی تر'))->name('lab.tests.other');
+        
+        // Management
+        Route::get('/management/approve', fn() => $labPlaceholder('پەسەندکردنی پشکنین'))->name('lab.management.approve');
+        Route::get('/management/complete', fn() => $labPlaceholder('تەواوکردنی پشکنین'))->name('lab.management.complete');
+        
+        // Results
+        Route::get('/results', fn() => $labPlaceholder('ئەنجامەکان'))->name('lab.results.index');
+        Route::get('/results/add', fn() => $labPlaceholder('زیادکردنی ئەنجام'))->name('lab.results.add');
+        Route::get('/results/edit', fn() => $labPlaceholder('گۆڕانکاری لە ئەنجام'))->name('lab.results.edit');
+        Route::get('/results/upload', fn() => $labPlaceholder('بەرزکردنەوەی PDF'))->name('lab.results.upload');
+        
+        // Reports
+        Route::get('/reports', fn() => $labPlaceholder('ڕاپۆرتەکان'))->name('lab.reports.index');
+        
+        // Communication
+        Route::get('/communication', fn() => $labPlaceholder('پەیوەندی'))->name('lab.communication.index');
+        
+        // Profile sub-routes
+        Route::get('/profile/staff', fn() => $labPlaceholder('ستافی تاقیگە'))->name('lab.profile.staff');
+    });
 });
 
 // Pharmacy Dashboard Routes

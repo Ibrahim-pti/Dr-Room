@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'doctor.profile.complete' => \App\Http\Middleware\EnsureDoctorProfileComplete::class,
+            'lab.profile.complete' => \App\Http\Middleware\EnsureLabProfileComplete::class,
         ]);
         $middleware->redirectGuestsTo(fn (Request $request) => $request->expectsJson() ? null : route('staff.login'));
     })
