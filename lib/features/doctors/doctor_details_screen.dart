@@ -316,6 +316,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     return _asDouble(_doctor?['consultation_fee']);
   }
 
+  /// How much the live offer knocks off the selected service, or 0 when there
+  /// is no discount running.
+  double get _selectedSaving {
+    final service = _selectedService;
+    if (service == null || service['has_discount'] != true) return 0;
+
+    final saving = _asDouble(service['old_price']) - _asDouble(service['price']);
+    return saving > 0 ? saving : 0;
+  }
+
   DateTime? get _selectedDateTime => _timeIndex >= 0 && _timeIndex < _slots.length
       ? _slots[_timeIndex].dateTime
       : null;
@@ -1280,6 +1290,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             final id = _asInt(service['id']);
             final isSelected = id != null && id == _selectedServiceId;
 
+            // The server decides whether an offer is live and by how much —
+            // it owns the expiry date, so the app never computes this itself.
+            final hasDiscount = service['has_discount'] == true;
+            final percent = _asInt(service['discount_percent']);
+            final oldPrice = _asDouble(service['old_price']);
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: _selectableTile(
@@ -1310,24 +1326,67 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            _serviceName(service),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.getTextTitle(context),
-                            ),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  _serviceName(service),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.getTextTitle(context),
+                                  ),
+                                ),
+                              ),
+                              if (hasDiscount && percent != null) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.error.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                  child: Text(
+                                    '−$percent٪',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           const SizedBox(height: 3),
-                          Text(
-                            _money(_asDouble(service['price'])),
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                _money(_asDouble(service['price'])),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              if (hasDiscount && oldPrice > 0) ...[
+                                const SizedBox(width: 8),
+                                Text(
+                                  _money(oldPrice),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11.5,
+                                    color: AppColors.textLight,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: AppColors.textLight,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),
@@ -1683,16 +1742,47 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             color: AppColors.getTextSubtitle(context),
                           ),
                         ),
-                        Text(
-                          _money(_selectedPrice),
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            if (_selectedSaving > 0) ...[
+                              Text(
+                                _money(_asDouble(service?['old_price'])),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12.5,
+                                  color: AppColors.textLight,
+                                  decoration: TextDecoration.lineThrough,
+                                  decorationColor: AppColors.textLight,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            Text(
+                              _money(_selectedPrice),
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                    if (_selectedSaving > 0) ...[
+                      const SizedBox(height: 6),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: Text(
+                          'dd_you_save'.tr(args: [_money(_selectedSaving)]),
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
