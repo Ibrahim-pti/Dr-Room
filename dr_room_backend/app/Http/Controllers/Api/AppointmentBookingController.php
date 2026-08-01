@@ -21,20 +21,30 @@ class AppointmentBookingController extends Controller
     {
         $request->validate([
             'doctor_id'        => 'required|exists:doctors,id',
+            'service_id'       => 'nullable|exists:doctor_services,id',
             'appointment_date' => 'required|date|after:now',
             'type'             => 'sometimes|in:in_person,online',
             'notes'            => 'nullable|string|max:500',
         ]);
 
         $doctor = Doctor::findOrFail($request->doctor_id);
+        
+        $fee = $doctor->consultation_fee;
+        if ($request->filled('service_id')) {
+            $service = \App\Models\DoctorService::where('id', $request->service_id)->where('doctor_id', $doctor->id)->first();
+            if ($service) {
+                $fee = $service->price;
+            }
+        }
 
         $appointment = Appointment::create([
             'doctor_id'        => $request->doctor_id,
+            'service_id'       => $request->service_id,
             'patient_id'       => Auth::id(),
             'appointment_date' => $request->appointment_date,
             'type'             => $request->type ?? 'in_person',
             'notes'            => $request->notes,
-            'fee'              => $doctor->consultation_fee,
+            'fee'              => $fee,
             'status'           => 'pending',
         ]);
 

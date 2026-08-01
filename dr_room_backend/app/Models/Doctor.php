@@ -37,4 +37,16 @@ class Doctor extends Model
     {
         return $this->appointments()->today()->count();
     }
+
+    /** Doctor Services (Visit Types / Treated Diseases) */
+    public function services()
+    {
+        return $this->hasMany(DoctorService::class);
+    }
+
+    /** Doctor Schedules (Available Times) */
+    public function schedules()
+    {
+        return $this->hasMany(DoctorSchedule::class);
+    }
 }

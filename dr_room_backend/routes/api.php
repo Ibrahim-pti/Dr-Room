@@ -31,6 +31,7 @@ Route::get('/banners', [AppController::class, 'banners']);
 Route::get('/articles', [AppController::class, 'articles']);
 Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
+Route::get('/doctors/{id}', [AppController::class, 'doctor']);
 Route::get('/global-search', [GlobalSearchController::class, 'search']);
 
 // ─── GetBodySmart Medical Anatomy & Muscular System API ───────────

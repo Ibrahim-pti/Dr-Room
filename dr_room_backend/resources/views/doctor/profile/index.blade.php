@@ -13,7 +13,13 @@
     </div>
 @endif
 
-<form id="profile-form" action="{{ route('doctor.profile.update') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 max-w-3xl">
+@if(session('error'))
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl font-medium">
+        {{ session('error') }}
+    </div>
+@endif
+
+<form id="profile-form" action="{{ route('doctor.profile.update') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 max-w-3xl">
     @csrf
     @method('PUT')
     
@@ -62,6 +68,45 @@
                 class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('bio', $doctor->bio) }}</textarea>
             @error('bio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
+        
+        <!-- Video Upload -->
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+            <h3 class="text-sm font-semibold text-slate-800 mb-4">ڤیدیۆی ناساندن (هەڵبژاردەیی)</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">جۆری ڤیدیۆ هەڵبژێرە</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="video_type" value="youtube" class="text-blue-600 focus:ring-blue-500" {{ old('video_type', $doctor->video_type) == 'youtube' ? 'checked' : '' }} onchange="toggleVideoInputs('youtube')">
+                            <span class="text-sm text-slate-700">لینکی یوتیوب</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="video_type" value="uploaded" class="text-blue-600 focus:ring-blue-500" {{ old('video_type', $doctor->video_type) == 'uploaded' ? 'checked' : '' }} onchange="toggleVideoInputs('uploaded')">
+                            <span class="text-sm text-slate-700">ئەپلۆدکردنی ڤیدیۆ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="youtube_input" class="{{ old('video_type', $doctor->video_type) == 'youtube' ? 'block' : 'hidden' }}">
+                    <label for="youtube_url" class="block text-sm font-medium text-slate-700 mb-2">لینکی یوتیوب</label>
+                    <input type="url" id="youtube_url" name="youtube_url" value="{{ old('youtube_url', $doctor->video_type == 'youtube' ? $doctor->video_url : '') }}" placeholder="https://youtube.com/watch?v=..." dir="ltr"
+                        class="w-full text-left px-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                    @error('youtube_url') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div id="upload_input" class="{{ old('video_type', $doctor->video_type) == 'uploaded' ? 'block' : 'hidden' }}">
+                    <label for="video_file" class="block text-sm font-medium text-slate-700 mb-2">فایلی ڤیدیۆ هەڵبژێرە (Max 50MB)</label>
+                    <input type="file" id="video_file" name="video_file" accept="video/mp4,video/x-m4v,video/*"
+                        class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    @error('video_file') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    
+                    @if($doctor->video_type == 'uploaded' && $doctor->video_url)
+                        <div class="mt-2 text-sm text-green-600">ڤیدیۆیەک پێشتر ئەپلۆد کراوە.</div>
+                    @endif
+                </div>
+            </div>
+        </div>
         @endif
 
         <div class="pt-4 border-t border-slate-100 flex justify-end">
@@ -73,6 +118,11 @@
 </form>
 
 <script>
+    function toggleVideoInputs(type) {
+        document.getElementById('youtube_input').style.display = type === 'youtube' ? 'block' : 'none';
+        document.getElementById('upload_input').style.display = type === 'uploaded' ? 'block' : 'none';
+    }
+
     document.getElementById('profile-form').addEventListener('submit', function() {
         var btn = document.getElementById('submit-btn');
         btn.disabled = true;

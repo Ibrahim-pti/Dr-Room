@@ -26,6 +26,9 @@ class DoctorProfileController extends Controller
             'specialty' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
             'consultation_fee' => 'nullable|numeric|min:0',
+            'video_type' => 'nullable|in:youtube,uploaded',
+            'youtube_url' => 'nullable|url',
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:50000', // max 50MB
         ]);
 
         $user->update([
@@ -39,6 +42,16 @@ class DoctorProfileController extends Controller
                 'bio' => $request->bio,
                 'consultation_fee' => $request->consultation_fee,
             ];
+
+            if ($request->has('video_type')) {
+                $updateData['video_type'] = $request->video_type;
+                if ($request->video_type === 'youtube') {
+                    $updateData['video_url'] = $request->youtube_url;
+                } elseif ($request->video_type === 'uploaded' && $request->hasFile('video_file')) {
+                    $path = $request->file('video_file')->store('doctor_videos', 'public');
+                    $updateData['video_url'] = '/storage/' . $path;
+                }
+            }
 
             try {
                 $tr = new \Stichoza\GoogleTranslate\GoogleTranslate();

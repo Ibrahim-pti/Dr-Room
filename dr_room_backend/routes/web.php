@@ -37,23 +37,38 @@ Route::prefix('staff')->group(function () {
     Route::get('/status', [StaffAuthController::class, 'status'])->name('staff.status')->middleware('auth');
 });
 
+// Global API for Staff/Web
+Route::post('/api/translate', [\App\Http\Controllers\Api\TranslateController::class, 'translate'])->name('api.translate')->middleware('auth');
+
 // Doctor Dashboard Routes
 Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function () {
-    Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('doctor.dashboard');
-    
-    // Appointments
-    Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('doctor.appointments.index');
-    Route::patch('/appointments/{appointment}/status', [DoctorAppointmentController::class, 'updateStatus'])->name('doctor.appointments.update_status');
-    
-    // Patients
-    Route::get('/patients', [DoctorPatientController::class, 'index'])->name('doctor.patients.index');
-    
-    // Earnings
-    Route::get('/earnings', [DoctorEarningsController::class, 'index'])->name('doctor.earnings.index');
+    Route::middleware('doctor.profile.complete')->group(function () {
+        Route::get('/dashboard', [DoctorDashboardController::class, 'index'])->name('doctor.dashboard');
+        
+        // Appointments
+        Route::get('/appointments', [DoctorAppointmentController::class, 'index'])->name('doctor.appointments.index');
+        Route::patch('/appointments/{appointment}/status', [DoctorAppointmentController::class, 'updateStatus'])->name('doctor.appointments.update_status');
+        
+        // Patients
+        Route::get('/patients', [DoctorPatientController::class, 'index'])->name('doctor.patients.index');
+        
+        // Earnings
+        Route::get('/earnings', [DoctorEarningsController::class, 'index'])->name('doctor.earnings.index');
+    });
     
     // Profile
     Route::get('/profile', [DoctorProfileController::class, 'index'])->name('doctor.profile.index');
     Route::put('/profile', [DoctorProfileController::class, 'update'])->name('doctor.profile.update');
+    
+    // Services
+    Route::get('/services', [\App\Http\Controllers\Web\DoctorServiceController::class, 'index'])->name('doctor.services.index');
+    Route::post('/services', [\App\Http\Controllers\Web\DoctorServiceController::class, 'store'])->name('doctor.services.store');
+    Route::delete('/services/{id}', [\App\Http\Controllers\Web\DoctorServiceController::class, 'destroy'])->name('doctor.services.destroy');
+
+    // Schedules
+    Route::get('/schedules', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'index'])->name('doctor.schedules.index');
+    Route::post('/schedules', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'store'])->name('doctor.schedules.store');
+    Route::delete('/schedules/{id}', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'destroy'])->name('doctor.schedules.destroy');
     
     // New Feature Placeholders (Doctor)
     $doctorPlaceholder = function ($title) {

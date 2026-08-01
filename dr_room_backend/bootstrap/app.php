@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
         ]);
+        $middleware->alias([
+            'doctor.profile.complete' => \App\Http\Middleware\EnsureDoctorProfileComplete::class,
+        ]);
         $middleware->redirectGuestsTo(fn (Request $request) => $request->expectsJson() ? null : route('staff.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -170,6 +170,7 @@
   "consultation_price": "Consultation Price",
   "detail_doctor": "Doctor Details",
   "about_doctor": "About Doctor",
+  "doctor_desc": "{} is one of the most professional doctors in the region. Specializing in {}, providing excellent care and precise diagnostics for all patients.",
   "available_time": "Available Time",
   "best_labs_desc": "Best labs in all cities of Kurdistan",
   "search_labs": "Search for labs...",

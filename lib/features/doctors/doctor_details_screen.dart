@@ -7,6 +7,10 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:video_player/video_player.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'dart:convert';
+
 import '../../core/providers/favorite_provider.dart';
 import '../../core/utils/api_client.dart';
 
@@ -33,25 +37,157 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   int _selectedDateIndex = 0;
   int _selectedTimeIndex = -1;
+  int _selectedServiceIndex = -1;
   bool _isBooking = false;
+  List<Map<String, dynamic>> _dynamicDates = [];
+  List<String> _dynamicTimes = [];
+  List<dynamic> _services = [];
 
-  final List<Map<String, String>> _dates = [
-    {'day': 'Mon', 'date': '12'},
-    {'day': 'Tue', 'date': '13'},
-    {'day': 'Wed', 'date': '14'},
-    {'day': 'Thu', 'date': '15'},
-    {'day': 'Fri', 'date': '16'},
-    {'day': 'Sat', 'date': '17'},
-  ];
+  Map<String, dynamic>? _doctorDetails;
+  bool _isLoadingDetails = true;
+  VideoPlayerController? _videoPlayerController;
+  YoutubePlayerController? _youtubeController;
 
-  final List<String> _times = [
-    '09:00 AM',
-    '10:30 AM',
-    '11:00 AM',
-    '01:00 PM',
-    '02:30 PM',
-    '04:00 PM',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchDoctorDetails();
+  }
+
+  Future<void> _fetchDoctorDetails() async {
+    try {
+      final response = await ApiClient.get('/doctors/${widget.doctorId}');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (mounted) {
+          setState(() {
+            _doctorDetails = data;
+            _isLoadingDetails = false;
+            if (data['services'] != null) {
+              _services = data['services'];
+            }
+            _generateDynamicSchedules(data['schedules']);
+          });
+          _initializeVideoPlayer();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingDetails = false;
+        });
+      }
+    }
+  }
+
+
+  void _generateDynamicSchedules(List<dynamic>? schedules) {
+    if (schedules == null || schedules.isEmpty) return;
+    
+    // Create next 14 days
+    _dynamicDates.clear();
+    final now = DateTime.now();
+    
+    // Map of days available
+    Map<String, dynamic> daysMap = {};
+    for (var s in schedules) {
+      daysMap[s['day_of_week']] = s;
+    }
+    
+    final daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    for (int i = 0; i < 30; i++) {
+      final date = now.add(Duration(days: i));
+      final dayName = daysOfWeek[date.weekday - 1];
+      
+      if (daysMap.containsKey(dayName)) {
+        final schedule = daysMap[dayName];
+        _dynamicDates.add({
+          'day': DateFormat('E').format(date),
+          'date': DateFormat('dd').format(date),
+          'full_date': DateFormat('yyyy-MM-dd').format(date),
+          'start_time': schedule['start_time'],
+          'end_time': schedule['end_time'],
+          'schedule_id': schedule['id'],
+        });
+      }
+    }
+    
+    if (_dynamicDates.isNotEmpty) {
+      _selectedDateIndex = 0;
+      _updateDynamicTimes();
+    }
+  }
+
+  void _updateDynamicTimes() {
+    _dynamicTimes.clear();
+    _selectedTimeIndex = -1;
+    if (_dynamicDates.isEmpty) return;
+    
+    final selectedDate = _dynamicDates[_selectedDateIndex];
+    final startStr = selectedDate['start_time'].toString();
+    final endStr = selectedDate['end_time'].toString();
+    
+    try {
+      var startParts = startStr.split(':');
+      var endParts = endStr.split(':');
+      
+      var start = TimeOfDay(hour: int.parse(startParts[0]), minute: int.parse(startParts[1]));
+      var end = TimeOfDay(hour: int.parse(endParts[0]), minute: int.parse(endParts[1]));
+      
+      var current = start;
+      while (current.hour < end.hour || (current.hour == end.hour && current.minute <= end.minute)) {
+        final period = current.hour >= 12 ? 'PM' : 'AM';
+        int h = current.hour > 12 ? current.hour - 12 : (current.hour == 0 ? 12 : current.hour);
+        final m = current.minute.toString().padLeft(2, '0');
+        _dynamicTimes.add('${h.toString().padLeft(2, '0')}:$m $period');
+        
+        // Add 30 mins
+        int newMin = current.minute + 30;
+        int newHour = current.hour;
+        if (newMin >= 60) {
+          newHour += 1;
+          newMin -= 60;
+        }
+        current = TimeOfDay(hour: newHour, minute: newMin);
+      }
+    } catch(e) {}
+  }
+
+  void _initializeVideoPlayer() {
+    if (_doctorDetails == null) return;
+    
+    final videoType = _doctorDetails!['video_type'];
+    final videoUrl = _doctorDetails!['video_url'];
+    
+    if (videoUrl != null && videoUrl.toString().isNotEmpty) {
+      if (videoType == 'youtube') {
+        _youtubeController = YoutubePlayerController.fromVideoId(
+          videoId: videoUrl.split('v=')[1].split('&')[0],
+          autoPlay: false,
+          params: const YoutubePlayerParams(showFullscreenButton: true),
+        );
+      } else if (videoType == 'uploaded') {
+        // Assuming videoUrl is a relative path like /storage/doctor_videos/xyz.mp4
+        final fullUrl = 'http://127.0.0.1:8000$videoUrl'; // Use ApiClient base URL ideally, but 127.0.0.1 is safe for emulator
+        _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(fullUrl))
+          ..initialize().then((_) {
+            if (mounted) setState(() {});
+          });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController?.dispose();
+    _youtubeController?.close();
+    super.dispose();
+  }
+
+
+
+
 
   Future<void> _bookAppointment() async {
     final prefs = await SharedPreferences.getInstance();
@@ -68,27 +204,34 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     });
 
     try {
-      // Mocking a valid future date based on selection
-      final date = _dates[_selectedDateIndex]['date']!;
-      final timeStr = _times[_selectedTimeIndex];
-      // Simple parse to make a valid date for API (e.g. 2026-11-XX HH:MM)
-      // Just a dummy conversion for the sake of the API
+      if (_dynamicDates.isEmpty || _selectedTimeIndex == -1) {
+        throw Exception('Please select date and time');
+      }
+      
+      final date = _dynamicDates[_selectedDateIndex]['full_date'];
+      final timeStr = _dynamicTimes[_selectedTimeIndex];
+      
       final isPM = timeStr.contains('PM');
       var hour = int.parse(timeStr.split(':')[0]);
       if (isPM && hour != 12) hour += 12;
       if (!isPM && hour == 12) hour = 0;
 
       final minute = timeStr.split(':')[1].substring(0, 2);
-      final formattedDate =
-          '2026-11-$date ${hour.toString().padLeft(2, '0')}:$minute:00';
+      final formattedDate = '$date ${hour.toString().padLeft(2, '0')}:$minute:00';
+
+      Map<String, dynamic> body = {
+        'doctor_id': widget.doctorId,
+        'appointment_date': formattedDate,
+        'type': 'in_person',
+      };
+      
+      if (_selectedServiceIndex != -1) {
+        body['service_id'] = _services[_selectedServiceIndex]['id'];
+      }
 
       final response = await ApiClient.post(
         '/appointments',
-        body: {
-          'doctor_id': widget.doctorId,
-          'appointment_date': formattedDate,
-          'type': 'in_person',
-        },
+        body: body,
       );
 
       if (response.statusCode == 201) {
@@ -259,15 +402,10 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                     tag: widget.name,
                     child: Container(
                       width: double.infinity,
-                      height: 280,
+                      height: 220, // Shorter height for a more beautiful look
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF), // Soft blue background
                         borderRadius: BorderRadius.circular(24),
-                        image: DecorationImage(
-                          image: AssetImage(widget.image),
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter,
-                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.05),
@@ -275,6 +413,16 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             offset: const Offset(0, 5),
                           ),
                         ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Image.asset(
+                          widget.image,
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.contain, // Prevents cropping
+                          alignment: Alignment.center,
+                        ),
                       ),
                     ),
                   ),
@@ -345,6 +493,54 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
                 const SizedBox(height: 24),
 
+
+                // ── Video Section ──
+                if (_isLoadingDetails)
+                  const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()))
+                else if (_youtubeController != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: YoutubePlayer(
+                        controller: _youtubeController!,
+                      ),
+                    ),
+                  )
+                else if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: AspectRatio(
+                        aspectRatio: _videoPlayerController!.value.aspectRatio,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            VideoPlayer(_videoPlayerController!),
+                            VideoProgressIndicator(_videoPlayerController!, allowScrubbing: true),
+                            Center(
+                              child: IconButton(
+                                icon: Icon(
+                                  _videoPlayerController!.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _videoPlayerController!.value.isPlaying
+                                        ? _videoPlayerController!.pause()
+                                        : _videoPlayerController!.play();
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // ── About Section ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -361,7 +557,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${widget.name} is one of the most professional doctors in the region. Specializing in ${widget.specialty}, providing excellent care and precise diagnostics for all patients.',
+                        'doctor_desc'.tr(args: [widget.name, widget.specialty]),
                         style: GoogleFonts.poppins(
                           color: AppColors.getTextSubtitle(context),
                           fontSize: 13,
@@ -425,6 +621,79 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
                 const SizedBox(height: 24),
 
+                // ── Services Section ──
+                if (_services.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      'جۆری سەردان (خزمەتگوزاری)',
+                      style: GoogleFonts.poppins(
+                        color: AppColors.getTextTitle(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 50,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _services.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final isSelected = _selectedServiceIndex == index;
+                        final service = _services[index];
+                        // Try to get locale based name, fallback to ckb
+                        String name = service['name_ckb'] ?? '';
+                        final locale = context.locale.languageCode;
+                        if (locale == 'en') name = service['name_en'] ?? name;
+                        if (locale == 'ar') name = service['name_ar'] ?? name;
+                        
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedServiceIndex = index),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFF3B82F6)
+                                  : AppColors.getSurface(context),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? const Color(0xFF3B82F6)
+                                    : AppColors.getBorder(context),
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      )
+                                    ]
+                                  : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              name,
+                              style: GoogleFonts.poppins(
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.getTextTitle(context),
+                                fontSize: 13,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
                 // ── Calendar Selection ──
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -443,8 +712,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _dates.length,
+                    itemCount: _dynamicDates.length,
                     itemBuilder: (context, index) {
+                      if (_dynamicDates.isEmpty) {
+                         return Center(child: Text("ببوورە کات بەردەست نییە", style: TextStyle(color: Colors.red)));
+                      }
                       final isSelected = _selectedDateIndex == index;
                       return GestureDetector(
                         onTap: () => setState(() => _selectedDateIndex = index),
@@ -467,7 +739,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                _dates[index]['day']!,
+                                _dynamicDates[index]['day'],
                                 style: GoogleFonts.poppins(
                                   color: isSelected
                                       ? Colors.white.withValues(alpha: 0.8)
@@ -477,7 +749,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _dates[index]['date']!,
+                                _dynamicDates[index]['date'],
                                 style: GoogleFonts.poppins(
                                   color: isSelected
                                       ? Colors.white
@@ -514,7 +786,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   child: Wrap(
                     spacing: 12,
                     runSpacing: 12,
-                    children: List.generate(_times.length, (index) {
+                    children: List.generate(_dynamicTimes.length, (index) {
                       final isSelected = _selectedTimeIndex == index;
                       return GestureDetector(
                         onTap: () => setState(() => _selectedTimeIndex = index),
@@ -536,7 +808,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                             ),
                           ),
                           child: Text(
-                            _times[index],
+                            _dynamicTimes[index],
                             style: GoogleFonts.poppins(
                               color: isSelected
                                   ? const Color(0xFF3B82F6)
