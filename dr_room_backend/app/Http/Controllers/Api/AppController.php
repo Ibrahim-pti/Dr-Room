@@ -14,11 +14,20 @@ class AppController extends Controller
 {
     public function home()
     {
+        $topDoctors = \App\Models\Doctor::whereHas('user', function($q) { $q->where('status', 'approved'); })
+            ->whereNotNull('specialty')
+            ->whereHas('services')
+            ->whereHas('schedules')
+            ->with(['user:id,name,email,is_doctor', 'services', 'schedules'])
+            ->orderBy('rating', 'desc')
+            ->take(5)
+            ->get();
+
         return response()->json([
             'banners' => Banner::where('is_active', true)->orderBy('sort_order')->get(),
             'categories' => Category::all(),
             'latest_articles' => Article::where('is_published', true)->latest()->take(5)->get(),
-            'top_doctors' => \App\Models\Doctor::with(['user:id,name,email,is_doctor', 'services', 'schedules'])->orderBy('rating', 'desc')->take(5)->get(),
+            'top_doctors' => $topDoctors,
             'top_pharmacies' => \App\Models\User::where('role', 'pharmacy')->where('status', 'approved')->take(4)->get(),
         ]);
     }
@@ -45,7 +54,11 @@ class AppController extends Controller
 
     public function doctors(Request $request)
     {
-        $query = \App\Models\Doctor::with(['user:id,name,email,is_doctor', 'services', 'schedules']);
+        $query = \App\Models\Doctor::whereHas('user', function($q) { $q->where('status', 'approved'); })
+            ->whereNotNull('specialty')
+            ->whereHas('services')
+            ->whereHas('schedules')
+            ->with(['user:id,name,email,is_doctor', 'services', 'schedules']);
 
         if ($request->has('specialty')) {
             $query->where('specialty', $request->specialty);

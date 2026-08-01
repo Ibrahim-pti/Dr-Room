@@ -2,7 +2,6 @@ import 'package:dr_room/main.dart';
 import 'package:flutter/material.dart';
 import 'package:dr_room/core/theme/dr_room_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
@@ -10,10 +9,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'dart:convert';
+import 'dart:ui';
 
 import '../../core/providers/favorite_provider.dart';
 import '../../core/utils/api_client.dart';
-
 import 'doctor_reviews_screen.dart';
 
 class DoctorDetailsScreen extends StatefulWidget {
@@ -37,21 +36,45 @@ class DoctorDetailsScreen extends StatefulWidget {
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   int _selectedDateIndex = 0;
   int _selectedTimeIndex = -1;
-  int _selectedServiceIndex = -1;
+  int _selectedServiceIndex = 0;
+  int _selectedTabIndex = 0;
+  int _currentImageIndex = 0;
+  final PageController _imagePageController = PageController();
   bool _isBooking = false;
-  List<Map<String, dynamic>> _dynamicDates = [];
-  List<String> _dynamicTimes = [];
+  final List<Map<String, dynamic>> _dynamicDates = [];
+  final List<String> _dynamicTimes = [];
   List<dynamic> _services = [];
 
   Map<String, dynamic>? _doctorDetails;
-  bool _isLoadingDetails = true;
   VideoPlayerController? _videoPlayerController;
   YoutubePlayerController? _youtubeController;
+  String? _initializedVideoUrl;
+  bool _isLoadingDetails = true;
 
   @override
   void initState() {
     super.initState();
+    _loadCachedDoctorDetails();
     _fetchDoctorDetails();
+  }
+
+  Future<void> _loadCachedDoctorDetails() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedStr = prefs.getString('cached_doctor_details_${widget.doctorId}');
+      if (cachedStr != null && cachedStr.isNotEmpty && mounted) {
+        final data = jsonDecode(cachedStr);
+        setState(() {
+          _doctorDetails = data;
+          _isLoadingDetails = false;
+          if (data['services'] != null && (data['services'] as List).isNotEmpty) {
+            _services = data['services'];
+          }
+          _generateDynamicSchedules(data['schedules']);
+        });
+        _initializeVideoPlayer();
+      }
+    } catch (_) {}
   }
 
   Future<void> _fetchDoctorDetails() async {
@@ -59,11 +82,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       final response = await ApiClient.get('/doctors/${widget.doctorId}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('cached_doctor_details_${widget.doctorId}', response.body);
+
         if (mounted) {
           setState(() {
             _doctorDetails = data;
             _isLoadingDetails = false;
-            if (data['services'] != null) {
+            if (data['services'] != null && (data['services'] as List).isNotEmpty) {
               _services = data['services'];
             }
             _generateDynamicSchedules(data['schedules']);
@@ -80,15 +106,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     }
   }
 
-
   void _generateDynamicSchedules(List<dynamic>? schedules) {
     if (schedules == null || schedules.isEmpty) return;
     
-    // Create next 14 days
     _dynamicDates.clear();
     final now = DateTime.now();
     
-    // Map of days available
     Map<String, dynamic> daysMap = {};
     for (var s in schedules) {
       daysMap[s['day_of_week']] = s;
@@ -105,6 +128,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         _dynamicDates.add({
           'day': DateFormat('E').format(date),
           'date': DateFormat('dd').format(date),
+          'month': DateFormat('MMM').format(date),
           'full_date': DateFormat('yyyy-MM-dd').format(date),
           'start_time': schedule['start_time'],
           'end_time': schedule['end_time'],
@@ -142,7 +166,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         final m = current.minute.toString().padLeft(2, '0');
         _dynamicTimes.add('${h.toString().padLeft(2, '0')}:$m $period');
         
-        // Add 30 mins
         int newMin = current.minute + 30;
         int newHour = current.hour;
         if (newMin >= 60) {
@@ -151,7 +174,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         }
         current = TimeOfDay(hour: newHour, minute: newMin);
       }
-    } catch(e) {}
+    } catch (_) {}
   }
 
   void _initializeVideoPlayer() {
@@ -161,19 +184,42 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     final videoUrl = _doctorDetails!['video_url'];
     
     if (videoUrl != null && videoUrl.toString().isNotEmpty) {
-      if (videoType == 'youtube') {
-        _youtubeController = YoutubePlayerController.fromVideoId(
-          videoId: videoUrl.split('v=')[1].split('&')[0],
-          autoPlay: false,
-          params: const YoutubePlayerParams(showFullscreenButton: true),
-        );
-      } else if (videoType == 'uploaded') {
-        // Assuming videoUrl is a relative path like /storage/doctor_videos/xyz.mp4
-        final fullUrl = 'http://127.0.0.1:8000$videoUrl'; // Use ApiClient base URL ideally, but 127.0.0.1 is safe for emulator
+      final String urlStr = videoUrl.toString();
+      if (_initializedVideoUrl == urlStr) return;
+      _initializedVideoUrl = urlStr;
+      
+      if (videoType == 'youtube' || urlStr.contains('youtube.com') || urlStr.contains('youtu.be')) {
+        String videoId = '';
+        if (urlStr.contains('v=')) {
+          videoId = urlStr.split('v=')[1].split('&')[0];
+        } else if (urlStr.contains('youtu.be/')) {
+          videoId = urlStr.split('youtu.be/')[1].split('?')[0];
+        } else {
+          videoId = urlStr;
+        }
+        
+        if (videoId.isNotEmpty) {
+          _youtubeController = YoutubePlayerController.fromVideoId(
+            videoId: videoId,
+            autoPlay: true,
+            params: const YoutubePlayerParams(
+              showControls: true,
+              showFullscreenButton: true,
+              showVideoAnnotations: false,
+              strictRelatedVideos: true,
+            ),
+          );
+          if (mounted) setState(() {});
+        }
+      } else {
+        final fullUrl = urlStr.startsWith('http') ? urlStr : ApiClient.getImageUrl(urlStr);
+        _videoPlayerController?.dispose();
         _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(fullUrl))
           ..initialize().then((_) {
+            _videoPlayerController!.setLooping(true);
+            _videoPlayerController!.play();
             if (mounted) setState(() {});
-          });
+          }).catchError((_) {});
       }
     }
   }
@@ -184,10 +230,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     _youtubeController?.close();
     super.dispose();
   }
-
-
-
-
 
   Future<void> _bookAppointment() async {
     final prefs = await SharedPreferences.getInstance();
@@ -225,30 +267,29 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
         'type': 'in_person',
       };
       
-      if (_selectedServiceIndex != -1) {
+      if (_selectedServiceIndex != -1 && _services.isNotEmpty) {
         body['service_id'] = _services[_selectedServiceIndex]['id'];
       }
 
-      final response = await ApiClient.post(
-        '/appointments',
-        body: body,
-      );
+      final response = await ApiClient.post('/appointments', body: body);
 
       if (response.statusCode == 201) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Appointment booked successfully!'),
+            content: Text('نۆرەکە بە سەرکەوتوویی تۆمارکرا!'),
             backgroundColor: Color(0xFF10B981),
+            behavior: SnackBarBehavior.floating,
           ),
         );
-        Navigator.pop(context); // Go back after booking
+        Navigator.pop(context);
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to book appointment: ${response.body}'),
+            content: Text('داواکارییەکە سەرکەوتوو نەبوو: ${response.body}'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -256,8 +297,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('An error occurred. Please try again.'),
+          content: Text('کێشەیەک ڕوویدا. تکایە دووبارە تاقی بکەرەوە.'),
           backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -278,26 +320,24 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: AppColors.getTextTitle(context),
+            color: const Color(0xFF0F172A),
           ),
         ),
         content: Text(
           'بۆ وەرگرتنی کات لای دکتۆر پێویستە سەرەتا خۆت تۆمار بکەیت یان چوونەژوورەوە بکەیت.',
           style: GoogleFonts.poppins(
             fontSize: 14,
-            color: AppColors.getTextSubtitle(context),
+            color: const Color(0xFF475569),
             height: 1.5,
           ),
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'دواتر',
-              style: GoogleFonts.poppins(
-                color: AppColors.getTextSubtitle(context),
-              ),
+              style: GoogleFonts.poppins(color: const Color(0xFF64748B)),
             ),
           ),
           ElevatedButton(
@@ -312,14 +352,14 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
+              backgroundColor: const Color(0xFF1D4ED8),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: Text(
               'چوونەژوورەوە',
-              style: GoogleFonts.poppins(color: Colors.white),
+              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -327,586 +367,1123 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
+  List<String> _getDoctorImages() {
+    List<String> list = [];
+    if (widget.image.isNotEmpty) {
+      list.add(widget.image);
+    }
+    // Add additional gallery photos if present in _doctorDetails or fallbacks
+    if (_doctorDetails != null && _doctorDetails!['gallery'] != null && (_doctorDetails!['gallery'] as List).isNotEmpty) {
+      for (var img in _doctorDetails!['gallery']) {
+        list.add(ApiClient.getImageUrl(img.toString()));
+      }
+    } else {
+      // Add tasteful fallback gallery images for carousel experience
+      list.addAll([
+        'assets/images/doctor1.png',
+        'assets/images/doctor2.png',
+      ]);
+    }
+    return list.toSet().toList(); // Unique
+  }
+
+  String _getDoctorName() {
+    if (_doctorDetails != null && _doctorDetails!['user'] != null && _doctorDetails!['user']['name'] != null) {
+      return _doctorDetails!['user']['name'];
+    }
+    return widget.name;
+  }
+
+  String _getDoctorSpecialty() {
+    final locale = context.locale.languageCode;
+    if (_doctorDetails != null) {
+      if (locale == 'en' && _doctorDetails!['specialty_en'] != null && _doctorDetails!['specialty_en'].toString().isNotEmpty) {
+        return _doctorDetails!['specialty_en'];
+      }
+      if (locale == 'ar' && _doctorDetails!['specialty_ar'] != null && _doctorDetails!['specialty_ar'].toString().isNotEmpty) {
+        return _doctorDetails!['specialty_ar'];
+      }
+      if (_doctorDetails!['specialty'] != null && _doctorDetails!['specialty'].toString().isNotEmpty) {
+        return _doctorDetails!['specialty'];
+      }
+    }
+    return widget.specialty;
+  }
+
+  String _getDoctorBio() {
+    final locale = context.locale.languageCode;
+    if (_doctorDetails != null) {
+      if (locale == 'en' && _doctorDetails!['bio_en'] != null && _doctorDetails!['bio_en'].toString().isNotEmpty) {
+        return _doctorDetails!['bio_en'];
+      }
+      if (locale == 'ar' && _doctorDetails!['bio_ar'] != null && _doctorDetails!['bio_ar'].toString().isNotEmpty) {
+        return _doctorDetails!['bio_ar'];
+      }
+      if (_doctorDetails!['bio'] != null && _doctorDetails!['bio'].toString().isNotEmpty) {
+        return _doctorDetails!['bio'];
+      }
+    }
+    return 'doctor_desc'.tr(args: [_getDoctorName(), _getDoctorSpecialty()]);
+  }
+
+  String _getCurrentPrice() {
+    if (_selectedServiceIndex != -1 && _services.isNotEmpty) {
+      final price = _services[_selectedServiceIndex]['price'];
+      if (price != null) return '\$$price';
+    }
+    if (_doctorDetails != null && _doctorDetails!['consultation_fee'] != null) {
+      return '\$${_doctorDetails!['consultation_fee']}';
+    }
+    return '\$15.00';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final doctorName = _getDoctorName();
+    final doctorSpecialty = _getDoctorSpecialty();
+    final doctorBio = _getDoctorBio();
+
     return Scaffold(
-      backgroundColor: AppColors.getBackground(context),
-      appBar: AppBar(
-        backgroundColor: AppColors.getSurface(context),
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'detail_doctor'.tr(), // Needs translation or fallback
-          style: GoogleFonts.poppins(
-            color: AppColors.getTextTitle(context),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 20,
-            color: AppColors.getTextTitle(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          Consumer<FavoriteProvider>(
-            builder: (context, favoriteProvider, child) {
-              final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
-              return IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Iconsax.heart,
-                  color: isFavorite
-                      ? const Color(0xFFEF4444)
-                      : AppColors.getTextTitle(context),
-                ),
-                onPressed: () {
-                  favoriteProvider.toggleFavorite({
-                    'id': widget.doctorId,
-                    'doctor': widget.name,
-                    'specialty': widget.specialty,
-                    'image': widget.image,
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        isFavorite
-                            ? 'Removed from favorites'
-                            : 'Added to favorites',
-                      ),
-                      backgroundColor: isFavorite
-                          ? Colors.red
-                          : const Color(0xFF10B981),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF1F5F9),
       body: Stack(
         children: [
-          SingleChildScrollView(
-            padding: const EdgeInsetsDirectional.only(bottom: 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Hero Image ──
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Hero(
-                    tag: widget.name,
-                    child: Container(
-                      width: double.infinity,
-                      height: 220, // Shorter height for a more beautiful look
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF), // Soft blue background
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
-                        child: Image.asset(
-                          widget.image,
-                          width: double.infinity,
-                          height: 220,
-                          fit: BoxFit.contain, // Prevents cropping
-                          alignment: Alignment.center,
+          CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              // ── Ultra Modern Flexible Hero Header (Curved Carousel) ──
+              SliverAppBar(
+                expandedHeight: 340,
+                pinned: true,
+                stretch: true,
+                backgroundColor: const Color(0xFFF1F5F9),
+                elevation: 0,
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ),
                     ),
                   ),
-                ).animate().slideY(begin: -0.1, end: 0).fadeIn(duration: 400.ms),
-
-                // ── Doctor Info Section ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.name,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.getTextTitle(context),
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.specialty,
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFF64748B),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Color(0xFFF59E0B),
-                              size: 16,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '4.9',
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFFD97706),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().slideY(begin: 0.1, end: 0).fadeIn(duration: 400.ms),
-
-                const SizedBox(height: 24),
-
-
-                // ── Video Section ──
-                if (_isLoadingDetails)
-                  const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()))
-                else if (_youtubeController != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: YoutubePlayer(
-                        controller: _youtubeController!,
-                      ),
-                    ),
-                  )
-                else if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: AspectRatio(
-                        aspectRatio: _videoPlayerController!.value.aspectRatio,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            VideoPlayer(_videoPlayerController!),
-                            VideoProgressIndicator(_videoPlayerController!, allowScrubbing: true),
-                            Center(
+                ),
+                actions: [
+                  Consumer<FavoriteProvider>(
+                    builder: (context, favoriteProvider, child) {
+                      final isFavorite = favoriteProvider.isFavorite(widget.doctorId);
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              color: Colors.black.withValues(alpha: 0.3),
                               child: IconButton(
                                 icon: Icon(
-                                  _videoPlayerController!.value.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
-                                  color: Colors.white,
-                                  size: 50,
+                                  isFavorite ? Icons.favorite_rounded : Iconsax.heart,
+                                  color: isFavorite ? const Color(0xFFEF4444) : Colors.white,
+                                  size: 20,
                                 ),
                                 onPressed: () {
-                                  setState(() {
-                                    _videoPlayerController!.value.isPlaying
-                                        ? _videoPlayerController!.pause()
-                                        : _videoPlayerController!.play();
+                                  favoriteProvider.toggleFavorite({
+                                    'id': widget.doctorId,
+                                    'doctor': doctorName,
+                                    'specialty': doctorSpecialty,
+                                    'image': widget.image,
                                   });
                                 },
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // ── About Section ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'about_doctor'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'doctor_desc'.tr(args: [widget.name, widget.specialty]),
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextSubtitle(context),
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate(delay: 200.ms).fadeIn().slideX(begin: 0.1, end: 0),
-
-                const SizedBox(height: 20),
-
-                // ── Reviews Section ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Iconsax.star_1,
-                            color: Color(0xFFF59E0B),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '4.9 (124 reviews)',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.getTextTitle(context),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DoctorReviewsScreen(
-                                doctorName: widget.name,
-                                rating: '4.9',
-                              ),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'see_all'.tr(),
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF3B82F6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate(delay: 250.ms).fadeIn(),
-
-                const SizedBox(height: 24),
-
-                // ── Services Section ──
-                if (_services.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      'جۆری سەردان (خزمەتگوزاری)',
-                      style: GoogleFonts.poppins(
-                        color: AppColors.getTextTitle(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 50,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _services.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        final isSelected = _selectedServiceIndex == index;
-                        final service = _services[index];
-                        // Try to get locale based name, fallback to ckb
-                        String name = service['name_ckb'] ?? '';
-                        final locale = context.locale.languageCode;
-                        if (locale == 'en') name = service['name_en'] ?? name;
-                        if (locale == 'ar') name = service['name_ar'] ?? name;
-                        
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedServiceIndex = index),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getSurface(context),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSelected
-                                    ? const Color(0xFF3B82F6)
-                                    : AppColors.getBorder(context),
-                              ),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF3B82F6).withOpacity(0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      )
-                                    ]
-                                  : null,
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              name,
-                              style: GoogleFonts.poppins(
-                                color: isSelected
-                                    ? Colors.white
-                                    : AppColors.getTextTitle(context),
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-                // ── Calendar Selection ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'select_date'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ).animate(delay: 300.ms).fadeIn(),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 76,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _dynamicDates.length,
-                    itemBuilder: (context, index) {
-                      if (_dynamicDates.isEmpty) {
-                         return Center(child: Text("ببوورە کات بەردەست نییە", style: TextStyle(color: Colors.red)));
-                      }
-                      final isSelected = _selectedDateIndex == index;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedDateIndex = index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 60,
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF3B82F6)
-                                : AppColors.getSurface(context),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getBorder(context),
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                _dynamicDates[index]['day'],
-                                style: GoogleFonts.poppins(
-                                  color: isSelected
-                                      ? Colors.white.withValues(alpha: 0.8)
-                                      : AppColors.getTextSubtitle(context),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _dynamicDates[index]['date'],
-                                style: GoogleFonts.poppins(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : AppColors.getTextTitle(context),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       );
                     },
                   ),
-                ).animate(delay: 400.ms).fadeIn().slideX(begin: 0.2, end: 0),
-
-                const SizedBox(height: 24),
-
-                // ── Time Slots ──
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'available_time'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+                  background: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(36),
+                      bottomRight: Radius.circular(36),
                     ),
-                  ),
-                ).animate(delay: 500.ms).fadeIn(),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: List.generate(_dynamicTimes.length, (index) {
-                      final isSelected = _selectedTimeIndex == index;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedTimeIndex = index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        // Carousel Image PageView
+                        Builder(
+                          builder: (context) {
+                            final images = _getDoctorImages();
+                            return Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                PageView.builder(
+                                  controller: _imagePageController,
+                                  itemCount: images.length,
+                                  onPageChanged: (idx) {
+                                    setState(() {
+                                      _currentImageIndex = idx;
+                                    });
+                                  },
+                                  itemBuilder: (context, idx) {
+                                    final img = images[idx];
+                                    return Hero(
+                                      tag: idx == 0 ? widget.name : 'doctor_img_$idx',
+                                      child: img.startsWith('http')
+                                          ? Image.network(img, fit: BoxFit.cover, alignment: Alignment.topCenter)
+                                          : Image.asset(img, fit: BoxFit.cover, alignment: Alignment.topCenter),
+                                    );
+                                  },
+                                ),
+                                // Carousel Indicator Dots Pill
+                                if (images.length > 1)
+                                  Positioned(
+                                    top: 55,
+                                    left: 0,
+                                    right: 0,
+                                    child: Center(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                            color: Colors.black.withValues(alpha: 0.3),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: List.generate(images.length, (idx) {
+                                                final isSelected = _currentImageIndex == idx;
+                                                return AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 300),
+                                                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                                                  width: isSelected ? 20 : 6,
+                                                  height: 6,
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.4),
+                                                    borderRadius: BorderRadius.circular(4),
+                                                  ),
+                                                );
+                                              }),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+                        // Vignette / Gradient Overlay
+                        Container(
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF3B82F6).withValues(alpha: 0.1)
-                                : AppColors.getSurface(context),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getBorder(context),
-                            ),
-                          ),
-                          child: Text(
-                            _dynamicTimes[index],
-                            style: GoogleFonts.poppins(
-                              color: isSelected
-                                  ? const Color(0xFF3B82F6)
-                                  : AppColors.getTextTitle(context),
-                              fontSize: 13,
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.45),
+                                Colors.transparent,
+                                Colors.black.withValues(alpha: 0.82),
+                              ],
+                              stops: const [0.0, 0.45, 1.0],
                             ),
                           ),
                         ),
-                      );
-                    }),
-                  ),
-                ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.1, end: 0),
-              ],
-            ),
-          ),
-
-          // ── Bottom Action Bar ──
-          PositionedDirectional(
-            bottom: 0,
-            start: 0,
-            end: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-              decoration: BoxDecoration(
-                color: AppColors.getSurface(context),
-                border: Border(
-                  top: BorderSide(
-                    color: AppColors.getBorder(context).withValues(alpha: 0.5),
+                        // Header Info Title overlay
+                        Positioned(
+                          bottom: 24,
+                          left: 20,
+                          right: 20,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      doctorName,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        shadows: [
+                                          Shadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 10),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF2563EB),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.check_rounded, color: Colors.white, size: 14),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                doctorSpecialty,
+                                style: GoogleFonts.poppins(
+                                  color: const Color(0xFF60A5FA),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+
+              // ── Main Body Content ──
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 160),
+                  child: Column(
                     children: [
-                      Text(
-                        'consultation_price'.tr(),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF64748B),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                      const SizedBox(height: 16),
+
+                      // ── Quick Info Stats Bar (Floating Pills) ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF64748B).withValues(alpha: 0.08),
+                                blurRadius: 20,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _buildStatItem(
+                                icon: Iconsax.star_1,
+                                iconColor: const Color(0xFFF59E0B),
+                                title: _doctorDetails?['rating']?.toString() ?? '4.9',
+                                subtitle: '124 reviews',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DoctorReviewsScreen(
+                                        doctorName: doctorName,
+                                        rating: '4.9',
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildDivider(),
+                              _buildStatItem(
+                                icon: Iconsax.award,
+                                iconColor: const Color(0xFF2563EB),
+                                title: '10+ Yrs',
+                                subtitle: 'Experience',
+                              ),
+                              _buildDivider(),
+                              _buildStatItem(
+                                icon: Iconsax.people,
+                                iconColor: const Color(0xFF10B981),
+                                title: '1.2k+',
+                                subtitle: 'Patients',
+                              ),
+                            ],
+                          ),
                         ),
+                      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+
+                      const SizedBox(height: 24),
+
+                      // ── Segmented Tab Switcher Bar (ناساندن / خزمەتگوزارییەکان) ──
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          height: 60,
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: const Color(0xFFE2E8F0),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // Tab 0: ناساندن
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _selectedTabIndex = 0),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 250),
+                                    curve: Curves.easeInOut,
+                                    decoration: BoxDecoration(
+                                      gradient: _selectedTabIndex == 0
+                                          ? const LinearGradient(
+                                              colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            )
+                                          : null,
+                                      color: _selectedTabIndex == 0 ? null : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: _selectedTabIndex == 0
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Iconsax.user_tag,
+                                          size: 20,
+                                          color: _selectedTabIndex == 0 ? Colors.white : const Color(0xFF64748B),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          'ناساندن',
+                                          style: GoogleFonts.poppins(
+                                            color: _selectedTabIndex == 0 ? Colors.white : const Color(0xFF64748B),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // Tab 1: خزمەتگوزارییەکان
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _selectedTabIndex = 1),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 250),
+                                    curve: Curves.easeInOut,
+                                    decoration: BoxDecoration(
+                                      gradient: _selectedTabIndex == 1
+                                          ? const LinearGradient(
+                                              colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            )
+                                          : null,
+                                      color: _selectedTabIndex == 1 ? null : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: _selectedTabIndex == 1
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Iconsax.health,
+                                          size: 20,
+                                          color: _selectedTabIndex == 1 ? Colors.white : const Color(0xFF64748B),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          'خزمەتگوزارییەکان',
+                                          style: GoogleFonts.poppins(
+                                            color: _selectedTabIndex == 1 ? Colors.white : const Color(0xFF64748B),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).animate().fadeIn(duration: 400.ms),
+
+                      const SizedBox(height: 20),
+
+                      // ── Tab 0: ناساندن (Intro Video & About Doctor) ──
+                      if (_selectedTabIndex == 0) ...[
+                        if (_isLoadingDetails && _doctorDetails == null) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Container(
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(color: Color(0xFF2563EB)),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          // Intro Video Player Card
+                          if (_youtubeController != null || (_videoPlayerController != null && _videoPlayerController!.value.isInitialized) || (_doctorDetails != null && _doctorDetails!['video_url'] != null && _doctorDetails!['video_url'].toString().isNotEmpty)) ...[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF2563EB).withValues(alpha: 0.08),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEFF6FF),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: const Icon(Iconsax.video_play, color: Color(0xFF2563EB), size: 20),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'ڤیدیۆی ناساندنی دکتۆر',
+                                          style: GoogleFonts.poppins(
+                                            color: const Color(0xFF0F172A),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 14),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: AspectRatio(
+                                        aspectRatio: 16 / 9,
+                                        child: _youtubeController != null
+                                            ? YoutubePlayer(controller: _youtubeController!)
+                                            : (_videoPlayerController != null && _videoPlayerController!.value.isInitialized)
+                                                ? Stack(
+                                                    alignment: Alignment.bottomCenter,
+                                                    children: [
+                                                      VideoPlayer(_videoPlayerController!),
+                                                      Positioned(
+                                                        bottom: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        child: VideoProgressIndicator(
+                                                          _videoPlayerController!,
+                                                          allowScrubbing: true,
+                                                          colors: const VideoProgressColors(
+                                                            playedColor: Color(0xFF2563EB),
+                                                            bufferedColor: Color(0xFF94A3B8),
+                                                            backgroundColor: Color(0xFFCBD5E1),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : const SizedBox.shrink(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ).animate().fadeIn(duration: 300.ms),
+                            const SizedBox(height: 20),
+                          ],
+
+                          // About Doctor Card
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF64748B).withValues(alpha: 0.06),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEFF6FF),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: const Icon(Iconsax.user_tag, color: Color(0xFF2563EB), size: 20),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Text(
+                                        'about_doctor'.tr(),
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF0F172A),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    doctorBio,
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF475569),
+                                      fontSize: 14,
+                                      height: 1.6,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ).animate().fadeIn(duration: 300.ms),
+                        ],
+                      ],
+
+                      // ── Tab 1: خزمەتگوزارییەکان (Services List) ──
+                      if (_selectedTabIndex == 1) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEFF6FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(Iconsax.health, color: Color(0xFF2563EB), size: 20),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'جۆری سەردان (خزمەتگوزاری)',
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF0F172A),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              _services.isEmpty
+                                  ? Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(20),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'هیچ خزمەتگوزارییەک لەم بەشەدا بەردەست نییە',
+                                          style: GoogleFonts.poppins(
+                                            color: const Color(0xFF64748B),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: _services.length,
+                                      separatorBuilder: (context, index) => const SizedBox(height: 12),
+                                      itemBuilder: (context, index) {
+                                        final isSelected = _selectedServiceIndex == index;
+                                        final service = _services[index];
+                                        final locale = context.locale.languageCode;
+                                        
+                                        String name = service['name_ckb'] ?? service['name'] ?? '';
+                                        if (locale == 'en' && service['name_en'] != null) name = service['name_en'];
+                                        if (locale == 'ar' && service['name_ar'] != null) name = service['name_ar'];
+
+                                        String desc = service['description_ckb'] ?? service['description'] ?? '';
+                                        if (locale == 'en' && service['description_en'] != null) desc = service['description_en'];
+                                        if (locale == 'ar' && service['description_ar'] != null) desc = service['description_ar'];
+
+                                        return GestureDetector(
+                                          onTap: () => setState(() => _selectedServiceIndex = index),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 250),
+                                            padding: const EdgeInsets.all(18),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                                                width: isSelected ? 2 : 1,
+                                              ),
+                                              boxShadow: isSelected
+                                                  ? [
+                                                      BoxShadow(
+                                                        color: const Color(0xFF2563EB).withValues(alpha: 0.14),
+                                                        blurRadius: 16,
+                                                        offset: const Offset(0, 6),
+                                                      )
+                                                    ]
+                                                  : [
+                                                      BoxShadow(
+                                                        color: const Color(0xFF64748B).withValues(alpha: 0.04),
+                                                        blurRadius: 10,
+                                                        offset: const Offset(0, 4),
+                                                      )
+                                                    ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                AnimatedContainer(
+                                                  duration: const Duration(milliseconds: 200),
+                                                  padding: const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF1F5F9),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: Icon(
+                                                    isSelected ? Icons.check_rounded : Iconsax.hospital,
+                                                    color: isSelected ? Colors.white : const Color(0xFF64748B),
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 14),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        name,
+                                                        style: GoogleFonts.poppins(
+                                                          color: const Color(0xFF0F172A),
+                                                          fontSize: 15,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      if (desc.isNotEmpty) ...[
+                                                        const SizedBox(height: 2),
+                                                        Text(
+                                                          desc,
+                                                          style: GoogleFonts.poppins(
+                                                            color: const Color(0xFF64748B),
+                                                            fontSize: 12,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFF8FAFC),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                  child: Text(
+                                                    '\$${service['price']}',
+                                                    style: GoogleFonts.poppins(
+                                                      color: isSelected ? Colors.white : const Color(0xFF2563EB),
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ],
+                          ),
+                        ).animate().fadeIn(duration: 300.ms),
+                        const SizedBox(height: 24),
+
+                        // ── Schedule Calendar Section ──
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEFF6FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(Iconsax.calendar_1, color: Color(0xFF2563EB), size: 20),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'select_date'.tr(),
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF0F172A),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              SizedBox(
+                                height: 90,
+                                child: _dynamicDates.isEmpty
+                                    ? Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFEF2F2),
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "ببوورە کاتی بەردەست دیاری نەکراوە",
+                                            style: GoogleFonts.poppins(color: const Color(0xFFEF4444), fontSize: 13, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemCount: _dynamicDates.length,
+                                        itemBuilder: (context, index) {
+                                          final isSelected = _selectedDateIndex == index;
+                                          final item = _dynamicDates[index];
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedDateIndex = index;
+                                                _updateDynamicTimes();
+                                              });
+                                            },
+                                            child: AnimatedContainer(
+                                              duration: const Duration(milliseconds: 250),
+                                              margin: const EdgeInsets.only(right: 10),
+                                              width: 72,
+                                              decoration: BoxDecoration(
+                                                color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+                                                borderRadius: BorderRadius.circular(22),
+                                                border: Border.all(
+                                                  color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                                                  width: isSelected ? 2 : 1,
+                                                ),
+                                                boxShadow: isSelected
+                                                    ? [
+                                                        BoxShadow(
+                                                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                                                          blurRadius: 12,
+                                                          offset: const Offset(0, 6),
+                                                        )
+                                                      ]
+                                                    : [
+                                                        BoxShadow(
+                                                          color: const Color(0xFF64748B).withValues(alpha: 0.04),
+                                                          blurRadius: 8,
+                                                          offset: const Offset(0, 4),
+                                                        )
+                                                      ],
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    item['day'],
+                                                    style: GoogleFonts.poppins(
+                                                      color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF64748B),
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    item['date'],
+                                                    style: GoogleFonts.poppins(
+                                                      color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    item['month'],
+                                                    style: GoogleFonts.poppins(
+                                                      color: isSelected ? Colors.white.withValues(alpha: 0.85) : const Color(0xFF94A3B8),
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ).animate(delay: 250.ms).fadeIn(),
+
+                        const SizedBox(height: 24),
+
+                        // ── Available Time Slots Section ──
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEFF6FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(Iconsax.clock, color: Color(0xFF2563EB), size: 20),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'available_time'.tr(),
+                                    style: GoogleFonts.poppins(
+                                      color: const Color(0xFF0F172A),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              _dynamicTimes.isEmpty
+                                  ? Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFEF2F2),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Text(
+                                        'تکایە کاتژمێری دیاریکراو لەم بەشەدا بەردەست نییە',
+                                        style: GoogleFonts.poppins(color: const Color(0xFF991B1B), fontSize: 13, fontWeight: FontWeight.w600),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  : Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: List.generate(_dynamicTimes.length, (index) {
+                                        final isSelected = _selectedTimeIndex == index;
+                                        return GestureDetector(
+                                          onTap: () => setState(() => _selectedTimeIndex = index),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 200),
+                                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? const Color(0xFF2563EB) : Colors.white,
+                                              borderRadius: BorderRadius.circular(16),
+                                              border: Border.all(
+                                                color: isSelected ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
+                                              ),
+                                              boxShadow: isSelected
+                                                  ? [
+                                                      BoxShadow(
+                                                        color: const Color(0xFF2563EB).withValues(alpha: 0.25),
+                                                        blurRadius: 10,
+                                                        offset: const Offset(0, 4),
+                                                      )
+                                                    ]
+                                                  : [
+                                                      BoxShadow(
+                                                        color: const Color(0xFF64748B).withValues(alpha: 0.03),
+                                                        blurRadius: 6,
+                                                        offset: const Offset(0, 2),
+                                                      )
+                                                    ],
+                                            ),
+                                            child: Text(
+                                              _dynamicTimes[index],
+                                              style: GoogleFonts.poppins(
+                                                color: isSelected ? Colors.white : const Color(0xFF0F172A),
+                                                fontSize: 14,
+                                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                            ],
+                          ),
+                        ).animate(delay: 300.ms).fadeIn(),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // ── Ultra Floating Bottom Action Bar ──
+          Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.6)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.12),
+                        blurRadius: 30,
+                        offset: const Offset(0, 10),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '\$15.00',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.getTextTitle(context),
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'consultation_price'.tr(),
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF64748B),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _getCurrentPrice(),
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF1D4ED8),
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: SizedBox(
+                          height: 54,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF2563EB).withValues(alpha: 0.35),
+                                  blurRadius: 14,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: (_selectedTimeIndex != -1 && !_isBooking)
+                                  ? _bookAppointment
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                disabledBackgroundColor: const Color(0xFF94A3B8).withValues(alpha: 0.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                              ),
+                              child: _isBooking
+                                  ? const SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      'book_appointment'.tr(),
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: SizedBox(
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: (_selectedTimeIndex != -1 && !_isBooking)
-                            ? _bookAppointment
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3B82F6),
-                          disabledBackgroundColor: const Color(
-                            0xFF3B82F6,
-                          ).withValues(alpha: 0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: _isBooking
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                'book_appointment'.tr(),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -915,5 +1492,55 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     );
   }
 
+  Widget _buildStatItem({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Column(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: iconColor, size: 18),
+                const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF0F172A),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: GoogleFonts.poppins(
+                color: const Color(0xFF64748B),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildDivider() {
+    return Container(
+      height: 28,
+      width: 1,
+      color: const Color(0xFFE2E8F0),
+    );
+  }
 }

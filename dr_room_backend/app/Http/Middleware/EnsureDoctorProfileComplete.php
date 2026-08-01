@@ -26,7 +26,7 @@ class EnsureDoctorProfileComplete
             }
 
             // Check if profile fields are filled
-            $isProfileComplete = $doctor->specialty && $doctor->bio && $doctor->consultation_fee !== null;
+            $isProfileComplete = $doctor->specialty && $doctor->bio ;
             
             // Check if they have at least one service and one schedule
             $hasServices = $doctor->services()->exists();

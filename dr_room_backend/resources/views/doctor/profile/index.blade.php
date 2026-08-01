@@ -23,6 +23,14 @@
     @csrf
     @method('PUT')
     
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-lg font-bold text-slate-800">زانیارییەکان</h3>
+        <button type="button" onclick="translateAll()" id="translateBtn" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors text-sm font-medium">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+            <span>وەرگێڕانی ئۆتۆماتیکی (Translate All)</span>
+        </button>
+    </div>
+
     <div class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Name -->
@@ -45,28 +53,57 @@
         @if($doctor)
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Specialty -->
-            <div>
-                <label for="specialty" class="block text-sm font-medium text-slate-700 mb-2">پسپۆڕی</label>
-                <input type="text" id="specialty" name="specialty" value="{{ old('specialty', $doctor->specialty) }}"
-                    class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
-                @error('specialty') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <div class="space-y-4">
+                <div>
+                    <label for="specialty" class="block text-sm font-medium text-slate-700 mb-2">پسپۆڕی (کوردی)</label>
+                    <input type="text" id="specialty" name="specialty" value="{{ old('specialty', $doctor->specialty) }}"
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                    @error('specialty') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="specialty_ar" class="block text-sm font-medium text-slate-700 mb-2">پسپۆڕی (عەرەبی)</label>
+                    <input type="text" id="specialty_ar" name="specialty_ar" value="{{ old('specialty_ar', $doctor->specialty_ar) }}" dir="rtl"
+                        class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
+                <div>
+                    <label for="specialty_en" class="block text-sm font-medium text-slate-700 mb-2">پسپۆڕی (ئینگلیزی)</label>
+                    <input type="text" id="specialty_en" name="specialty_en" value="{{ old('specialty_en', $doctor->specialty_en) }}" dir="ltr"
+                        class="w-full text-left px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                </div>
             </div>
 
-            <!-- Consultation Fee -->
+            <!-- Profile Image -->
             <div>
-                <label for="consultation_fee" class="block text-sm font-medium text-slate-700 mb-2">نرخی بینین ($)</label>
-                <input type="number" step="0.01" id="consultation_fee" name="consultation_fee" value="{{ old('consultation_fee', $doctor->consultation_fee) }}" dir="ltr"
-                    class="w-full text-right px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
-                @error('consultation_fee') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                <label for="image" class="block text-sm font-medium text-slate-700 mb-2">وێنەی پڕۆفایل</label>
+                <div class="flex items-center gap-4">
+                    @if($doctor->image_path)
+                        <img src="{{ $doctor->image_path }}" alt="Profile Image" class="w-16 h-16 rounded-full object-cover border border-slate-200">
+                    @endif
+                    <input type="file" id="image" name="image" accept="image/*"
+                        class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all">
+                </div>
+                @error('image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 
         <!-- Bio -->
-        <div>
-            <label for="bio" class="block text-sm font-medium text-slate-700 mb-2">کورتەیەک دەربارەی خۆت</label>
-            <textarea id="bio" name="bio" rows="4"
-                class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('bio', $doctor->bio) }}</textarea>
-            @error('bio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        <div class="space-y-4">
+            <div>
+                <label for="bio" class="block text-sm font-medium text-slate-700 mb-2">کورتەیەک دەربارەی خۆت (کوردی)</label>
+                <textarea id="bio" name="bio" rows="3"
+                    class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('bio', $doctor->bio) }}</textarea>
+                @error('bio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+            <div>
+                <label for="bio_ar" class="block text-sm font-medium text-slate-700 mb-2">کورتەیەک دەربارەی خۆت (عەرەبی)</label>
+                <textarea id="bio_ar" name="bio_ar" rows="3" dir="rtl"
+                    class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('bio_ar', $doctor->bio_ar) }}</textarea>
+            </div>
+            <div>
+                <label for="bio_en" class="block text-sm font-medium text-slate-700 mb-2">کورتەیەک دەربارەی خۆت (ئینگلیزی)</label>
+                <textarea id="bio_en" name="bio_en" rows="3" dir="ltr"
+                    class="w-full text-left px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('bio_en', $doctor->bio_en) }}</textarea>
+            </div>
         </div>
         
         <!-- Video Upload -->
@@ -118,6 +155,45 @@
 </form>
 
 <script>
+    async function translateAll() {
+        const btn = document.getElementById('translateBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>چاوەڕێبە...</span>';
+        btn.disabled = true;
+
+        const specialty = document.getElementById('specialty').value;
+        const bio = document.getElementById('bio').value;
+
+        try {
+            if (specialty) {
+                const res = await fetch(`/api/translate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                    body: JSON.stringify({text: specialty})
+                });
+                const data = await res.json();
+                document.getElementById('specialty_en').value = data.translations?.en || '';
+                document.getElementById('specialty_ar').value = data.translations?.ar || '';
+            }
+
+            if (bio) {
+                const res = await fetch(`/api/translate`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                    body: JSON.stringify({text: bio})
+                });
+                const data = await res.json();
+                document.getElementById('bio_en').value = data.translations?.en || '';
+                document.getElementById('bio_ar').value = data.translations?.ar || '';
+            }
+        } catch(e) {
+            alert('کێشەیەک ڕوویدا لە وەرگێڕان');
+        }
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+
     function toggleVideoInputs(type) {
         document.getElementById('youtube_input').style.display = type === 'youtube' ? 'block' : 'none';
         document.getElementById('upload_input').style.display = type === 'uploaded' ? 'block' : 'none';

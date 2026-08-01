@@ -24,8 +24,12 @@ class DoctorProfileController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'specialty' => 'nullable|string|max:255',
+            'specialty_en' => 'nullable|string|max:255',
+            'specialty_ar' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'consultation_fee' => 'nullable|numeric|min:0',
+            'bio_en' => 'nullable|string',
+            'bio_ar' => 'nullable|string',
+            'image' => 'nullable|image|max:5120',
             'video_type' => 'nullable|in:youtube,uploaded',
             'youtube_url' => 'nullable|url',
             'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:50000', // max 50MB
@@ -40,8 +44,12 @@ class DoctorProfileController extends Controller
             $updateData = [
                 'specialty' => $request->specialty,
                 'bio' => $request->bio,
-                'consultation_fee' => $request->consultation_fee,
             ];
+
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('doctor_images', 'public');
+                $updateData['image_path'] = '/storage/' . $path;
+            }
 
             if ($request->has('video_type')) {
                 $updateData['video_type'] = $request->video_type;
@@ -53,14 +61,23 @@ class DoctorProfileController extends Controller
                 }
             }
 
+            $updateData['specialty_en'] = $request->specialty_en;
+            $updateData['specialty_ar'] = $request->specialty_ar;
+            $updateData['bio_en'] = $request->bio_en;
+            $updateData['bio_ar'] = $request->bio_ar;
+            
             try {
                 $tr = new \Stichoza\GoogleTranslate\GoogleTranslate();
-                if ($request->specialty) {
+                if ($request->specialty && !$request->specialty_en) {
                     $updateData['specialty_en'] = $tr->setTarget('en')->translate($request->specialty);
+                }
+                if ($request->specialty && !$request->specialty_ar) {
                     $updateData['specialty_ar'] = $tr->setTarget('ar')->translate($request->specialty);
                 }
-                if ($request->bio) {
+                if ($request->bio && !$request->bio_en) {
                     $updateData['bio_en'] = $tr->setTarget('en')->translate($request->bio);
+                }
+                if ($request->bio && !$request->bio_ar) {
                     $updateData['bio_ar'] = $tr->setTarget('ar')->translate($request->bio);
                 }
             } catch (\Exception $e) {

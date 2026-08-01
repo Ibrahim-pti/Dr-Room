@@ -21,6 +21,19 @@ class ApiClient {
   static String get baseUrl => AppConfig.baseUrl;
   static String get storageUrl => AppConfig.storageUrl;
 
+  static String getImageUrl(String path) {
+    if (path.isEmpty) return '';
+    if (path.startsWith('http')) return path;
+    
+    final origin = AppConfig.baseUrl.replaceAll(RegExp(r'/api/?$'), '');
+    final cleanPath = path.startsWith('/') ? path : '/$path';
+    // Handle the case where path already contains /storage
+    if (cleanPath.startsWith('/storage')) {
+        return '$origin$cleanPath';
+    }
+    return '$origin/storage$cleanPath';
+  }
+
   /// Invoked when any request comes back 401 so the app can clear its session
   /// and send the user back to login. Wired up in main().
   static void Function()? onUnauthorized;

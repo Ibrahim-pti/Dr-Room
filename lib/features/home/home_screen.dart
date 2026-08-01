@@ -660,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ── Doctor List Card ──
                 Builder(
                   builder: (context) {
-                    final doctorsList = _topDoctors.length > 2 ? _topDoctors : _fallbackDoctors;
+                    final doctorsList = _topDoctors.isNotEmpty ? _topDoctors : _fallbackDoctors;
 
                     return SizedBox(
                       height: 220, // Smaller height
@@ -688,7 +688,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             fallbackImages[index % fallbackImages.length];
 
                         final image = (doc['image_path'] != null)
-                            ? '${ApiClient.storageUrl}/${doc['image_path']}'
+                            ? ApiClient.getImageUrl(doc['image_path'])
                             : fallbackImage;
                         final doctorId = doc['id'];
 
@@ -1257,7 +1257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 180,
                   child: Builder(
                     builder: (context) {
-                      final pharmaciesList = _topPharmacies.length > 2
+                      final pharmaciesList = _topPharmacies.isNotEmpty
                           ? _topPharmacies
                           : _fallbackPharmacies;
 
