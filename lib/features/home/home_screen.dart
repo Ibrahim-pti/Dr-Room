@@ -26,6 +26,7 @@ import '../records/medical_records_screen.dart';
 import '../emergency/sos_screen.dart';
 import '../lab/lab_details_screen.dart';
 import '../search/global_search_screen.dart';
+import '../../core/widgets/tinder_swipe_card.dart';
 
 import 'dart:convert';
 import '../../core/utils/api_client.dart';
@@ -539,24 +540,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         );
                                       },
                                       child: Container(
-                                        height: 60,
-                                        padding:
-                                            const EdgeInsetsDirectional.only(
-                                              start: 20,
-                                              end: 8,
-                                            ),
+                                        height: 56, // Slightly slimmer
+                                        padding: const EdgeInsetsDirectional.only(
+                                          start: 20,
+                                          end: 6,
+                                        ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.getSurface(context),
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(20),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.08,
-                                              ),
+                                              color: const Color(0xFF3B82F6).withValues(alpha: 0.05),
                                               blurRadius: 24,
-                                              offset: const Offset(0, 12),
+                                              offset: const Offset(0, 10),
                                             ),
                                           ],
                                         ),
@@ -564,45 +560,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             const Icon(
                                               Iconsax.search_normal_1,
-                                              color: Color(0xFF94A3B8),
-                                              size: 22,
+                                              color: Color(0xFF64748B),
+                                              size: 20,
                                             ),
                                             const SizedBox(width: 12),
                                             Text(
                                               'search_doctors'.tr(),
                                               style: GoogleFonts.poppins(
                                                 color: const Color(0xFF94A3B8),
-                                                fontSize: 15,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                             const Spacer(),
                                             Container(
-                                                  width: 44,
-                                                  height: 44,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                        color: Color(
-                                                          0xFF3B82F6,
-                                                        ),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                  child: Icon(
-                                                    Iconsax.microphone,
-                                                    color: AppColors.getSurface(
-                                                      context,
-                                                    ),
-                                                    size: 20,
-                                                  ),
-                                                )
-                                                .animate(
-                                                  onPlay: (controller) =>
-                                                      controller.repeat(),
-                                                )
-                                                .shimmer(
-                                                  duration: 2000.ms,
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.5),
-                                                ),
+                                              width: 44,
+                                              height: 44,
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF3B82F6).withValues(alpha: 0.08),
+                                                borderRadius: BorderRadius.circular(16),
+                                              ),
+                                              child: const Icon(
+                                                Iconsax.microphone,
+                                                color: Color(0xFF3B82F6),
+                                                size: 20,
+                                              ),
+                                            ).animate(onPlay: (controller) => controller.repeat())
+                                             .shimmer(
+                                                duration: 2500.ms,
+                                                color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
+                                             ),
                                           ],
                                         ),
                                       ),
@@ -1679,14 +1666,60 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AllSchedulesScreen()),
-          );
-        },
-        child: Container(
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
+              ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Iconsax.trash,
+                    color: Colors.redAccent,
+                    size: 32,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'appointment_cancelled'.tr(),
+                    style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          TinderSwipeCard(
+            onSwiped: () {
+              appointmentProvider.cancelAppointment(next.id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'appointment_cancelled'.tr(),
+                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
+                  ),
+                  backgroundColor: Colors.redAccent,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              );
+            },
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AllSchedulesScreen(),
+              ),
+            );
+          },
+          child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.getSurface(context),
@@ -1860,7 +1893,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-        ),
+            ),
+          ),
+          ),
+        ],
       ),
     ).animate().fadeIn(delay: 250.ms).slideY(begin: 0.1, end: 0);
   }
