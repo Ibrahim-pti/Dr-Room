@@ -19,6 +19,7 @@ class _TinderSwipeCardState extends State<TinderSwipeCard> with SingleTickerProv
   Offset _dragOffset = Offset.zero;
   double _angle = 0;
   bool _isDragging = false;
+  bool _isDismissed = false;
   
   @override
   void initState() {
@@ -90,6 +91,9 @@ class _TinderSwipeCardState extends State<TinderSwipeCard> with SingleTickerProv
     
     _controller.forward(from: 0).then((_) {
       if (mounted) {
+        setState(() {
+          _isDismissed = true;
+        });
         widget.onSwiped();
       }
     });
@@ -109,18 +113,24 @@ class _TinderSwipeCardState extends State<TinderSwipeCard> with SingleTickerProv
   
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanStart: _onPanStart,
-      onPanUpdate: _onPanUpdate,
-      onPanEnd: _onPanEnd,
-      child: Transform.translate(
-        offset: _dragOffset,
-        child: Transform.rotate(
-          angle: _angle,
-          alignment: Alignment.center,
-          child: widget.child,
-        ),
-      ),
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+      child: _isDismissed
+          ? const SizedBox(width: double.infinity, height: 0)
+          : GestureDetector(
+              onPanStart: _onPanStart,
+              onPanUpdate: _onPanUpdate,
+              onPanEnd: _onPanEnd,
+              child: Transform.translate(
+                offset: _dragOffset,
+                child: Transform.rotate(
+                  angle: _angle,
+                  alignment: Alignment.center,
+                  child: widget.child,
+                ),
+              ),
+            ),
     );
   }
 }

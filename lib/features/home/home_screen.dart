@@ -211,34 +211,48 @@ class _HomeScreenState extends State<HomeScreen> {
           Positioned(
             left: -40,
             bottom: 100,
-            child: Transform.rotate(
-              angle: -0.2,
-              child: const Icon(
-                Icons.local_hospital_outlined,
-                size: 200,
-                color: Colors.black,
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .fade(begin: 0.015, end: 0.025, duration: 6000.ms)
-             .moveX(begin: 0, end: 15, duration: 7000.ms, curve: Curves.easeInOut)
-             .rotate(begin: -0.03, end: 0.03, duration: 9000.ms),
+            child:
+                Transform.rotate(
+                      angle: -0.2,
+                      child: const Icon(
+                        Icons.local_hospital_outlined,
+                        size: 200,
+                        color: Colors.black,
+                      ),
+                    )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .fade(begin: 0.015, end: 0.025, duration: 6000.ms)
+                    .moveX(
+                      begin: 0,
+                      end: 15,
+                      duration: 7000.ms,
+                      curve: Curves.easeInOut,
+                    )
+                    .rotate(begin: -0.03, end: 0.03, duration: 9000.ms),
           ),
           Positioned(
             right: -20,
             bottom: 350,
-            child: Transform.rotate(
-              angle: 0.2,
-              child: const Icon(
-                Icons.healing_outlined,
-                size: 150,
-                color: Colors.black,
-              ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-             .fade(begin: 0.01, end: 0.02, duration: 5000.ms)
-             .moveX(begin: 0, end: -15, duration: 8000.ms, curve: Curves.easeInOut)
-             .rotate(begin: -0.02, end: 0.02, duration: 10000.ms),
+            child:
+                Transform.rotate(
+                      angle: 0.2,
+                      child: const Icon(
+                        Icons.healing_outlined,
+                        size: 150,
+                        color: Colors.black,
+                      ),
+                    )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .fade(begin: 0.01, end: 0.02, duration: 5000.ms)
+                    .moveX(
+                      begin: 0,
+                      end: -15,
+                      duration: 8000.ms,
+                      curve: Curves.easeInOut,
+                    )
+                    .rotate(begin: -0.02, end: 0.02, duration: 10000.ms),
           ),
-          
+
           // Scrollable Content
           RefreshIndicator(
             onRefresh: _fetchHomeData,
@@ -263,56 +277,92 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 280,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFF3B82F6), // Strong Blue
-                                Color(0xFF8BB5F8), // Lighter Blue
-                                Color(0xFFE2EAF8), // Fades to background
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0xFF3B82F6), // Strong Blue
+                                  Color(0xFF8BB5F8), // Lighter Blue
+                                  Color(0xFFE2EAF8), // Fades to background
+                                ],
+                                stops: [0.0, 0.7, 1.0],
+                              ),
+                            ),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                // Large Medical Icon (Right)
+                                Positioned(
+                                  right: -30,
+                                  top: -20,
+                                  child:
+                                      Transform.rotate(
+                                            angle: -0.2,
+                                            child: const Icon(
+                                              Icons.medical_services_outlined,
+                                              size: 180,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                          .animate(
+                                            onPlay: (c) =>
+                                                c.repeat(reverse: true),
+                                          )
+                                          .fade(
+                                            begin: 0.03,
+                                            end: 0.05,
+                                            duration: 4000.ms,
+                                          )
+                                          .moveX(
+                                            begin: 0,
+                                            end: -12,
+                                            duration: 5000.ms,
+                                            curve: Curves.easeInOut,
+                                          )
+                                          .rotate(
+                                            begin: -0.01,
+                                            end: 0.01,
+                                            duration: 7000.ms,
+                                          ),
+                                ),
+
+                                // Smaller Heart/Health Icon (Left)
+                                Positioned(
+                                  left: -20,
+                                  top: 80,
+                                  child:
+                                      Transform.rotate(
+                                            angle: 0.3,
+                                            child: const Icon(
+                                              Icons.monitor_heart_outlined,
+                                              size: 120,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                          .animate(
+                                            onPlay: (c) =>
+                                                c.repeat(reverse: true),
+                                          )
+                                          .fade(
+                                            begin: 0.02,
+                                            end: 0.04,
+                                            duration: 5000.ms,
+                                          )
+                                          .moveX(
+                                            begin: 0,
+                                            end: 12,
+                                            duration: 6000.ms,
+                                            curve: Curves.easeInOut,
+                                          )
+                                          .rotate(
+                                            begin: -0.02,
+                                            end: 0.02,
+                                            duration: 8000.ms,
+                                          ),
+                                ),
                               ],
-                              stops: [0.0, 0.7, 1.0],
                             ),
                           ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              // Large Medical Icon (Right)
-                              Positioned(
-                                right: -30,
-                                top: -20,
-                                child: Transform.rotate(
-                                  angle: -0.2,
-                                  child: const Icon(
-                                    Icons.medical_services_outlined,
-                                    size: 180,
-                                    color: Colors.white,
-                                  ),
-                                ).animate(onPlay: (c) => c.repeat(reverse: true))
-                                 .fade(begin: 0.03, end: 0.05, duration: 4000.ms)
-                                 .moveX(begin: 0, end: -12, duration: 5000.ms, curve: Curves.easeInOut)
-                                 .rotate(begin: -0.01, end: 0.01, duration: 7000.ms),
-                              ),
-                              
-                              // Smaller Heart/Health Icon (Left)
-                              Positioned(
-                                left: -20,
-                                top: 80,
-                                child: Transform.rotate(
-                                  angle: 0.3,
-                                  child: const Icon(
-                                    Icons.monitor_heart_outlined,
-                                    size: 120,
-                                    color: Colors.white,
-                                  ),
-                                ).animate(onPlay: (c) => c.repeat(reverse: true))
-                                 .fade(begin: 0.02, end: 0.04, duration: 5000.ms)
-                                 .moveX(begin: 0, end: 12, duration: 6000.ms, curve: Curves.easeInOut)
-                                 .rotate(begin: -0.02, end: 0.02, duration: 8000.ms),
-                              ),
-                            ],
-                          ),
-                        ),
                         ),
 
                         // Content over background
@@ -541,16 +591,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                       child: Container(
                                         height: 56, // Slightly slimmer
-                                        padding: const EdgeInsetsDirectional.only(
-                                          start: 20,
-                                          end: 6,
-                                        ),
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                              start: 20,
+                                              end: 6,
+                                            ),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: const Color(0xFF3B82F6).withValues(alpha: 0.05),
+                                              color: const Color(
+                                                0xFF3B82F6,
+                                              ).withValues(alpha: 0.05),
                                               blurRadius: 24,
                                               offset: const Offset(0, 10),
                                             ),
@@ -574,22 +629,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                             const Spacer(),
                                             Container(
-                                              width: 44,
-                                              height: 44,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xFF3B82F6).withValues(alpha: 0.08),
-                                                borderRadius: BorderRadius.circular(16),
-                                              ),
-                                              child: const Icon(
-                                                Iconsax.microphone,
-                                                color: Color(0xFF3B82F6),
-                                                size: 20,
-                                              ),
-                                            ).animate(onPlay: (controller) => controller.repeat())
-                                             .shimmer(
-                                                duration: 2500.ms,
-                                                color: const Color(0xFF3B82F6).withValues(alpha: 0.2),
-                                             ),
+                                                  width: 44,
+                                                  height: 44,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFF3B82F6,
+                                                    ).withValues(alpha: 0.08),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          16,
+                                                        ),
+                                                  ),
+                                                  child: const Icon(
+                                                    Iconsax.microphone,
+                                                    color: Color(0xFF3B82F6),
+                                                    size: 20,
+                                                  ),
+                                                )
+                                                .animate(
+                                                  onPlay: (controller) =>
+                                                      controller.repeat(),
+                                                )
+                                                .shimmer(
+                                                  duration: 2500.ms,
+                                                  color: const Color(
+                                                    0xFF3B82F6,
+                                                  ).withValues(alpha: 0.2),
+                                                ),
                                           ],
                                         ),
                                       ),
@@ -664,10 +730,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         .slideY(begin: 0.2, end: 0),
 
                     // ── Upcoming Appointment ──
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                     _buildUpcomingAppointmentCard(context),
-
-                    const SizedBox(height: 32),
 
                     // ── Top Doctors Header ──
                     Padding(
@@ -716,7 +780,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             : _fallbackDoctors;
 
                         return SizedBox(
-                          height: 220, // Smaller height
+                          height: 200, // Safely increased to prevent overflow
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -769,7 +833,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 145, // Smaller width
                                   margin: const EdgeInsetsDirectional.only(
                                     end: 14,
-                                    bottom: 12,
+                                    bottom: 4,
                                     top: 4,
                                   ),
                                   child: ClipRRect(
@@ -985,7 +1049,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 7),
 
                     // ── Top Labs Header ──
                     Padding(
@@ -1023,11 +1087,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ).animate().fadeIn(delay: 550.ms),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
                     // ── Top Labs Horizontal List ──
                     SizedBox(
-                      height: 180, // Even smaller height
+                      height: 185, // Safely increased to prevent overflow
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1074,7 +1138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 170, // Even smaller width
                                   margin: const EdgeInsetsDirectional.only(
                                     end: 14,
-                                    bottom: 12,
+                                    bottom: 4,
                                     top: 4,
                                   ),
                                   child: ClipRRect(
@@ -1310,7 +1374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     // ── Top Pharmacies ──
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 4),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Row(
@@ -1345,9 +1409,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ).animate().fadeIn(delay: 600.ms),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     SizedBox(
-                      height: 180,
+                      height: 185, // Safely increased to prevent overflow
                       child: Builder(
                         builder: (context) {
                           final pharmaciesList = _topPharmacies.isNotEmpty
@@ -1401,7 +1465,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: 170,
                                   margin: const EdgeInsetsDirectional.only(
                                     end: 14,
-                                    bottom: 12,
+                                    bottom: 4,
                                     top: 4,
                                   ),
                                   child: ClipRRect(
@@ -1665,7 +1729,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final next = upcoming.first;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
       child: Stack(
         children: [
           Positioned.fill(
@@ -1673,21 +1737,22 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: Colors.redAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.redAccent.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: Colors.redAccent.withValues(alpha: 0.2),
+                ),
               ),
               alignment: Alignment.center,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Iconsax.trash,
-                    color: Colors.redAccent,
-                    size: 32,
-                  ),
+                  const Icon(Iconsax.trash, color: Colors.redAccent, size: 32),
                   const SizedBox(height: 8),
                   Text(
                     'appointment_cancelled'.tr(),
-                    style: GoogleFonts.poppins(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -1700,7 +1765,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 SnackBar(
                   content: Text(
                     'appointment_cancelled'.tr(),
-                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
                   ),
                   backgroundColor: Colors.redAccent,
                   behavior: SnackBarBehavior.floating,
@@ -1710,191 +1778,223 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AllSchedulesScreen(),
-              ),
-            );
-          },
-          child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppColors.getSurface(context),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // ── Header: Title & Status ──
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'upcoming_appointments'.tr(),
-                    style: GoogleFonts.poppins(
-                      color: AppColors.getTextTitle(context),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: next.status.color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      next.status.kurdiName, // Kurdish translation for status
-                      style: GoogleFonts.poppins(
-                        color: next.status.color,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
+            child:
+                GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AllSchedulesScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: AppColors.getSurface(context),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: const Color(
+                              0xFF3B82F6,
+                            ).withValues(alpha: 0.15),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            // ── Header: Title & Status ──
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'upcoming_appointments'.tr(),
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.getTextTitle(context),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: next.status.color.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    next
+                                        .status
+                                        .kurdiName, // Kurdish translation for status
+                                    style: GoogleFonts.poppins(
+                                      color: next.status.color,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // ── Doctor Info ──
+                            Row(
+                              children: [
+                                Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: const Color(
+                                      0xFF3B82F6,
+                                    ).withValues(alpha: 0.1),
+                                    image: next.doctorImageUrl != null
+                                        ? DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                              next.doctorImageUrl!,
+                                            ),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: next.doctorImageUrl == null
+                                      ? const Icon(
+                                          Iconsax.user,
+                                          color: Color(0xFF3B82F6),
+                                        )
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        next.doctorName.isNotEmpty
+                                            ? next.doctorName
+                                            : 'Doctor',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextTitle(
+                                            context,
+                                          ),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        next.doctorSpecialty.isNotEmpty
+                                            ? next.doctorSpecialty
+                                            : 'پزیشکی گشتی',
+                                        style: GoogleFonts.poppins(
+                                          color: AppColors.getTextSubtitle(
+                                            context,
+                                          ),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFEFF6FF),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Iconsax.arrow_left_2, // Left arrow for RTL
+                                    color: Color(0xFF3B82F6),
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+                            const Divider(color: Color(0xFFF1F5F9), height: 1),
+                            const SizedBox(height: 16),
+
+                            // ── Date & Time (Moved down nicely) ──
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Iconsax.calendar_1,
+                                        color: Color(0xFF64748B),
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        next.formattedDate,
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF475569),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Iconsax.clock,
+                                        color: Color(0xFF64748B),
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        next.formattedTime,
+                                        style: GoogleFonts.poppins(
+                                          color: const Color(0xFF475569),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
+                    )
+                    .animate(onPlay: (c) => c.repeat())
+                    .shake(
+                      hz: 1.5,
+                      rotation: 0.015,
+                      curve: Curves.easeInOutSine,
+                      delay: 3500.ms,
+                      duration: 1200.ms,
+                    )
+                    .moveX(
+                      begin: -4,
+                      end: 4,
+                      curve: Curves.easeInOutSine,
+                      delay: 3500.ms,
+                      duration: 1200.ms,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // ── Doctor Info ──
-              Row(
-                children: [
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
-                      image: next.doctorImageUrl != null
-                          ? DecorationImage(
-                              image: CachedNetworkImageProvider(
-                                next.doctorImageUrl!,
-                              ),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: next.doctorImageUrl == null
-                        ? const Icon(Iconsax.user, color: Color(0xFF3B82F6))
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          next.doctorName.isNotEmpty
-                              ? next.doctorName
-                              : 'Doctor',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.getTextTitle(context),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          next.doctorSpecialty.isNotEmpty
-                              ? next.doctorSpecialty
-                              : 'پزیشکی گشتی',
-                          style: GoogleFonts.poppins(
-                            color: AppColors.getTextSubtitle(context),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEFF6FF),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Iconsax.arrow_left_2, // Left arrow for RTL
-                      color: Color(0xFF3B82F6),
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-              const Divider(color: Color(0xFFF1F5F9), height: 1),
-              const SizedBox(height: 16),
-
-              // ── Date & Time (Moved down nicely) ──
-              Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Iconsax.calendar_1,
-                          color: Color(0xFF64748B),
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          next.formattedDate,
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF475569),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Iconsax.clock,
-                          color: Color(0xFF64748B),
-                          size: 18,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          next.formattedTime,
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF475569),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-            ),
-          ),
           ),
         ],
       ),
@@ -2231,7 +2331,11 @@ class OvalBottomBorderClipper extends CustomClipper<Path> {
     final path = Path();
     path.lineTo(0, size.height - 50);
     path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height - 50);
+      size.width / 2,
+      size.height,
+      size.width,
+      size.height - 50,
+    );
     path.lineTo(size.width, 0);
     path.close();
     return path;
