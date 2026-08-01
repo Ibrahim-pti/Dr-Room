@@ -714,6 +714,20 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               itemBuilder: (context, index) => Image(
                 image: _imageProvider(images[index]),
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: AppColors.getSurfaceSecondary(context),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
                 errorBuilder: (_, _, _) => Container(
                   color: AppColors.primary,
                   child: const Icon(Iconsax.user, color: Colors.white, size: 44),
@@ -1225,7 +1239,30 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image(image: _imageProvider(_doctorImage), fit: BoxFit.cover),
+          Image(
+            image: _imageProvider(_doctorImage),
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                color: AppColors.getSurfaceSecondary(context),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (_, _, _) => Container(
+              color: AppColors.getSurfaceSecondary(context),
+              child: const Center(
+                child: Icon(Icons.image_not_supported_rounded, color: Colors.grey, size: 32),
+              ),
+            ),
+          ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
