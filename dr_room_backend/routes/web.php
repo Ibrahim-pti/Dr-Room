@@ -73,6 +73,8 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
     // Services
     Route::get('/services', [\App\Http\Controllers\Web\DoctorServiceController::class, 'index'])->name('doctor.services.index');
     Route::post('/services', [\App\Http\Controllers\Web\DoctorServiceController::class, 'store'])->name('doctor.services.store');
+    Route::put('/services/{id}', [\App\Http\Controllers\Web\DoctorServiceController::class, 'update'])->name('doctor.services.update');
+    Route::patch('/services/{id}/toggle', [\App\Http\Controllers\Web\DoctorServiceController::class, 'toggle'])->name('doctor.services.toggle');
     Route::delete('/services/{id}', [\App\Http\Controllers\Web\DoctorServiceController::class, 'destroy'])->name('doctor.services.destroy');
 
     // Schedules
@@ -80,50 +82,6 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
     Route::post('/schedules', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'store'])->name('doctor.schedules.store');
     Route::delete('/schedules/{id}', [\App\Http\Controllers\Web\DoctorScheduleController::class, 'destroy'])->name('doctor.schedules.destroy');
     
-    // New Feature Placeholders (Doctor)
-    $doctorPlaceholder = function ($title) {
-        return view('shared.placeholder', ['layout' => 'doctor.layouts.app', 'title' => $title]);
-    };
-    
-    // Patient sub-routes
-    Route::get('/patients/history', fn() => $doctorPlaceholder('مێژووی پزیشکی'))->name('doctor.patients.history');
-    Route::get('/patients/allergies', fn() => $doctorPlaceholder('هەستیارییەکان'))->name('doctor.patients.allergies');
-    Route::get('/patients/files', fn() => $doctorPlaceholder('فایلە پزیشکییەکان'))->name('doctor.patients.files');
-    
-    // Appointment sub-routes
-    Route::get('/appointments/history', fn() => $doctorPlaceholder('مێژووی چاوپێکەوتنەکان'))->name('doctor.appointments.history');
-    
-    // Consultations
-    Route::get('/consultation', fn() => $doctorPlaceholder('ڕاوێژکاری'))->name('doctor.consultation.index');
-    Route::get('/consultation/video', fn() => $doctorPlaceholder('ڕاوێژکاری ڤیدیۆیی'))->name('doctor.consultation.video');
-    Route::get('/consultation/voice', fn() => $doctorPlaceholder('ڕاوێژکاری دەنگی'))->name('doctor.consultation.voice');
-    Route::get('/consultation/chat', fn() => $doctorPlaceholder('چاتی ڕاستەوخۆ'))->name('doctor.consultation.chat');
-    
-    // Diagnosis
-    Route::get('/diagnosis', fn() => $doctorPlaceholder('دەستنیشانکردن'))->name('doctor.diagnosis.index');
-    Route::get('/diagnosis/create', fn() => $doctorPlaceholder('زیادکردنی دەستنیشانکردن'))->name('doctor.diagnosis.create');
-    Route::get('/diagnosis/plan', fn() => $doctorPlaceholder('پلانی چارەسەر'))->name('doctor.diagnosis.plan');
-    
-    // Laboratory
-    Route::get('/laboratory', fn() => $doctorPlaceholder('تاقیگە'))->name('doctor.laboratory.index');
-    Route::get('/laboratory/request', fn() => $doctorPlaceholder('داواکردنی پشکنین'))->name('doctor.laboratory.request');
-    Route::get('/laboratory/results', fn() => $doctorPlaceholder('ئەنجامەکانی پشکنین'))->name('doctor.laboratory.results');
-    
-    // Prescriptions
-    Route::get('/prescriptions', fn() => $doctorPlaceholder('ڕەچەتەکان'))->name('doctor.prescriptions.index');
-    Route::get('/prescriptions/create', fn() => $doctorPlaceholder('نووسینی ڕەچەتە'))->name('doctor.prescriptions.create');
-    Route::get('/prescriptions/history', fn() => $doctorPlaceholder('مێژووی ڕەچەتەکان'))->name('doctor.prescriptions.history');
-    
-    // Messages
-    Route::get('/messages', fn() => $doctorPlaceholder('نامەکان'))->name('doctor.messages.index');
-    Route::get('/messages/patients', fn() => $doctorPlaceholder('نامەی نەخۆشەکان'))->name('doctor.messages.patients');
-    Route::get('/messages/staff', fn() => $doctorPlaceholder('نامەی ستاف'))->name('doctor.messages.staff');
-    
-    // Notifications
-    Route::get('/notifications', fn() => $doctorPlaceholder('ئاگادارکردنەوەکان'))->name('doctor.notifications.index');
-    
-    // Settings
-    Route::get('/settings', fn() => $doctorPlaceholder('ڕێکخستنەکان'))->name('doctor.settings.index');
 });
 
 // Nurse Dashboard Routes

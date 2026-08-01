@@ -80,23 +80,7 @@
         .nav-item:hover { background: #f8fafc; color: #1e293b; }
         .nav-item.active { background: #eef2ff; color: #4f46e5; font-weight: 700; }
         .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
-        .nav-item .chevron { margin-right: auto; margin-left: 0; transition: transform 0.25s ease; }
-        .nav-item .chevron.open { transform: rotate(180deg); }
 
-        .nav-sub { padding-right: 44px; padding-left: 8px; overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
-        .nav-sub.open { max-height: 300px; }
-        .nav-sub a {
-            display: block;
-            padding: 8px 12px;
-            font-size: 0.82rem;
-            color: #94a3b8;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-        .nav-sub a:hover { color: #1e293b; background: #f8fafc; }
-        .nav-sub a.active { color: #4f46e5; font-weight: 700; }
 
         .nav-label {
             font-size: 0.7rem;
@@ -273,76 +257,16 @@
 
                 <div class="nav-label">بەڕێوەبردن</div>
 
-                <!-- Patients -->
-                <button class="nav-item" onclick="toggleNav('patients')">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    نەخۆشەکان
-                    <svg class="chevron" id="chevron-patients" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="nav-sub" id="sub-patients">
-                    <a href="{{ route('doctor.patients.index') }}" class="{{ request()->routeIs('doctor.patients.index') ? 'active' : '' }}">لیستی نەخۆشەکان</a>
-                    <a href="{{ route('doctor.patients.history') }}" class="{{ request()->routeIs('doctor.patients.history') ? 'active' : '' }}">مێژووی پزیشکی</a>
-                    <a href="{{ route('doctor.patients.allergies') }}" class="{{ request()->routeIs('doctor.patients.allergies') ? 'active' : '' }}">سەردانەکانی پێشوو</a>
-                    <a href="{{ route('doctor.patients.files') }}" class="{{ request()->routeIs('doctor.patients.files') ? 'active' : '' }}">فایلە پزیشکییەکان</a>
-                </div>
-
                 <!-- Appointments -->
-                <button class="nav-item" onclick="toggleNav('appointments')">
+                <a href="{{ route('doctor.appointments.index') }}" class="nav-item {{ request()->routeIs('doctor.appointments.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     چاوپێکەوتنەکان
-                    <svg class="chevron" id="chevron-appointments" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="nav-sub" id="sub-appointments">
-                    <a href="{{ route('doctor.appointments.index') }}" class="{{ request()->routeIs('doctor.appointments.index') ? 'active' : '' }}">بینینی چاوپێکەوتنەکان</a>
-                    <a href="{{ route('doctor.appointments.history') }}">مێژووی چاوپێکەوتنەکان</a>
-                </div>
-
-                <!-- Online Consultation -->
-                <button class="nav-item" onclick="toggleNav('online')">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    ڕاوێژی ئۆنلاین
-                    <svg class="chevron" id="chevron-online" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="nav-sub" id="sub-online">
-                    <a href="{{ route('doctor.consultation.video') }}">ڕاوێژی ڤیدیۆیی</a>
-                    <a href="{{ route('doctor.consultation.voice') }}">ڕاوێژی دەنگی</a>
-                    <a href="{{ route('doctor.consultation.chat') }}">چاتی ڕاستەوخۆ</a>
-                </div>
-
-                <!-- Diagnosis -->
-                <button class="nav-item" onclick="toggleNav('diagnosis')">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    دەستنیشانکردن و چارەسەر
-                    <svg class="chevron" id="chevron-diagnosis" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="nav-sub" id="sub-diagnosis">
-                    <a href="{{ route('doctor.diagnosis.create') }}">دروستکردنی دەستنیشانکردن</a>
-                    <a href="{{ route('doctor.diagnosis.plan') }}">پلانی چارەسەر</a>
-                </div>
-
-                <!-- Laboratory -->
-                <button class="nav-item" onclick="toggleNav('lab')">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                    تاقیگە
-                    <svg class="chevron" id="chevron-lab" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="nav-sub" id="sub-lab">
-                    <a href="{{ route('doctor.laboratory.request') }}">داواکردنی پشکنین</a>
-                    <a href="{{ route('doctor.laboratory.results') }}">بینینی ئەنجامەکان</a>
-                </div>
-
-                <div class="nav-label">تر</div>
-
-                <!-- Prescriptions -->
-                <a href="{{ route('doctor.prescriptions.index') }}" class="nav-item {{ request()->routeIs('doctor.prescriptions.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    ڕەچەتەکان
                 </a>
 
-                <!-- Messages -->
-                <a href="{{ route('doctor.messages.index') }}" class="nav-item {{ request()->routeIs('doctor.messages.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                    نامەکان
+                <!-- Patients -->
+                <a href="{{ route('doctor.patients.index') }}" class="nav-item {{ request()->routeIs('doctor.patients.*') ? 'active' : '' }}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    نەخۆشەکان
                 </a>
 
                 <!-- Earnings -->
@@ -351,12 +275,6 @@
                     داهات
                 </a>
 
-                <!-- Notifications -->
-                <a href="{{ route('doctor.notifications.index') }}" class="nav-item {{ request()->routeIs('doctor.notifications.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    ئاگادارکردنەوەکان
-                </a>
-                
                 @endif
 
                 <!-- Profile -->
@@ -382,12 +300,6 @@
                 <a href="{{ route('doctor.reviews.index') }}" class="nav-item {{ request()->routeIs('doctor.reviews.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                     هەڵسەنگاندنەکان
-                </a>
-
-                <!-- Settings -->
-                <a href="{{ route('doctor.settings.index') }}" class="nav-item {{ request()->routeIs('doctor.settings.*') ? 'active' : '' }}">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    ڕێکخستنەکان
                 </a>
                 @endif
             </nav>
@@ -455,44 +367,7 @@
                 document.getElementById('sidebarOverlay').classList.remove('show');
             }
 
-            let openMenu = null;
-            function toggleNav(name) {
-                const sub = document.getElementById('sub-' + name);
-                const chev = document.getElementById('chevron-' + name);
-                if (openMenu && openMenu !== name) {
-                    const prevSub = document.getElementById('sub-' + openMenu);
-                    const prevChev = document.getElementById('chevron-' + openMenu);
-                    if (prevSub) prevSub.classList.remove('open');
-                    if (prevChev) prevChev.classList.remove('open');
-                }
-                if (sub.classList.contains('open')) {
-                    sub.classList.remove('open');
-                    if (chev) chev.classList.remove('open');
-                    openMenu = null;
-                } else {
-                    sub.classList.add('open');
-                    if (chev) chev.classList.add('open');
-                    openMenu = name;
-                }
-            }
-
-            // Auto-open the active submenu
             document.addEventListener('DOMContentLoaded', function() {
-                const url = window.location.href.split('?')[0];
-                document.querySelectorAll('.nav-sub a').forEach(link => {
-                    if (link.href && link.href.split('?')[0] === url) {
-                        link.classList.add('active');
-                        const sub = link.closest('.nav-sub');
-                        if (sub) {
-                            sub.classList.add('open');
-                            const id = sub.id.replace('sub-', '');
-                            const chev = document.getElementById('chevron-' + id);
-                            if (chev) chev.classList.add('open');
-                            openMenu = id;
-                        }
-                    }
-                });
-
                 // Mobile logo
                 if (window.innerWidth < 1024) {
                     document.getElementById('mobileLogo').style.display = 'block';
