@@ -86,6 +86,27 @@
             </div>
         </div>
 
+        <!-- Experience & Fee -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="experience_years" class="block text-sm font-medium text-slate-700 mb-2">ساڵی ئەزموون</label>
+                <input type="number" id="experience_years" name="experience_years" min="0" max="70" dir="ltr"
+                    value="{{ old('experience_years', $doctor->experience_years) }}" placeholder="10"
+                    class="w-full text-right px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                <p class="text-xs text-slate-400 mt-1">لە ئەپەکەدا لە پڕۆفایلی تۆدا دەردەکەوێت.</p>
+                @error('experience_years') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label for="consultation_fee" class="block text-sm font-medium text-slate-700 mb-2">نرخی پشکنین (دینار)</label>
+                <input type="number" id="consultation_fee" name="consultation_fee" min="0" step="250" dir="ltr"
+                    value="{{ old('consultation_fee', $doctor->consultation_fee ? (int) $doctor->consultation_fee : '') }}" placeholder="25000"
+                    class="w-full text-right px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">
+                <p class="text-xs text-slate-400 mt-1">ئەگەر بەتاڵ بێت، نرخی خزمەتگوزارییەکان بەکاردێت.</p>
+                @error('consultation_fee') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
         <!-- Bio -->
         <div class="space-y-4">
             <div>

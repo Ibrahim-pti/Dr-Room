@@ -49,4 +49,22 @@ class Doctor extends Model
     {
         return $this->hasMany(DoctorSchedule::class);
     }
+
+    /** Patient reviews left for this doctor */
+    public function reviews()
+    {
+        return $this->hasMany(DoctorReview::class);
+    }
+
+    /**
+     * Recalculates the cached `rating` / `total_reviews` columns from the
+     * reviews table. Call after any review is created, changed or removed.
+     */
+    public function refreshRating(): void
+    {
+        $this->update([
+            'rating' => round((float) $this->reviews()->avg('rating'), 1),
+            'total_reviews' => $this->reviews()->count(),
+        ]);
+    }
 }

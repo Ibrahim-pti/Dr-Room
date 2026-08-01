@@ -32,6 +32,7 @@ Route::get('/articles', [AppController::class, 'articles']);
 Route::get('/notifications', [AppController::class, 'notifications']);
 Route::get('/doctors', [AppController::class, 'doctors']);
 Route::get('/doctors/{id}', [AppController::class, 'doctor']);
+Route::get('/doctors/{id}/reviews', [\App\Http\Controllers\Api\DoctorReviewController::class, 'index']);
 Route::get('/global-search', [GlobalSearchController::class, 'search']);
 
 // ─── GetBodySmart Medical Anatomy & Muscular System API ───────────
@@ -58,6 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/appointments', [AppointmentBookingController::class, 'index']);
     Route::post('/appointments', [AppointmentBookingController::class, 'store']);
     Route::delete('/appointments/{id}', [AppointmentBookingController::class, 'destroy']);
+
+    // ─── Patient: Doctor Reviews ────────────────────────────────────────────
+    Route::post('/doctors/{id}/reviews', [\App\Http\Controllers\Api\DoctorReviewController::class, 'store']);
 
     // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
     Route::get('/orders', [OrderController::class, 'index']);

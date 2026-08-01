@@ -29,6 +29,8 @@ class DoctorProfileController extends Controller
             'bio' => 'nullable|string',
             'bio_en' => 'nullable|string',
             'bio_ar' => 'nullable|string',
+            'experience_years' => 'nullable|integer|min:0|max:70',
+            'consultation_fee' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|max:5120',
             'video_type' => 'nullable|in:youtube,uploaded',
             'youtube_url' => 'nullable|url',
@@ -44,6 +46,8 @@ class DoctorProfileController extends Controller
             $updateData = [
                 'specialty' => $request->specialty,
                 'bio' => $request->bio,
+                'experience_years' => $request->filled('experience_years') ? $request->experience_years : null,
+                'consultation_fee' => $request->filled('consultation_fee') ? $request->consultation_fee : null,
             ];
 
             if ($request->hasFile('image')) {

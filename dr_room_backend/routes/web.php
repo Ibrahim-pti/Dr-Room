@@ -54,6 +54,9 @@ Route::prefix('doctor')->middleware(['auth', IsDoctor::class])->group(function (
         
         // Earnings
         Route::get('/earnings', [DoctorEarningsController::class, 'index'])->name('doctor.earnings.index');
+
+        // Reviews
+        Route::get('/reviews', [\App\Http\Controllers\Web\DoctorReviewController::class, 'index'])->name('doctor.reviews.index');
     });
     
     // Profile

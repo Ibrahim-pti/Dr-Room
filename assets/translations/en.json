@@ -467,5 +467,17 @@
   "mo_11": "Nov",
   "mo_12": "Dec",
   "am": "AM",
-  "pm": "PM"
+  "pm": "PM",
+  "reviews_ratings": "Ratings & reviews",
+  "based_on_reviews": "Based on {} reviews",
+  "rv_how_was": "How was your experience?",
+  "rv_rate": "Rate {}",
+  "rv_hint": "Write your review here...",
+  "rv_empty": "No reviews yet",
+  "rv_empty_sub": "Be the first to leave one.",
+  "rv_thanks": "Thanks for your review",
+  "rv_failed": "Couldn't send your review, please try again",
+  "rv_load_failed": "Couldn't load reviews",
+  "rv_patient": "A patient",
+  "rv_edit_note": "You already reviewed — sending again replaces it."
 }
