@@ -26,7 +26,8 @@ class DoctorScheduleController extends Controller
         $doctor = Auth::user()->doctor;
 
         $request->validate([
-            'day_of_week' => ['required', 'string', Rule::in(self::DAYS)],
+            'days' => ['required', 'array', 'min:1'],
+            'days.*' => ['string', Rule::in(self::DAYS)],
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'slot_minutes' => 'required|integer|min:5|max:180',
@@ -34,27 +35,32 @@ class DoctorScheduleController extends Controller
 
         $start = $request->start_time;
         $end = $request->end_time;
+        $createdCount = 0;
 
-        // Two shifts that overlap would generate the same slot twice, so the
-        // doctor is told to merge them instead.
-        $clash = $doctor->schedules()
-            ->where('day_of_week', $request->day_of_week)
-            ->where(fn ($q) => $q->where('start_time', '<', $end)
-                ->where('end_time', '>', $start))
-            ->exists();
+        foreach ($request->days as $day) {
+            // Check for clash on this specific day
+            $clash = $doctor->schedules()
+                ->where('day_of_week', $day)
+                ->where(fn ($q) => $q->where('start_time', '<', $end)
+                    ->where('end_time', '>', $start))
+                ->exists();
 
-        if ($clash) {
-            return back()->with('error', 'ئەم کاتە لەگەڵ کاتێکی تۆمارکراوی هەمان ڕۆژ تێکەڵ دەبێت.');
+            if (! $clash) {
+                $doctor->schedules()->create([
+                    'day_of_week' => $day,
+                    'start_time' => $start,
+                    'end_time' => $end,
+                    'slot_minutes' => $request->slot_minutes,
+                ]);
+                $createdCount++;
+            }
         }
 
-        $doctor->schedules()->create([
-            'day_of_week' => $request->day_of_week,
-            'start_time' => $start,
-            'end_time' => $end,
-            'slot_minutes' => $request->slot_minutes,
-        ]);
+        if ($createdCount === 0) {
+            return back()->with('error', 'ئەم کاتە لەگەڵ کاتێکی تر تێکەڵ دەبێت بۆ ڕۆژە دیاریکراوەکان.');
+        }
 
-        return back()->with('success', 'کاتی نوێ بە سەرکەوتوویی دیاریکرا.');
+        return back()->with('success', 'خشتەی کارکردن بە سەرکەوتوویی دیاریکرا.');
     }
 
     public function destroy($id)
