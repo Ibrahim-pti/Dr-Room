@@ -29,10 +29,6 @@ class DoctorDetailsScreen extends StatefulWidget {
   final String specialty;
   final String image;
 
-  /// The doctor row the previous screen already holds. `/doctors` returns the
-  /// full record — bio, rating, services, schedules — so handing it over lets
-  /// this screen paint complete on its first frame instead of showing a
-  /// skeleton while it re-fetches what the caller had all along.
   final Map<String, dynamic>? initialDoctor;
 
   const DoctorDetailsScreen({
@@ -176,7 +172,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   String get _doctorName {
     final locale = context.locale.languageCode;
     final localized = _doctor?['user']?['name_$locale']?.toString();
-    if (localized != null && localized.trim().isNotEmpty) return localized.trim();
+    if (localized != null && localized.trim().isNotEmpty)
+      return localized.trim();
     return _doctor?['user']?['name']?.toString() ?? widget.name;
   }
 
@@ -568,43 +565,49 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     if (_videoUrl != null) {
       sections
         ..add(const SizedBox(height: 22))
-        ..add(DoctorDetailsVideo(
-          videoStarted: _videoStarted,
-          videoController: _videoController,
-          youtubeController: _youtubeController,
-          onStartVideo: _startVideo,
-          imageProvider: _imageProvider,
-          doctorImage: _doctorImage,
-        ));
+        ..add(
+          DoctorDetailsVideo(
+            videoStarted: _videoStarted,
+            videoController: _videoController,
+            youtubeController: _youtubeController,
+            onStartVideo: _startVideo,
+            imageProvider: _imageProvider,
+            doctorImage: _doctorImage,
+          ),
+        );
     }
 
     sections
       ..add(const SizedBox(height: 24))
-      ..add(DoctorDetailsServices(
-        isDark: isDark,
-        services: _services,
-        selectedServiceId: _selectedServiceId,
-        onServiceSelected: (id) => setState(() => _selectedServiceId = id),
-        serviceName: _serviceName,
-        money: _money,
-      ))
+      ..add(
+        DoctorDetailsServices(
+          isDark: isDark,
+          services: _services,
+          selectedServiceId: _selectedServiceId,
+          onServiceSelected: (id) => setState(() => _selectedServiceId = id),
+          serviceName: _serviceName,
+          money: _money,
+        ),
+      )
       ..add(const SizedBox(height: 24))
-      ..add(DoctorDetailsSchedule(
-        isDark: isDark,
-        slotsLoading: _slotsLoading,
-        days: _days,
-        dayIndex: _dayIndex,
-        timeIndex: _timeIndex,
-        onDaySelected: (i) => setState(() {
-          _dayIndex = i;
-          _timeIndex = -1;
-        }),
-        onTimeSelected: (i) => setState(() => _timeIndex = i),
-        dayLabel: _dayLabel,
-        monthName: _monthName,
-        clock: _clock,
-        scheduleKey: _scheduleKey,
-      ));
+      ..add(
+        DoctorDetailsSchedule(
+          isDark: isDark,
+          slotsLoading: _slotsLoading,
+          days: _days,
+          dayIndex: _dayIndex,
+          timeIndex: _timeIndex,
+          onDaySelected: (i) => setState(() {
+            _dayIndex = i;
+            _timeIndex = -1;
+          }),
+          onTimeSelected: (i) => setState(() => _timeIndex = i),
+          dayLabel: _dayLabel,
+          monthName: _monthName,
+          clock: _clock,
+          scheduleKey: _scheduleKey,
+        ),
+      );
 
     var address = _doctor?['address_$locale']?.toString().trim();
     if (address == null || address.isEmpty) {
@@ -619,15 +622,17 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     if (_hasLocation || address.isNotEmpty || clinic.isNotEmpty) {
       sections
         ..add(const SizedBox(height: 24))
-        ..add(DoctorDetailsLocation(
-          isDark: isDark,
-          doctorId: widget.doctorId,
-          clinicName: clinic,
-          address: address,
-          latitude: _latitude,
-          longitude: _longitude,
-          onOpenInMaps: _openInMaps,
-        ));
+        ..add(
+          DoctorDetailsLocation(
+            isDark: isDark,
+            doctorId: widget.doctorId,
+            clinicName: clinic,
+            address: address,
+            latitude: _latitude,
+            longitude: _longitude,
+            onOpenInMaps: _openInMaps,
+          ),
+        );
     }
 
     return sections
