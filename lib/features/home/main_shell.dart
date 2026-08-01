@@ -83,7 +83,7 @@ class _MainShellState extends State<MainShell> {
                       _buildNavItem(0, Iconsax.home_2),
                       _buildNavItem(1, Icons.accessibility_new_rounded),
                       const SizedBox(width: 56),
-                      _buildNavItem(2, Iconsax.video_play),
+                      _buildNavItem(2, Iconsax.document_text),
                       _buildNavItem(3, Iconsax.user),
                     ],
                   ),
@@ -161,7 +161,7 @@ class _MainShellState extends State<MainShell> {
       case 1:
         return 'body_map'.tr();
       case 2:
-        return 'Reels'; // Or tr() if available
+        return 'medical_articles'.tr();
       case 3:
         return 'profile'.tr();
       default:
