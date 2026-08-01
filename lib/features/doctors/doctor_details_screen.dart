@@ -24,19 +24,24 @@ class _HeroCurveClipper extends CustomClipper<Path> {
   const _HeroCurveClipper();
 
   static const double _sideInset = 46;
-  static const double _dip = 40;
+  static const double _dip = 46;
+
+  /// Rounds off the points where the straight side edges meet the arc, so the
+  /// shape reads as a curve rather than a box with a bite taken out of it.
+  static const double _corner = 30;
 
   @override
   Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    final edge = h - _sideInset;
+
     return Path()
-      ..lineTo(0, size.height - _sideInset)
-      ..quadraticBezierTo(
-        size.width / 2,
-        size.height + _dip,
-        size.width,
-        size.height - _sideInset,
-      )
-      ..lineTo(size.width, 0)
+      ..lineTo(0, edge - _corner)
+      ..quadraticBezierTo(0, edge, _corner, edge)
+      ..quadraticBezierTo(w / 2, h + _dip, w - _corner, edge)
+      ..quadraticBezierTo(w, edge, w, edge - _corner)
+      ..lineTo(w, 0)
       ..close();
   }
 
@@ -76,7 +81,7 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  static const double _carouselHeight = 250;
+  static const double _carouselHeight = 316;
   // Carousel (which absorbs the status bar) + name + specialty pills.
   static const double _heroHeight = _carouselHeight + 102;
   static const int _slotMinutes = 30;
@@ -88,6 +93,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   bool _loading = true;
   bool _loadFailed = false;
+  bool _hasFreshData = false;
   bool _isBooking = false;
   bool _bioExpanded = false;
   bool _videoStarted = false;
@@ -126,7 +132,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final cached = prefs.getString('cached_doctor_details_${widget.doctorId}');
-      if (cached == null || cached.isEmpty || !mounted) return;
+      // The network call runs in parallel; if it already won, the cache is
+      // stale and applying it would flip the screen back to older data.
+      if (cached == null || cached.isEmpty || !mounted || _hasFreshData) return;
       _applyDoctor(jsonDecode(cached));
     } catch (_) {
       // A bad cache entry is not worth surfacing — the network call follows.
@@ -137,13 +145,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     try {
       final response = await ApiClient.get('/doctors/${widget.doctorId}');
       if (response.statusCode == 200) {
+        _hasFreshData = true;
+        if (mounted) _applyDoctor(jsonDecode(response.body));
+
+        // Painting comes first; writing the cache can finish afterwards.
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(
           'cached_doctor_details_${widget.doctorId}',
           response.body,
         );
-        if (!mounted) return;
-        _applyDoctor(jsonDecode(response.body));
         return;
       }
     } catch (_) {
@@ -706,7 +716,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 26,
+                bottom: 18,
                 child: Center(
                   child: AnimatedSmoothIndicator(
                     activeIndex: _heroPage,
