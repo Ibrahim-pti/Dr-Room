@@ -50,6 +50,104 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingArticles = true;
   List<dynamic> _articles = [];
 
+  final List<Map<String, dynamic>> _fallbackDoctors = [
+    {
+      'id': 101,
+      'user': {'name': 'د. ئارام عوسمان'},
+      'specialty': 'پسپۆڕی دڵ و بۆرییەکانی خوێن',
+      'rating': 4.9,
+      'total_reviews': 128,
+      'image_path': null,
+    },
+    {
+      'id': 102,
+      'user': {'name': 'د. ژینۆ ئەحمەد'},
+      'specialty': 'پسپۆڕی نەخۆشییەکانی منداڵان',
+      'rating': 4.8,
+      'total_reviews': 95,
+      'image_path': null,
+    },
+    {
+      'id': 103,
+      'user': {'name': 'د. سەرۆک عومەر'},
+      'specialty': 'پسپۆڕی ئێسک و جومگە',
+      'rating': 4.9,
+      'total_reviews': 142,
+      'image_path': null,
+    },
+    {
+      'id': 104,
+      'user': {'name': 'د. کاروان کامەران'},
+      'specialty': 'پسپۆڕی پێست و جوانکاری',
+      'rating': 4.7,
+      'total_reviews': 76,
+      'image_path': null,
+    },
+    {
+      'id': 105,
+      'user': {'name': 'د. ڕۆژان محەمەد'},
+      'specialty': 'پسپۆڕی ئافرەتان و منداڵبوون',
+      'rating': 4.9,
+      'total_reviews': 210,
+      'image_path': null,
+    },
+    {
+      'id': 106,
+      'user': {'name': 'د. هەورامان عەلی'},
+      'specialty': 'پسپۆڕی نەخۆشییەکانی چاو',
+      'rating': 4.8,
+      'total_reviews': 105,
+      'image_path': null,
+    },
+    {
+      'id': 107,
+      'user': {'name': 'د. نەبەز جەمال'},
+      'specialty': 'پسپۆڕی هەناوی و شەکرە',
+      'rating': 4.7,
+      'total_reviews': 88,
+      'image_path': null,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _fallbackPharmacies = [
+    {
+      'id': 201,
+      'name': 'دەرمانخانەی سۆران ناوەندی',
+      'city': 'هەولێر',
+      'time': '٢٤ کاتژمێر بەردەوام',
+      'rating': 4.9,
+      'delivery_fee': 1500.0,
+      'profile_image': null,
+    },
+    {
+      'id': 202,
+      'name': 'دەرمانخانەی بەختیاری',
+      'city': 'سلێمانی',
+      'time': '٨ بەیانی - ١٢ شەو',
+      'rating': 4.8,
+      'delivery_fee': 2000.0,
+      'profile_image': null,
+    },
+    {
+      'id': 203,
+      'name': 'دەرمانخانەی ئازادی',
+      'city': 'دهۆک',
+      'time': '٢٤ کاتژمێر',
+      'rating': 4.9,
+      'delivery_fee': 1500.0,
+      'profile_image': null,
+    },
+    {
+      'id': 204,
+      'name': 'دەرمانخانەی شاری پزیشکی',
+      'city': 'هەولێر',
+      'time': '٢٤ کاتژمێر',
+      'rating': 4.7,
+      'delivery_fee': 1000.0,
+      'profile_image': null,
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -560,37 +658,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
 
                 // ── Doctor List Card ──
-                if (_topDoctors.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(
-                      child: Text('No doctors available right now.'),
-                    ),
-                  )
-                else
-                  SizedBox(
-                    height: 220, // Smaller height
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      itemCount: _topDoctors.length,
-                      itemBuilder: (context, index) {
-                        final doc = _topDoctors[index];
-                        final name = doc['user'] != null
-                            ? doc['user']['name']
-                            : 'Doctor';
-                        final specialty = doc['specialty'] ?? 'Specialist';
-                        final rating = doc['rating']?.toString() ?? '4.8';
-                        final totalReviews = doc['total_reviews'] ?? 0;
-                        final reviews = '$totalReviews Reviews';
-                            
+                Builder(
+                  builder: (context) {
+                    final doctorsList = _topDoctors.length > 2 ? _topDoctors : _fallbackDoctors;
+
+                    return SizedBox(
+                      height: 220, // Smaller height
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        itemCount: doctorsList.length,
+                        itemBuilder: (context, index) {
+                          final doc = doctorsList[index];
+                          final name = doc['user'] != null
+                              ? doc['user']['name']
+                              : (doc['name'] ?? 'د. ئارام عوسمان');
+                          final specialty = doc['specialty'] ?? 'پسپۆڕی پزیشکی';
+                          final rating = doc['rating']?.toString() ?? '4.8';
+                          final totalReviews = doc['total_reviews'] ?? 45;
+                          final reviews = '$totalReviews هەڵسەنگاندن';
+
                         final fallbackImages = [
                           'assets/images/doctor1.png',
                           'assets/images/doctor2.png',
                           'assets/images/doctor3.png',
                           'assets/images/doctor.png',
                         ];
-                        final fallbackImage = fallbackImages[index % fallbackImages.length];
+                        final fallbackImage =
+                            fallbackImages[index % fallbackImages.length];
 
                         final image = (doc['image_path'] != null)
                             ? '${ApiClient.storageUrl}/${doc['image_path']}'
@@ -656,17 +751,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     color: const Color(
                                                       0xFFF8FAFC,
                                                     ),
-                                                    image: doc['image_path'] != null
-                                                    ? DecorationImage(
-                                                        image: NetworkImage(image),
-                                                        fit: BoxFit.cover,
-                                                        alignment: Alignment.topCenter,
-                                                      )
-                                                    : DecorationImage(
-                                                        image: AssetImage(image),
-                                                        fit: BoxFit.cover,
-                                                        alignment: Alignment.topCenter,
-                                                      ),
+                                                    image:
+                                                        doc['image_path'] !=
+                                                            null
+                                                        ? DecorationImage(
+                                                            image: NetworkImage(
+                                                              image,
+                                                            ),
+                                                            fit: BoxFit.cover,
+                                                            alignment: Alignment
+                                                                .topCenter,
+                                                          )
+                                                        : DecorationImage(
+                                                            image: AssetImage(
+                                                              image,
+                                                            ),
+                                                            fit: BoxFit.cover,
+                                                            alignment: Alignment
+                                                                .topCenter,
+                                                          ),
                                                   ),
                                                 ),
                                                 const SizedBox(height: 10),
@@ -807,9 +910,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             .slideX(begin: 0.1, end: 0);
                       },
                     ),
-                  ),
+                  );
+                },
+                ),
 
                 const SizedBox(height: 32),
+
 
                 // ── Top Labs Header ──
                 Padding(
@@ -1149,19 +1255,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                   height: 180,
-                  child: _topPharmacies.isEmpty
-                      ? const Center(child: Text('بەم زووانە...'))
-                      : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          itemCount: _topPharmacies.length,
-                          itemBuilder: (context, index) {
-                            final pharm = _topPharmacies[index];
-                            final name = pharm['name'] ?? 'دەرمانخانە';
-                            // We don't have city/time in DB yet, so placeholder:
-                            final city = 'Erbil';
-                            final time = '24 Hours';
-                            final profileImage = pharm['profile_image'];
+                  child: Builder(
+                    builder: (context) {
+                      final pharmaciesList = _topPharmacies.length > 2
+                          ? _topPharmacies
+                          : _fallbackPharmacies;
+
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        itemCount: pharmaciesList.length,
+                        itemBuilder: (context, index) {
+                          final pharm = pharmaciesList[index];
+                          final name = pharm['name'] ?? 'دەرمانخانەی سۆران';
+                          final city = pharm['city'] ?? 'هەولێر';
+                          final time = pharm['time'] ?? '٢٤ کاتژمێر';
+                          final profileImage = pharm['profile_image'];
 
                             return GestureDetector(
                               onTap: () {
@@ -1414,13 +1523,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                            ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
-                          },
-                        ),
+                              ).animate().fadeIn(delay: (650 + (index * 100)).ms).slideY(begin: 0.1, end: 0);
+                            },
+                          );
+                        },
+                      ),
                 ),
 
-                const SizedBox(height: 32),
-                _buildHealthArticlesSection(context),
               ],
             ),
           ),
@@ -1431,11 +1540,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildUpcomingAppointmentCard(BuildContext context) {
     final appointmentProvider = context.watch<AppointmentProvider>();
-    final upcoming = appointmentProvider.appointments
-        .where((a) =>
-            a.isUpcoming && a.status != AppointmentStatus.cancelled)
-        .toList()
-      ..sort((a, b) => a.appointmentDate.compareTo(b.appointmentDate));
+    final upcoming =
+        appointmentProvider.appointments
+            .where(
+              (a) => a.isUpcoming && a.status != AppointmentStatus.cancelled,
+            )
+            .toList()
+          ..sort((a, b) => a.appointmentDate.compareTo(b.appointmentDate));
 
     if (upcoming.isEmpty) return const SizedBox.shrink();
     final next = upcoming.first;
@@ -1454,7 +1565,9 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             color: AppColors.getSurface(context),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.15)),
+            border: Border.all(
+              color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
@@ -1500,7 +1613,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: next.status.color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
@@ -1545,119 +1661,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ).animate().fadeIn(delay: 250.ms).slideY(begin: 0.1, end: 0);
   }
 
-  Widget _buildHealthArticlesSection(BuildContext context) {
-    final langCode = context.locale.languageCode;
-    String translated(dynamic article, String field) {
-      if (langCode == 'en' && article['${field}_en'] != null) return article['${field}_en'];
-      if (langCode == 'ar' && article['${field}_ar'] != null) return article['${field}_ar'];
-      return article[field]?.toString() ?? '';
-    }
-
-    if (_isLoadingArticles) {
-      return const Padding(
-        padding: EdgeInsets.all(24),
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
-    if (_articles.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Text(
-            'articles'.tr(),
-            style: GoogleFonts.poppins(
-              color: AppColors.getTextTitle(context),
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 190,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: _articles.length,
-            itemBuilder: (context, index) {
-              final article = _articles[index];
-              final imagePath = article['image_path'];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ArticleDetailsScreen(article: article),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 200,
-                  margin: const EdgeInsetsDirectional.only(end: 14, bottom: 12, top: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.getSurface(context),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.getBorder(context)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                        child: Container(
-                          height: 90,
-                          width: double.infinity,
-                          color: const Color(0xFFEFF6FF),
-                          child: imagePath != null
-                              ? Image.network(
-                                  '${ApiClient.storageUrl}/$imagePath',
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(Iconsax.document_text, color: Color(0xFF3B82F6), size: 32),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              (article['category'] ?? 'ARTICLE').toString().toUpperCase(),
-                              style: GoogleFonts.poppins(
-                                color: const Color(0xFF3B82F6),
-                                fontSize: 9,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              translated(article, 'title'),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(
-                                color: AppColors.getTextTitle(context),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ).animate().fadeIn(delay: (100 * index).ms).slideX(begin: 0.1, end: 0);
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildCategoryGrid(BuildContext context) {
     return SingleChildScrollView(
