@@ -14,30 +14,43 @@ class AllDoctorsScreen extends StatefulWidget {
 }
 
 class _AllDoctorsScreenState extends State<AllDoctorsScreen> {
+  static List<dynamic>? _cachedDoctors;
+
   bool _isLoading = true;
   List<dynamic> _doctors = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchDoctors();
+    if (_cachedDoctors != null) {
+      _doctors = _cachedDoctors!;
+      _isLoading = false;
+      _fetchDoctors(background: true);
+    } else {
+      _fetchDoctors();
+    }
   }
 
-  Future<void> _fetchDoctors() async {
-    setState(() => _isLoading = true);
+  Future<void> _fetchDoctors({bool background = false}) async {
+    if (!background) {
+      setState(() => _isLoading = true);
+    }
     try {
       final response = await ApiClient.get('/doctors');
       if (response.statusCode == 200) {
         if (mounted) {
           setState(() {
             _doctors = jsonDecode(response.body);
+            _cachedDoctors = _doctors;
           });
         }
       }
     } catch (e) {
       debugPrint('Error fetching doctors: $e');
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -95,7 +108,10 @@ class _AllDoctorsScreenState extends State<AllDoctorsScreen> {
                                 doctorId: doctorId,
                                 name: name,
                                 specialty: specialty,
-                                image: image, // In real app, we need to pass a network image flag or handle NetworkImage
+                                image: image,
+                                // The list endpoint returns the full record;
+                                // passing it opens the details instantly.
+                                initialDoctor: Map<String, dynamic>.from(doc),
                               ),
                             ),
                           );

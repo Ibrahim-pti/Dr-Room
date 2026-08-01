@@ -107,12 +107,19 @@ class DoctorDetailsScreen extends StatefulWidget {
   final String specialty;
   final String image;
 
+  /// The doctor row the previous screen already holds. `/doctors` returns the
+  /// full record — bio, rating, services, schedules — so handing it over lets
+  /// this screen paint complete on its first frame instead of showing a
+  /// skeleton while it re-fetches what the caller had all along.
+  final Map<String, dynamic>? initialDoctor;
+
   const DoctorDetailsScreen({
     super.key,
     required this.doctorId,
     required this.name,
     required this.specialty,
     required this.image,
+    this.initialDoctor,
   });
 
   @override
@@ -131,7 +138,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   bool _loading = true;
   bool _loadFailed = false;
-  bool _hasFreshData = false;
   bool _isBooking = false;
   bool _bioExpanded = false;
   bool _videoStarted = false;
@@ -151,7 +157,18 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCached();
+
+    // Paint complete on frame one when the caller handed the record over.
+    // No await, no disk read — the data is already in memory.
+    final handedOver = widget.initialDoctor;
+    if (handedOver != null) {
+      _doctor = handedOver;
+      _loading = false;
+      _services = (handedOver['services'] as List?) ?? const [];
+      _selectedServiceId =
+          _services.isNotEmpty ? _asInt(_services.first['id']) : null;
+    }
+
     _fetchDoctor();
     _fetchAvailability();
   }
@@ -167,37 +184,19 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
   // ─────────────────────────── data ───────────────────────────
 
-  Future<void> _loadCached() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cached = prefs.getString('cached_doctor_details_${widget.doctorId}');
-      // The network call runs in parallel; if it already won, the cache is
-      // stale and applying it would flip the screen back to older data.
-      if (cached == null || cached.isEmpty || !mounted || _hasFreshData) return;
-      _applyDoctor(jsonDecode(cached));
-    } catch (_) {
-      // A bad cache entry is not worth surfacing — the network call follows.
-    }
-  }
-
+  /// Refreshes in the background. The screen is already on screen by now, so
+  /// this only fills in anything that changed since the list was loaded.
   Future<void> _fetchDoctor() async {
     try {
       final response = await ApiClient.get('/doctors/${widget.doctorId}');
       if (response.statusCode == 200) {
-        _hasFreshData = true;
         if (mounted) _applyDoctor(jsonDecode(response.body));
-
-        // Painting comes first; writing the cache can finish afterwards.
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(
-          'cached_doctor_details_${widget.doctorId}',
-          response.body,
-        );
         return;
       }
     } catch (_) {
       // Fall through to the failure state below.
     }
+    // Only a cold open with no handed-over record can end up with nothing.
     if (mounted && _doctor == null) {
       setState(() {
         _loading = false;
