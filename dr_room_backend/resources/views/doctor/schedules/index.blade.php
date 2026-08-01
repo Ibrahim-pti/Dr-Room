@@ -13,6 +13,12 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl font-medium">
+        {{ session('error') }}
+    </div>
+@endif
+
 <!-- Add New Schedule Form -->
 <form action="{{ route('doctor.schedules.store') }}" method="POST" class="bg-white rounded-2xl shadow-sm border border-slate-200/60 p-6 mb-8 max-w-3xl">
     @csrf
@@ -48,6 +54,20 @@
         </div>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div>
+            <label for="slot_minutes" class="block text-sm font-medium text-slate-700 mb-2">ماوەی هەر نۆرەیەک</label>
+            <select id="slot_minutes" name="slot_minutes" required
+                class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium text-slate-700">
+                @foreach([10, 15, 20, 30, 45, 60] as $minutes)
+                    <option value="{{ $minutes }}" {{ old('slot_minutes', 30) == $minutes ? 'selected' : '' }}>{{ $minutes }} خولەک</option>
+                @endforeach
+            </select>
+            <p class="text-xs text-slate-400 mt-1">کاتەکە بەم ماوەیە دابەش دەکرێت لە ئەپەکەدا.</p>
+            @error('slot_minutes') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+    </div>
+
     <div class="flex justify-end">
         <button type="submit" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30">
             زیادکردنی کات
@@ -63,6 +83,8 @@
                 <th class="py-4 px-6 border-b border-slate-200">ڕۆژ</th>
                 <th class="py-4 px-6 border-b border-slate-200">کاتی دەستپێکردن</th>
                 <th class="py-4 px-6 border-b border-slate-200">کاتی کۆتایهاتن</th>
+                <th class="py-4 px-6 border-b border-slate-200">ماوەی نۆرە</th>
+                <th class="py-4 px-6 border-b border-slate-200">ژمارەی نۆرە</th>
                 <th class="py-4 px-6 border-b border-slate-200">کردارەکان</th>
             </tr>
         </thead>
@@ -72,6 +94,13 @@
                 <td class="py-4 px-6 font-medium text-slate-800">{{ __('days.' . $schedule->day_of_week) ?? $schedule->day_of_week }}</td>
                 <td class="py-4 px-6 text-slate-600" dir="ltr">{{ \Carbon\Carbon::parse($schedule->start_time)->format('h:i A') }}</td>
                 <td class="py-4 px-6 text-slate-600" dir="ltr">{{ \Carbon\Carbon::parse($schedule->end_time)->format('h:i A') }}</td>
+                @php
+                    $slotLength = $schedule->slot_minutes ?: 30;
+                    $spanMinutes = \Carbon\Carbon::parse($schedule->start_time)
+                        ->diffInMinutes(\Carbon\Carbon::parse($schedule->end_time));
+                @endphp
+                <td class="py-4 px-6 text-slate-600">{{ $slotLength }} خولەک</td>
+                <td class="py-4 px-6 text-slate-600">{{ intdiv($spanMinutes, $slotLength) }} نۆرە</td>
                 <td class="py-4 px-6">
                     <form action="{{ route('doctor.schedules.destroy', $schedule->id) }}" method="POST" onsubmit="return confirm('دڵنیایت لە سڕینەوەی ئەم کاتە؟');">
                         @csrf

@@ -62,17 +62,43 @@ class _HeroCurveClipper extends CustomClipper<Path> {
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
-/// One bookable day, expanded from the doctor's weekly schedule.
-class _DaySlot {
-  final DateTime date;
-  final String startTime; // "HH:mm:ss"
-  final String endTime;
+/// One appointment time, exactly as the server generated it.
+class _Slot {
+  final DateTime dateTime;
+  final bool taken;
 
-  const _DaySlot({
-    required this.date,
-    required this.startTime,
-    required this.endTime,
-  });
+  const _Slot({required this.dateTime, required this.taken});
+}
+
+/// One bookable day. The server decides which days and slots exist — the app
+/// never derives its own grid, so the two can't drift apart.
+class _BookableDay {
+  final DateTime date;
+  final List<_Slot> slots;
+
+  const _BookableDay({required this.date, required this.slots});
+
+  static _BookableDay? fromJson(Map<String, dynamic> json) {
+    final date = DateTime.tryParse(json['date']?.toString() ?? '');
+    if (date == null) return null;
+
+    final slots = <_Slot>[];
+    for (final raw in (json['slots'] as List?) ?? const []) {
+      final parts = raw['time'].toString().split(':');
+      if (parts.length < 2) continue;
+      final hour = int.tryParse(parts[0]);
+      final minute = int.tryParse(parts[1]);
+      if (hour == null || minute == null) continue;
+
+      slots.add(
+        _Slot(
+          dateTime: DateTime(date.year, date.month, date.day, hour, minute),
+          taken: raw['taken'] == true,
+        ),
+      );
+    }
+    return _BookableDay(date: date, slots: slots);
+  }
 }
 
 class DoctorDetailsScreen extends StatefulWidget {
@@ -97,12 +123,11 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   static const double _carouselHeight = 258;
   // Carousel (which absorbs the status bar) + name + specialty pills.
   static const double _heroHeight = _carouselHeight + 80;
-  static const int _slotMinutes = 30;
 
   Map<String, dynamic>? _doctor;
   List<dynamic> _services = [];
-  List<_DaySlot> _days = [];
-  List<DateTime> _times = [];
+  List<_BookableDay> _days = [];
+  bool _slotsLoading = true;
 
   bool _loading = true;
   bool _loadFailed = false;
@@ -128,6 +153,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     super.initState();
     _loadCached();
     _fetchDoctor();
+    _fetchAvailability();
   }
 
   @override
@@ -187,80 +213,40 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       _loadFailed = false;
       _services = (data['services'] as List?) ?? const [];
       _selectedServiceId ??= _services.isNotEmpty ? _asInt(_services.first['id']) : null;
-      _days = _buildDays(data['schedules'] as List?);
-      if (_dayIndex >= _days.length) _dayIndex = 0;
-      _times = _buildTimes();
-      if (_timeIndex >= _times.length) _timeIndex = -1;
     });
     _startVideo();
   }
 
-  /// Projects the weekly schedule onto the next 30 calendar days, keeping only
-  /// days the doctor actually works and dropping today if it is already over.
-  List<_DaySlot> _buildDays(List? schedules) {
-    if (schedules == null || schedules.isEmpty) return const [];
-
-    const weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    final byDay = {for (final s in schedules) s['day_of_week'].toString(): s};
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final result = <_DaySlot>[];
-
-    for (var i = 0; i < 30; i++) {
-      final date = today.add(Duration(days: i));
-      final schedule = byDay[weekdays[date.weekday - 1]];
-      if (schedule == null) continue;
-
-      final day = _DaySlot(
-        date: date,
-        startTime: schedule['start_time'].toString(),
-        endTime: schedule['end_time'].toString(),
-      );
-      // Skip today when every slot has already passed.
-      if (i == 0 && _slotsFor(day).isEmpty) continue;
-      result.add(day);
+  /// The server owns slot generation — it knows the doctor's slot length and
+  /// which times are already booked, neither of which the app can infer.
+  Future<void> _fetchAvailability() async {
+    try {
+      final response =
+          await ApiClient.get('/doctors/${widget.doctorId}/availability');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final days = <_BookableDay>[];
+        for (final raw in (data['days'] as List?) ?? const []) {
+          final day = _BookableDay.fromJson(Map<String, dynamic>.from(raw));
+          if (day != null) days.add(day);
+        }
+        if (!mounted) return;
+        setState(() {
+          _days = days;
+          _slotsLoading = false;
+          if (_dayIndex >= _days.length) _dayIndex = 0;
+          _timeIndex = -1;
+        });
+        return;
+      }
+    } catch (_) {
+      // Falls through — the schedule section shows its empty state.
     }
-    return result;
+    if (mounted) setState(() => _slotsLoading = false);
   }
 
-  List<DateTime> _buildTimes() {
-    if (_days.isEmpty || _dayIndex >= _days.length) return const [];
-    return _slotsFor(_days[_dayIndex]);
-  }
-
-  /// Splits a day's opening hours into bookable slots, excluding past ones.
-  List<DateTime> _slotsFor(_DaySlot day) {
-    final start = _parseTime(day.date, day.startTime);
-    final end = _parseTime(day.date, day.endTime);
-    if (start == null || end == null || !end.isAfter(start)) return const [];
-
-    final now = DateTime.now();
-    final slots = <DateTime>[];
-    var cursor = start;
-    while (cursor.isBefore(end)) {
-      if (cursor.isAfter(now)) slots.add(cursor);
-      cursor = cursor.add(const Duration(minutes: _slotMinutes));
-    }
-    return slots;
-  }
-
-  DateTime? _parseTime(DateTime date, String raw) {
-    final parts = raw.split(':');
-    if (parts.length < 2) return null;
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-    if (hour == null || minute == null) return null;
-    return DateTime(date.year, date.month, date.day, hour, minute);
-  }
+  List<_Slot> get _slots =>
+      _days.isEmpty || _dayIndex >= _days.length ? const [] : _days[_dayIndex].slots;
 
   // ─────────────────────── value helpers ───────────────────────
 
@@ -330,8 +316,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     return _asDouble(_doctor?['consultation_fee']);
   }
 
-  DateTime? get _selectedDateTime =>
-      _timeIndex >= 0 && _timeIndex < _times.length ? _times[_timeIndex] : null;
+  DateTime? get _selectedDateTime => _timeIndex >= 0 && _timeIndex < _slots.length
+      ? _slots[_timeIndex].dateTime
+      : null;
 
   ImageProvider _imageProvider(String path) {
     if (path.isEmpty) return const AssetImage('assets/images/doctor.png');
@@ -405,6 +392,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     refreshSheet(() {});
 
     var booked = false;
+    var slotGone = false;
     try {
       final body = <String, dynamic>{
         'doctor_id': widget.doctorId,
@@ -415,6 +403,8 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
 
       final response = await ApiClient.post('/appointments', body: body);
       booked = response.statusCode == 200 || response.statusCode == 201;
+      // 409: someone else took this slot between loading and confirming.
+      slotGone = response.statusCode == 409;
     } catch (_) {
       booked = false;
     }
@@ -425,10 +415,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     if (booked) {
       Navigator.pop(context); // close the summary sheet
       _toast('dd_booked'.tr(), AppColors.success);
-      setState(() {
-        _timeIndex = -1;
-        _times = _buildTimes();
-      });
+      setState(() => _timeIndex = -1);
+      _fetchAvailability();
+    } else if (slotGone) {
+      Navigator.pop(context);
+      _toast('dd_slot_taken'.tr(), AppColors.warning);
+      _fetchAvailability();
     } else {
       refreshSheet(() {});
       _toast('dd_book_failed'.tr(), AppColors.error);
@@ -1379,7 +1371,12 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       children: [
         _sectionHeader(Iconsax.calendar_1, 'dd_schedule'.tr()),
         const SizedBox(height: 12),
-        if (_days.isEmpty)
+        if (_slotsLoading)
+          const SizedBox(
+            height: 84,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
+          )
+        else if (_days.isEmpty)
           _emptyBox('dd_no_days'.tr(), isDark)
         else ...[
           SizedBox(
@@ -1398,7 +1395,6 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                   onTap: () => setState(() {
                     _dayIndex = index;
                     _timeIndex = -1;
-                    _times = _buildTimes();
                   }),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -1468,16 +1464,23 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             ),
           ),
           const SizedBox(height: 18),
-          if (_times.isEmpty)
+          if (_slots.isEmpty)
             _emptyBox('dd_no_times'.tr(), isDark)
           else
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: List.generate(_times.length, (index) {
+              children: List.generate(_slots.length, (index) {
+                final slot = _slots[index];
                 final isSelected = _timeIndex == index;
+                // Taken slots stay visible but dead, so the patient can see
+                // how busy the doctor is rather than wondering what vanished.
+                final isTaken = slot.taken;
+
                 return GestureDetector(
-                  onTap: () => setState(() => _timeIndex = index),
+                  onTap: isTaken
+                      ? null
+                      : () => setState(() => _timeIndex = index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.symmetric(
@@ -1485,25 +1488,31 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
                       vertical: 12,
                     ),
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.getSurface(context),
+                      color: isTaken
+                          ? AppColors.getSurfaceSecondary(context)
+                          : isSelected
+                              ? AppColors.primary
+                              : AppColors.getSurface(context),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isSelected
+                        color: isSelected && !isTaken
                             ? AppColors.primary
                             : AppColors.getBorder(context),
                       ),
                     ),
                     child: Text(
-                      _clock(_times[index]),
+                      _clock(slot.dateTime),
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.getTextTitle(context),
+                            isSelected && !isTaken ? FontWeight.bold : FontWeight.w500,
+                        decoration: isTaken ? TextDecoration.lineThrough : null,
+                        decorationColor: AppColors.textLight,
+                        color: isTaken
+                            ? AppColors.textLight
+                            : isSelected
+                                ? Colors.white
+                                : AppColors.getTextTitle(context),
                       ),
                     ),
                   ),

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Doctor;
+use App\Services\AppointmentSlotService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +19,7 @@ class AppointmentBookingController extends Controller
      * POST /api/appointments
      * Book an appointment with a doctor.
      */
-    public function store(Request $request)
+    public function store(Request $request, AppointmentSlotService $slots)
     {
         $request->validate([
             'doctor_id'        => 'required|exists:doctors,id',
@@ -28,7 +30,17 @@ class AppointmentBookingController extends Controller
         ]);
 
         $doctor = Doctor::findOrFail($request->doctor_id);
-        
+        $when = Carbon::parse($request->appointment_date)->seconds(0);
+
+        // The client generates nothing on its own — the requested time has to
+        // be a slot this doctor actually offers, and still be free.
+        if (! $slots->isBookable($doctor, $when)) {
+            return response()->json([
+                'message' => 'This time is no longer available.',
+                'code'    => 'slot_unavailable',
+            ], 409);
+        }
+
         $fee = $doctor->consultation_fee;
         if ($request->filled('service_id')) {
             $service = \App\Models\DoctorService::where('id', $request->service_id)->where('doctor_id', $doctor->id)->first();
@@ -41,7 +53,7 @@ class AppointmentBookingController extends Controller
             'doctor_id'        => $request->doctor_id,
             'service_id'       => $request->service_id,
             'patient_id'       => Auth::id(),
-            'appointment_date' => $request->appointment_date,
+            'appointment_date' => $when,
             'type'             => $request->type ?? 'in_person',
             'notes'            => $request->notes,
             'fee'              => $fee,
@@ -52,6 +64,22 @@ class AppointmentBookingController extends Controller
             'message'     => 'Appointment booked successfully.',
             'appointment' => $appointment->load('doctor.user:id,name', 'patient:id,name'),
         ], 201);
+    }
+
+    /**
+     * GET /api/doctors/{id}/availability
+     *
+     * The bookable days and times, already stripped of past and taken slots.
+     * The app renders this verbatim rather than deriving its own grid.
+     */
+    public function availability($id, AppointmentSlotService $slots)
+    {
+        $doctor = Doctor::findOrFail($id);
+
+        return response()->json([
+            'horizon_days' => AppointmentSlotService::HORIZON_DAYS,
+            'days' => $slots->availability($doctor),
+        ]);
     }
 
     /**

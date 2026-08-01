@@ -482,5 +482,6 @@
   "rv_edit_note": "You already reviewed — sending again replaces it.",
   "dd_location": "Clinic location",
   "dd_open_maps": "Open in Maps",
-  "dd_no_address": "No address provided"
+  "dd_no_address": "No address provided",
+  "dd_slot_taken": "Sorry, that time was just taken. Please pick another."
 }
