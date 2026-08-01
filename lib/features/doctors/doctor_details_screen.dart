@@ -25,12 +25,12 @@ class _HeroCurveClipper extends CustomClipper<Path> {
   const _HeroCurveClipper();
 
   /// How far above the bottom the two side edges stop.
-  static const double _sideInset = 78;
+  static const double _sideInset = 58;
 
   /// Rounds off the three points of the V, so it reads as a soft chevron
   /// rather than a shape with knife edges.
-  static const double _sideCorner = 26;
-  static const double _tipCorner = 34;
+  static const double _sideCorner = 22;
+  static const double _tipCorner = 28;
 
   @override
   Path getClip(Size size) {
@@ -93,9 +93,9 @@ class DoctorDetailsScreen extends StatefulWidget {
 }
 
 class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
-  static const double _carouselHeight = 330;
+  static const double _carouselHeight = 258;
   // Carousel (which absorbs the status bar) + name + specialty pills.
-  static const double _heroHeight = _carouselHeight + 88;
+  static const double _heroHeight = _carouselHeight + 80;
   static const int _slotMinutes = 30;
 
   Map<String, dynamic>? _doctor;
@@ -664,7 +664,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
             overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               color: AppColors.getTextTitle(context),
-              fontSize: 21,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -737,7 +737,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 92,
+                bottom: 70,
                 child: Center(
                   child: AnimatedSmoothIndicator(
                     activeIndex: _heroPage,
@@ -911,17 +911,17 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
     final column = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 20, color: color),
-        const SizedBox(height: 6),
+        Icon(icon, size: 18, color: color),
+        const SizedBox(height: 4),
         Text(
           value,
           style: GoogleFonts.poppins(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: AppColors.getTextTitle(context),
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1022,7 +1022,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionHeader(Iconsax.profile_circle, 'about_doctor'.tr()),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         _card(
           isDark: isDark,
           child: Column(
@@ -1056,9 +1056,9 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               ],
               // Rating / experience / price share this card — they describe the
               // same doctor, so a second card between them was just a seam.
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Divider(height: 1, color: AppColors.getDivider(context)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _buildStatsRow(),
             ],
           ),
@@ -1717,15 +1717,15 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 34,
-          height: 34,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 17, color: AppColors.primary),
+          child: Icon(icon, size: 15, color: AppColors.primary),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1733,7 +1733,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
               Text(
                 title,
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.getTextTitle(context),
                 ),
@@ -1756,7 +1756,7 @@ class _DoctorDetailsScreenState extends State<DoctorDetailsScreen> {
   Widget _card({
     required bool isDark,
     required Widget child,
-    EdgeInsetsGeometry padding = const EdgeInsets.all(16),
+    EdgeInsetsGeometry padding = const EdgeInsets.all(14),
   }) {
     return Container(
       width: double.infinity,
