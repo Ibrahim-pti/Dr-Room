@@ -1,51 +1,135 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EmergencyReelItem extends StatefulWidget {
   final Map<String, dynamic> reelData;
 
-  const EmergencyReelItem({super.key, required this.reelData});
+  /// Whether this reel is the page currently on screen. Only the active reel
+  /// plays — otherwise off-screen pages keep playing audio in the background.
+  final bool isActive;
+
+  const EmergencyReelItem({
+    super.key,
+    required this.reelData,
+    this.isActive = true,
+  });
 
   @override
   State<EmergencyReelItem> createState() => _EmergencyReelItemState();
 }
 
 class _EmergencyReelItemState extends State<EmergencyReelItem> {
-  late VideoPlayerController _videoController;
+  VideoPlayerController? _videoController;
+  YoutubePlayerController? _youtubeController;
   bool _isInitialized = false;
+  bool _isPlaying = false;
+
+  bool get _isYoutube => widget.reelData['type'] == 'youtube';
 
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.networkUrl(
+    _isYoutube ? _initYoutube() : _initVideoFile();
+  }
+
+  void _initYoutube() {
+    _youtubeController = YoutubePlayerController.fromVideoId(
+      videoId: widget.reelData['youtube_id'],
+      autoPlay: widget.isActive,
+      params: const YoutubePlayerParams(
+        showControls: false,
+        showFullscreenButton: false,
+        showVideoAnnotations: false,
+        enableCaption: false,
+        strictRelatedVideos: true,
+        playsInline: true,
+        loop: true,
+        // Let taps and vertical swipes reach the PageView instead of the
+        // embedded web player.
+        pointerEvents: PointerEvents.none,
+      ),
+    );
+    _isInitialized = true;
+    _isPlaying = widget.isActive;
+  }
+
+  void _initVideoFile() {
+    final controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.reelData['video_url']),
-    )..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _isInitialized = true;
-          });
-          _videoController.setLooping(true);
-          _videoController.play();
-        }
-      });
+    );
+    _videoController = controller;
+    controller.initialize().then((_) {
+      if (!mounted) return;
+      setState(() => _isInitialized = true);
+      controller.setLooping(true);
+      if (widget.isActive) {
+        controller.play();
+        setState(() => _isPlaying = true);
+      }
+    });
   }
 
   @override
+  void didUpdateWidget(EmergencyReelItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive != oldWidget.isActive) {
+      widget.isActive ? _play() : _pause();
+    }
+  }
+
+  void _play() {
+    _youtubeController?.playVideo();
+    _videoController?.play();
+    if (mounted) setState(() => _isPlaying = true);
+  }
+
+  void _pause() {
+    _youtubeController?.pauseVideo();
+    _videoController?.pause();
+    if (mounted) setState(() => _isPlaying = false);
+  }
+
+  void _togglePlay() => _isPlaying ? _pause() : _play();
+
+  @override
   void dispose() {
-    _videoController.dispose();
+    _videoController?.dispose();
+    _youtubeController?.close();
     super.dispose();
   }
 
-  void _togglePlay() {
-    setState(() {
-      if (_videoController.value.isPlaying) {
-        _videoController.pause();
-      } else {
-        _videoController.play();
-      }
-    });
+  Widget _buildPlayer() {
+    if (!_isInitialized) {
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
+    }
+
+    if (_isYoutube) {
+      // Channel footage is landscape, so letterbox it rather than cropping
+      // away the demonstration.
+      return Center(
+        child: YoutubePlayer(
+          controller: _youtubeController!,
+          aspectRatio: 16 / 9,
+          enableFullScreenOnVerticalDrag: false,
+          autoFullScreen: false,
+        ),
+      );
+    }
+
+    final controller = _videoController!;
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: controller.value.size.width,
+          height: controller.value.size.height,
+          child: VideoPlayer(controller),
+        ),
+      ),
+    );
   }
 
   @override
@@ -56,20 +140,7 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
         fit: StackFit.expand,
         children: [
           // Video Player Background
-          _isInitialized
-              ? SizedBox.expand(
-                  child: FittedBox(
-                    fit: BoxFit.cover,
-                    child: SizedBox(
-                      width: _videoController.value.size.width,
-                      height: _videoController.value.size.height,
-                      child: VideoPlayer(_videoController),
-                    ),
-                  ),
-                )
-              : const Center(
-                  child: CircularProgressIndicator(color: Colors.white),
-                ),
+          _buildPlayer(),
 
           // Gradient Overlay to make text readable
           Container(
@@ -87,7 +158,7 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
           ),
 
           // Pause Icon Overlay (If paused)
-          if (_isInitialized && !_videoController.value.isPlaying)
+          if (_isInitialized && !_isPlaying)
             Center(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -136,7 +207,7 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Title
                 Text(
                   widget.reelData['title'] ?? 'Emergency Guide',
@@ -147,7 +218,7 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                
+
                 // Description
                 Text(
                   widget.reelData['description'] ?? '',
@@ -158,6 +229,20 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
+
+                // Source credit (required by the stock/channel licenses)
+                if ((widget.reelData['attribution'] ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.reelData['attribution'],
+                    style: GoogleFonts.poppins(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 10,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),
@@ -176,8 +261,10 @@ class _EmergencyReelItemState extends State<EmergencyReelItem> {
                 ),
                 const SizedBox(height: 24),
                 _buildActionButton(
-                  icon: Iconsax.message,
-                  label: '0',
+                  icon: widget.reelData['views'] != null
+                      ? Iconsax.eye
+                      : Iconsax.message,
+                  label: '${widget.reelData['views'] ?? 0}',
                   onTap: () {},
                 ),
                 const SizedBox(height: 24),

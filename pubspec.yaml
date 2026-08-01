@@ -38,6 +38,7 @@ dependencies:
   latlong2: ^0.10.1
   google_maps_flutter: ^2.18.0
   video_player: ^2.11.1
+  youtube_player_iframe: ^6.0.2
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,7 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
   final PageController _pageController = PageController();
   List<dynamic> _reels = [];
   bool _isLoading = true;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -73,8 +74,12 @@ class _EmergencyReelsScreenState extends State<EmergencyReelsScreen> {
         controller: _pageController,
         scrollDirection: Axis.vertical,
         itemCount: _reels.length,
+        onPageChanged: (index) => setState(() => _currentPage = index),
         itemBuilder: (context, index) {
-          return EmergencyReelItem(reelData: _reels[index]);
+          return EmergencyReelItem(
+            reelData: _reels[index],
+            isActive: index == _currentPage,
+          );
         },
       ),
     );
