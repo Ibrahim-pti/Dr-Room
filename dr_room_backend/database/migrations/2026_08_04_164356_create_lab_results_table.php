@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('lab_results', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('lab_id')->constrained('labs')->cascadeOnDelete();
+            $table->foreignId('patient_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('test_id')->nullable()->constrained('lab_tests')->nullOnDelete();
+            $table->string('result_value')->nullable();
+            $table->string('status')->default('pending'); // pending, completed
+            $table->string('file_path')->nullable();
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

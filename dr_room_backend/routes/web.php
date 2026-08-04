@@ -108,11 +108,8 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
         return view('shared.placeholder', ['layout' => 'nurse.layouts.app', 'title' => $title]);
     };
     
-    // Patient Care sub-routes
-    Route::get('/patients/symptoms', fn() => $nursePlaceholder('تۆمارکردنی نیشانەکان'))->name('nurse.patients.symptoms');
-    Route::get('/patients/monitoring', fn() => $nursePlaceholder('چاودێریکردنی نەخۆش'))->name('nurse.patients.monitoring');
-    Route::get('/patients/notes', fn() => $nursePlaceholder('تێبینی ڕۆژانە'))->name('nurse.patients.notes');
-    Route::get('/patients/medication', fn() => $nursePlaceholder('پێدانی دەرمان'))->name('nurse.patients.medication');
+    // Patient Care sub-routes (converted to resource)
+    Route::resource('/patient_cares', \App\Http\Controllers\Web\NursePatientCareController::class, ['as' => 'nurse']);
     
     // Appointments sub-routes
     Route::get('/appointments/confirm', fn() => $nursePlaceholder('دڵنیابوونەوە لە کات'))->name('nurse.appointments.confirm');
@@ -128,7 +125,7 @@ Route::prefix('nurse')->middleware(['auth', IsNurse::class])->group(function () 
     Route::get('/reports/progress', fn() => $nursePlaceholder('بەرەوپێشچوونی نەخۆش'))->name('nurse.reports.progress');
     
     // Profile sub-routes
-    Route::get('/profile/schedule', fn() => $nursePlaceholder('خشتەی کارکردن'))->name('nurse.profile.schedule');
+    Route::get('/profile/schedule', [\App\Http\Controllers\Web\NurseScheduleController::class, 'index'])->name('nurse.profile.schedule');
 });
 
 // Lab Dashboard Routes
@@ -144,29 +141,20 @@ Route::prefix('lab')->middleware(['auth', \App\Http\Middleware\IsLab::class])->g
         // Patients
         Route::get('/patients', [\App\Http\Controllers\Web\LabPatientController::class, 'index'])->name('lab.patients.index');
         
-        // New Feature Placeholders (Lab)
+        // Tests
+        Route::resource('/tests', \App\Http\Controllers\Web\LabTestController::class, ['as' => 'lab']);
+        
+        // Results
+        Route::resource('/results', \App\Http\Controllers\Web\LabResultController::class, ['as' => 'lab']);
+        
+        // Management
+        Route::get('/management/approve', [\App\Http\Controllers\Web\LabManagementController::class, 'approve'])->name('lab.management.approve');
+        Route::get('/management/complete', [\App\Http\Controllers\Web\LabManagementController::class, 'complete'])->name('lab.management.complete');
+        Route::patch('/management/{result}/status', [\App\Http\Controllers\Web\LabManagementController::class, 'updateStatus'])->name('lab.management.status');
+
         $labPlaceholder = function ($title) {
             return view('shared.placeholder', ['layout' => 'lab.layouts.app', 'title' => $title]);
         };
-        
-        // Tests
-        Route::get('/tests', fn() => $labPlaceholder('پشکنینەکان'))->name('lab.tests.index');
-        Route::get('/tests/create', fn() => view('lab.tests.create'))->name('lab.tests.create');
-        Route::get('/test-types/create', fn() => view('lab.test-types.create'))->name('lab.test-types.create');
-        Route::get('/tests/blood', fn() => $labPlaceholder('پشکنینی خوێن'))->name('lab.tests.blood');
-        Route::get('/tests/urine', fn() => $labPlaceholder('پشکنینی میز'))->name('lab.tests.urine');
-        Route::get('/tests/hormone', fn() => $labPlaceholder('پشکنینی هۆرمۆن'))->name('lab.tests.hormone');
-        Route::get('/tests/other', fn() => $labPlaceholder('پشکنینەکانی تر'))->name('lab.tests.other');
-        
-        // Management
-        Route::get('/management/approve', fn() => $labPlaceholder('پەسەندکردنی پشکنین'))->name('lab.management.approve');
-        Route::get('/management/complete', fn() => $labPlaceholder('تەواوکردنی پشکنین'))->name('lab.management.complete');
-        
-        // Results
-        Route::get('/results', fn() => $labPlaceholder('ئەنجامەکان'))->name('lab.results.index');
-        Route::get('/results/add', fn() => $labPlaceholder('زیادکردنی ئەنجام'))->name('lab.results.add');
-        Route::get('/results/edit', fn() => $labPlaceholder('گۆڕانکاری لە ئەنجام'))->name('lab.results.edit');
-        Route::get('/results/upload', fn() => $labPlaceholder('بەرزکردنەوەی PDF'))->name('lab.results.upload');
         
         // Reports
         Route::get('/reports', fn() => $labPlaceholder('ڕاپۆرتەکان'))->name('lab.reports.index');
