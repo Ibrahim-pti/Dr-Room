@@ -71,6 +71,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
     Route::get('/orders', [OrderController::class, 'index']);
 
+    // ─── Patient: Lab and Nurse Records ─────────────────────────────────────
+    Route::get('/lab-results', [\App\Http\Controllers\Api\PatientRecordController::class, 'labResults']);
+    Route::get('/nurse-cares', [\App\Http\Controllers\Api\PatientRecordController::class, 'nurseCares']);
+
     // ─── Patient: AI Pill Scanner ───────────────────────────────────────────
     Route::post('/pills/identify', [\App\Http\Controllers\Api\PillIdentifierController::class, 'identify']);
 

@@ -116,18 +116,19 @@
                     <svg class="chevron" id="chevron-tests" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="nav-sub" id="sub-tests">
-                    <a href="{{ route('lab.tests.create') }}" style="color: #7c3aed; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f5f3ff;">
+                    <a href="{{ route('lab.results.create') }}" style="color: #7c3aed; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #f5f3ff;">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        تۆمارکردنی داواکاری
+                        تۆمارکردنی ئەنجام
                     </a>
-                    <a href="{{ route('lab.test-types.create') }}" style="color: #059669; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #ecfdf5;">
+                    <a href="{{ route('lab.tests.create') }}" style="color: #059669; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: #ecfdf5;">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         زیادکردنی جۆری پشکنین
                     </a>
-                    <a href="{{ route('lab.tests.blood') }}">پشکنینی خوێن</a>
-                    <a href="{{ route('lab.tests.urine') }}">پشکنینی میز</a>
-                    <a href="{{ route('lab.tests.hormone') }}">پشکنینی هۆرمۆن</a>
-                    <a href="{{ route('lab.tests.other') }}">پشکنینەکانی تر</a>
+                    <a href="{{ route('lab.tests.index') }}">هەموو پشکنینەکان</a>
+                    <a href="{{ route('lab.tests.index', ['type' => 'blood']) }}">پشکنینی خوێن</a>
+                    <a href="{{ route('lab.tests.index', ['type' => 'urine']) }}">پشکنینی میز</a>
+                    <a href="{{ route('lab.tests.index', ['type' => 'hormone']) }}">پشکنینی هۆرمۆن</a>
+                    <a href="{{ route('lab.tests.index', ['type' => 'other']) }}">پشکنینەکانی تر</a>
                 </div>
 
                 <button class="nav-item" onclick="toggleNav('management')">
@@ -147,9 +148,8 @@
                     <svg class="chevron" id="chevron-results" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="nav-sub" id="sub-results">
-                    <a href="{{ route('lab.results.add') }}">زیادکردنی ئەنجام</a>
-                    <a href="{{ route('lab.results.edit') }}">گۆڕانکاری</a>
-                    <a href="{{ route('lab.results.upload') }}">بەرزکردنەوەی PDF</a>
+                    <a href="{{ route('lab.results.create') }}">زیادکردنی ئەنجام</a>
+                    <a href="{{ route('lab.results.index') }}">بینینی ئەنجامەکان</a>
                 </div>
 
                 <div class="nav-label">تر</div>
