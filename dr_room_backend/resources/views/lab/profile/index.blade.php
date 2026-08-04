@@ -72,6 +72,7 @@
                     <label for="about_us" class="block text-sm font-medium text-slate-700 mb-2">دەربارەی تاقیگە (کوردی) <span class="text-red-500">*</span></label>
                     <textarea id="about_us" name="about_us" rows="2" required
                         class="w-full px-4 py-2.5 bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-700">{{ old('about_us', $lab?->about_us) }}</textarea>
+                    @error('about_us') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label for="about_us_ar" class="block text-sm font-medium text-slate-700 mb-2">دەربارەی تاقیگە (عەرەبی)</label>

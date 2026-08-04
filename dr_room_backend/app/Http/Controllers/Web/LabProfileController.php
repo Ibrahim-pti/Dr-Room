@@ -41,23 +41,23 @@ class LabProfileController extends Controller
             'phone' => $request->phone,
         ]);
 
-        if ($lab) {
-            $updateData = [
-                'phone' => $request->phone,
-                'about_us' => $request->about_us,
-                'about_us_en' => $request->about_us_en,
-                'about_us_ar' => $request->about_us_ar,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'home_sample_collection' => $request->has('home_sample_collection') ? true : false,
-            ];
+        $updateData = [
+            'phone' => $request->phone,
+            'about_us' => $request->about_us,
+            'about_us_en' => $request->about_us_en,
+            'about_us_ar' => $request->about_us_ar,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'home_sample_collection' => $request->has('home_sample_collection') ? true : false,
+        ];
 
-            if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('lab_images', 'public');
-                $updateData['image_path'] = '/storage/' . $path;
-            }
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('lab_images', 'public');
+            $updateData['image_path'] = '/storage/' . $path;
+        }
 
-            try {
+        try {
+            if (class_exists('\Stichoza\GoogleTranslate\GoogleTranslate')) {
                 $tr = new \Stichoza\GoogleTranslate\GoogleTranslate();
                 
                 if ($request->about_us && !$request->about_us_en) {
@@ -66,20 +66,17 @@ class LabProfileController extends Controller
                 if ($request->about_us && !$request->about_us_ar) {
                     $updateData['about_us_ar'] = $tr->setTarget('ar')->translate($request->about_us);
                 }
-                
-                if ($request->location && !$request->location_en) {
-                    $updateData['location_en'] = $tr->setTarget('en')->translate($request->location);
-                }
-                if ($request->location && !$request->location_ar) {
-                    $updateData['location_ar'] = $tr->setTarget('ar')->translate($request->location);
-                }
-            } catch (\Exception $e) {
-                // Translation failed, ignore
             }
-
-            $lab->update($updateData);
+        } catch (\Exception $e) {
+            // Translation failed, ignore
         }
 
-        return redirect()->route('lab.dashboard')->with('success', 'زانیارییەکانی پرۆفایل بە سەرکەوتوویی نوێکرانەوە.');
+        if ($lab) {
+            $lab->update($updateData);
+        } else {
+            $user->lab()->create($updateData);
+        }
+
+        return redirect()->back()->with('success', 'زانیارییەکانی پرۆفایل بە سەرکەوتوویی نوێکرانەوە.');
     }
 }
