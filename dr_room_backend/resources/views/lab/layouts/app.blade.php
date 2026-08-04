@@ -246,5 +246,7 @@
             <div style="width:100%;max-width:1200px;margin:0 auto;position:relative;z-index:1;">@yield('content')</div>
         </main>
     @endif
+    
+    @yield('scripts')
 </body>
 </html>

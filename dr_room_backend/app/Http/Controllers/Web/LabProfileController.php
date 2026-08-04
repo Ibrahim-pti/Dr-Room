@@ -25,14 +25,11 @@ class LabProfileController extends Controller
             'name_en' => 'nullable|string|max:255',
             'name_ar' => 'nullable|string|max:255',
             'phone' => 'required|string|max:20',
-            'license_number' => 'nullable|string|max:255',
-            'about_us' => 'nullable|string',
-            'about_us_en' => 'nullable|string',
-            'about_us_ar' => 'nullable|string',
-            'location' => 'nullable|string|max:500',
-            'location_en' => 'nullable|string|max:500',
-            'location_ar' => 'nullable|string|max:500',
-            'equipment_level' => 'nullable|string|max:255',
+            'about_us' => 'required|string|max:1000',
+            'about_us_en' => 'nullable|string|max:1000',
+            'about_us_ar' => 'nullable|string|max:1000',
+            'latitude' => 'nullable|string|max:50',
+            'longitude' => 'nullable|string|max:50',
             'home_sample_collection' => 'nullable|boolean',
             'image' => 'nullable|image|max:5120',
         ]);
@@ -47,14 +44,11 @@ class LabProfileController extends Controller
         if ($lab) {
             $updateData = [
                 'phone' => $request->phone,
-                'license_number' => $request->license_number,
                 'about_us' => $request->about_us,
                 'about_us_en' => $request->about_us_en,
                 'about_us_ar' => $request->about_us_ar,
-                'location' => $request->location,
-                'location_en' => $request->location_en,
-                'location_ar' => $request->location_ar,
-                'equipment_level' => $request->equipment_level,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude,
                 'home_sample_collection' => $request->has('home_sample_collection') ? true : false,
             ];
 

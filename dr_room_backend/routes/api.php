@@ -48,6 +48,10 @@ Route::get('/pharmacies', [\App\Http\Controllers\Api\PharmacyApiController::clas
 Route::get('/pharmacies/{id}/medications', [\App\Http\Controllers\Api\PharmacyApiController::class, 'medications']);
 Route::get('/pharmacies/{id}/offers', [\App\Http\Controllers\Api\PharmacyApiController::class, 'offers']);
 
+// ─── Lab Mobile App API ─────────────────────────────────────────────────
+Route::get('/labs', [\App\Http\Controllers\Api\LabApiController::class, 'index']);
+Route::get('/labs/{id}', [\App\Http\Controllers\Api\LabApiController::class, 'show']);
+
 // ─── Patient: Orders (Labs, Pharmacy, Nursing) ──────────────────────────
 Route::post('/orders', [OrderController::class, 'store']); // Moved outside for testing Without Login
 
